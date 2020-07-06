@@ -9,4 +9,4 @@ Dependencies:
 - MVPA Light
 - PsychToolbox
 - MATLAB Signal Processing Toolbox
-- Several functions (dependencies folder)
+- Several functions (see dependencies folder)
