@@ -8,4 +8,5 @@ Dependencies:
 - FieldTrip
 - MVPA Light
 - PsychToolbox
-- Several functions
+- MATLAB Signal Processing Toolbox
+- Several functions (dependencies folder)
