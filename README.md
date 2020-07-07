@@ -14,7 +14,7 @@ Dependencies:
 ## Table of contents
 [Installation](#installation)
 
-[Introductoin](#introduction)
+[Introduction](#introduction)
 
 ## Installation
 1. Download all files
