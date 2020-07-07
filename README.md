@@ -12,9 +12,9 @@ Dependencies:
 - [Several functions](dependencies)
 
 
-[Installation](#install-toolbox)
+[Installation](#installation)
 
-## Install Toolbox
+## Installation
 1. Download all files
-2. Unzip
+2. Unzip to preferred folder
 3. Run the function [setup_braintime](setup).
