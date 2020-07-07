@@ -2,7 +2,7 @@
 %%% used for choosing the most suitable brain time ICA component.
 %%% We will also try different parameters in the pipeline
 
-% Create template topography (saved in template folder)
+% Create template topography (saved in topography folder)
 load layout
 cfg.layout = layout;
 bt_templatetopo(cfg);
