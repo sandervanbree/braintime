@@ -78,7 +78,7 @@ if figopt == 1
     
     % Plot AC map
     subplot(2,2,2)
-    pcolor(timevec,timevec,ac);shading interp;title(['Autocorrelation map'])
+    pcolor(timevec,timevec,ac(1:numel(timevec),1:numel(timevec)));shading interp;title(['Autocorrelation map'])
     caxis([-max(max(abs(ac))) max(max(abs(ac)))])
     cb=colorbar;
     title(cb,'corr')
