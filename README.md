@@ -2,7 +2,7 @@
 
 ![btlogo](https://i.imgur.com/cjhrUnt.png)
 
-Warp clock time data to brain time and test for recurrence of mental representation. By *Sander van Bree, María Melcón, Maria Wimber & Simon Hanslmayr*.
+Warp electrophysiological data from (default) clock time to brain time and test for the recurrence of mental representations. By *Sander van Bree, María Melcón, Maria Wimber & Simon Hanslmayr*.
 
 Dependencies:
 - FieldTrip
