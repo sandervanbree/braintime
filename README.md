@@ -1,9 +1,8 @@
 # Brain Time Toolbox
-Warp clock time data to brain time and test for recurrence of mental representation.
 
 ![btlogo](https://i.imgur.com/cjhrUnt.png)
 
-By Sander van Bree, María Melcón, Maria Wimber & Simon Hanslmayr.
+Warp clock time data to brain time and test for recurrence of mental representation. By Sander van Bree, María Melcón, Maria Wimber & Simon Hanslmayr.
 
 Dependencies:
 - FieldTrip
@@ -15,5 +14,4 @@ Dependencies:
 
 [Installation](#install-toolbox)
 
-#install-toolbox
 Install by running the function setup/setup_braintime.
