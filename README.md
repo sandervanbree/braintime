@@ -15,5 +15,5 @@ Dependencies:
 
 [Installation](#Installation)
 
-#Installation
+#installation
 Install by running the function setup/setup_braintime.
