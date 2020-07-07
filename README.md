@@ -15,5 +15,5 @@ Dependencies:
 
 [Installation](#Installation)
 
-#installation
+#install-toolbox
 Install by running the function setup/setup_braintime.
