@@ -9,5 +9,6 @@ addpath(fullfile(braintime_path,'TGManalyze'));
 addpath(fullfile(braintime_path,'setup'));
 addpath(fullfile(braintime_path,'ica'));
 addpath(fullfile(braintime_path,'dependencies'));
+addpath(fullfile(braintime_path,'topography'));
 
-disp('All folders successfully added to path')
+disp('All folders added to path successfully. See tutorials to get started.')
