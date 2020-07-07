@@ -25,7 +25,7 @@ Option 1: Download
 
 Option 2: Git client or checkout with SVN
 
-Type
+Type:
 ```java
 git clone https://github.com/sandervanbree/braintime.git
 ```
