@@ -13,8 +13,11 @@ Dependencies:
 
 ## Table of contents
 [Installation](#installation)
+[Overview](#overview)
 
 ## Installation
 1. Download all files
 2. Unzip to preferred folder
 3. Run the function [setup_braintime](setup).
+
+## Introduction
