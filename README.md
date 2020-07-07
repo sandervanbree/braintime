@@ -27,7 +27,7 @@ Option 2: Git or checkout with SVN
 
 1. 
 ```java
-git clone https://github.com/treder/MVPA-Light.git
+git clone https://github.com/sandervanbree/braintime.git
 ```
 
 ## Introduction
