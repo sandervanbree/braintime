@@ -17,7 +17,7 @@ Dependencies:
 [Introduction](#introduction)
 
 ## Installation
-**Option 1:** Download
+**Option 1:** Download files
 
 1. Download ZIP on the top right of this page (green code button)
 2. Unzip to preferred folder
