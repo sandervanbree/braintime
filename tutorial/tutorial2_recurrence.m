@@ -41,7 +41,7 @@ mv_plot_2D(ct_TGM);title('Clock time TGM')
 %% Quantify TGM recurrence (compare clock and brain time)
 cfg = [];
 cfg.bt_struc        = bt_struc;      %specify so that information can be retrieved
-cfg.refdimension    = 'clocktime';   %quantify recurrence as a function of seconds in the data or the warped frequency
+cfg.refdimension    = 'braintime';   %quantify recurrence as a function of seconds in the data or the warped frequency
 cfg.figure          = 'yes';
 bt_quantTGM         = bt_quantifyTGM(cfg,bt_TGM); %do once for brain time
 ct_quantTGM         = bt_quantifyTGM(cfg,ct_TGM); %compare with clock time
