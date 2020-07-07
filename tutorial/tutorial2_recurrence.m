@@ -34,21 +34,24 @@ cfg_mv.k           = 5;         %number of folds
 
 % Plot results
 figure; subplot(1,2,1)
-mv_plot_2D(bt_TGM);
+mv_plot_2D(bt_TGM);title('Brain time TGM')
 subplot(1,2,2)
-mv_plot_2D(ct_TGM);
+mv_plot_2D(ct_TGM);title('Clock time TGM')
 
-%% Quantify TGM recurrence
+%% Quantify TGM recurrence (compare clock and brain time)
 cfg = [];
 cfg.bt_struc        = bt_struc;      %specify so that information can be retrieved
-cfg.refdimension    = 'braintime';   %quantify recurrence as a function of seconds in the data or the warped frequency
+cfg.refdimension    = 'clocktime';   %quantify recurrence as a function of seconds in the data or the warped frequency
 cfg.figure          = 'yes';
-bt_quantTGM         = bt_quantifyTGM(cfg,bt_TGM);
+bt_quantTGM         = bt_quantifyTGM(cfg,bt_TGM); %do once for brain time
+ct_quantTGM         = bt_quantifyTGM(cfg,ct_TGM); %compare with clock time
 
-%% Statistically test TGM recurrence
-cfg.permlevels      = 1;             %for data with multiple participants, two level.
-cfg.numperms1       = 20;            %number of permutations on the first level
-cfg.mvpacfg         = cfg_mv;        %input previous mvpa light config structure
-cfg.statsrange      = [1 20];        %range of tested recurrence rates
+%% Statistically test TGM recurrence (compare clock and brain time)
+cfg.permlevels      = 1;               %for data with multiple participants, two level.
+cfg.numperms1       = 10;              %number of permutations on the first level
+cfg.mvpacfg         = cfg_mv;          %input previous mvpa light config structure
+cfg.statsrange      = [1 20];          %range of tested recurrence rates
 cfg.clabel          = bt_struc.clabel;
-bt_statsTGM(cfg,bt_data,bt_quantTGM);
+bt_statsTGM(cfg,bt_data,bt_quantTGM);  %brain time results (significant)
+bt_statsTGM(cfg,ct_data,ct_quantTGM);  %clock time results (not significant)
+

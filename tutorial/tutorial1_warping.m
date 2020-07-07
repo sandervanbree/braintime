@@ -1,6 +1,6 @@
 %%% In tutorial 1 we will transform data from clock time (input) to
 %%% brain time (output). The tutorial loads two classes of 3 second
-%%% simulated data (-1s to 2s) with a 10 Hz recurring pattern.
+%%% simulated data (-1s to 2s) with a 8 Hz recurring pattern.
 %%% We will transform extract and transform the first second (0 to 1s)
 %%% of data after having applied basic preprocessing steps.
 %%% ct = clock time, bt = brain time
@@ -29,15 +29,15 @@ comp             = ft_componentanalysis(cfg ,ct_data);
 
 % Perform FFT over components to enable sorting by power and to enable phase extraction
 cfg = [];
-cfg.cutmethod    = 'cutartefact';    % 'cutartefact' or 'consistenttime' See "help bt_analyzecomps" or our paper for details
+cfg.cutmethod    = 'consistenttime';    % 'cutartefact' or 'consistenttime' See "help bt_analyzecomps" or our paper for details
 cfg.sortmethod   = 'maxpow';         % sort by power in frequency range of interest. Alternative: 'templatetopo' 
 cfg.mintime      = 0;                % start time of interest
 cfg.maxtime      = 1;                % end time of interest
 cfg.topcomp      = 10;               % number of components to be considered
 cfg.minfft       = 2;                % minimum frequency of FFT
 cfg.maxfft       = 30;               % maximum frequency of FFT
-cfg.minfoi       = 8;                % lowest frequency of interest
-cfg.maxfoi       = 12;               % highest frequency of interest
+cfg.minfoi       = 6;                % lowest frequency of interest
+cfg.maxfoi       = 10;               % highest frequency of interest
 [fft_comp]       = bt_analyzecomps(cfg,comp);
 
 % Designate component frequency as brain time
@@ -49,7 +49,7 @@ cfg.layoutfile   = layout;           % load template for topography plotting
 
 % Warp original clock time data to brain time
 cfg              = [];
-cfg.btsrate      = 256;              % determine sampling rate of bt data
+cfg.btsrate      = 128;              % determine sampling rate of bt data
 [bt_struc]        = bt_clocktobrain(cfg,ct_data,bt_comp);
 
 % Save results (required for tutorial 2)
