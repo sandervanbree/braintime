@@ -13,7 +13,7 @@ Dependencies:
 - Several functions (see dependencies folder)
 
 
-[Installation](#Installation)
+[Installation](#install-toolbox)
 
 #install-toolbox
 Install by running the function setup/setup_braintime.
