@@ -24,6 +24,7 @@ Option 1: Download
 3. Run the function [setup_braintime](setup).
 
 Option 2: Git client or checkout with SVN
+
 Type
 ```java
 git clone https://github.com/sandervanbree/braintime.git
