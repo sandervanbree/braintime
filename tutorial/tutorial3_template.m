@@ -1,6 +1,6 @@
 %%% In tutorial 3 we will make a template topography that can be 
-%%% used to select for choosing the most suitable brain time ICA component.
-%%% We will also use different parameters.
+%%% used for choosing the most suitable brain time ICA component.
+%%% We will also try different parameters in the pipeline
 
 % Create template topography (saved in template folder)
 load layout
