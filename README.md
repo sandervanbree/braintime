@@ -11,7 +11,7 @@ Dependencies:
 - MATLAB Signal Processing Toolbox
 - [Several functions](dependencies)
 
-
+## Table of contents
 [Installation](#installation)
 
 ## Installation
