@@ -19,7 +19,7 @@ Dependencies:
 ## Installation
 Option 1: Download
 
-1. Download ZIP in top right of this page (under code)
+1. Download ZIP on the top right of this page (green code button)
 2. Unzip to preferred folder
 3. Run the function [setup_braintime](setup).
 
