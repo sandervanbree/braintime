@@ -17,8 +17,17 @@ Dependencies:
 [Introduction](#introduction)
 
 ## Installation
-1. Download all files
+Option 1: Download
+
+1. Download ZIP in top right of this page (under code)
 2. Unzip to preferred folder
 3. Run the function [setup_braintime](setup).
+
+Option 2: Git or checkout with SVN
+
+1. 
+```java
+git clone https://github.com/treder/MVPA-Light.git
+```
 
 ## Introduction
