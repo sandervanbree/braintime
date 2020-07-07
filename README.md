@@ -4,7 +4,7 @@
 
 Warp clock time data to brain time and test for recurrence of mental representation. By Sander van Bree, María Melcón, Maria Wimber & Simon Hanslmayr.
 
-Dependencies:
+[my directory](setup):
 - FieldTrip
 - MVPA Light
 - PsychToolbox
