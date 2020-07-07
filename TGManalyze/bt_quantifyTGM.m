@@ -77,9 +77,16 @@ if figopt == 1
     end
     
     % Plot AC map
+    % Detect appropriate color range by zscoring  
+    mn_ac=median(ac(:));
+    sd_ac=std(ac(:));
+    ac_z=(ac-mn_ac)/sd_ac;
+    indx = (abs(ac_z)<5); %filter to include only z-scores under 5
+    clim = max(ac(indx)); %take the max number as clim for plotting
+    
     subplot(2,2,2)
     pcolor(timevec,timevec,ac(1:numel(timevec),1:numel(timevec)));shading interp;title(['Autocorrelation map'])
-    caxis([-max(max(abs(ac))) max(max(abs(ac)))])
+    caxis([-clim +clim])
     cb=colorbar;
     title(cb,'corr')
     if strcmp(config.refdimension,'braintime')
