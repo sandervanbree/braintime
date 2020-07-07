@@ -17,13 +17,13 @@ Dependencies:
 [Introduction](#introduction)
 
 ## Installation
-Option 1: Download
+**Option 1:** Download
 
 1. Download ZIP on the top right of this page (green code button)
 2. Unzip to preferred folder
 3. Run the function [setup_braintime](setup).
 
-Option 2: Git client or checkout with SVN
+**Option 2:** Git client or checkout with SVN
 
 Type:
 ```java
