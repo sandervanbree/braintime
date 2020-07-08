@@ -29,13 +29,6 @@ function [bt_quantTGM] = bt_quantifyTGM(config, TGM)
 %                    % of the AC map, and config details saved for later
 %                    % retrieval.
 
-Warp clock to brain time. The clock time data is resampled based on the
-% warping path from the brain time phase vector to the phase of a
-% stationary sinusoid.
-%
-% Use:
-% [bt_struc] = bt_analyzecomps(config,data,bt_comp)
-
 % Establish basic parameters
 toi = config.bt_struc.toi;
 warpfreq = config.bt_struc.freq;
