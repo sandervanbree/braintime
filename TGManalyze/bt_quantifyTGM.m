@@ -1,12 +1,33 @@
 function [bt_quantTGM] = bt_quantifyTGM(config, TGM)
-% Quantify the degree of cross-time recurrence in the TGM. Creates an 
-% autocorrelation map (AC map) of the TGM, and applies an FFT over each row
-% and column of the AC map. For each row and column, the maximum power
-% frequency will be displayed. The mode frequency represents the primary
-% recurrence rate present in the TGM.
+% Quantify the degree of cross-time recurrence in the time generalization
+% matrix (TGM). Creates an autocorrelation map (AC map) of the TGM, and
+% applies an FFT over each row and column of the AC map. For each row and
+% column, the maximum power frequency will be displayed. The mode frequency
+% represents the primary recurrence rate present in the TGM.
 %
 % Use:
-% [bt_quantTGM = bt_quantifyTGM(cfg,TGM)
+% [bt_quantTGM] = bt_quantifyTGM(config, TGM)
+%
+% Input Arguments:
+% config
+%   - bt_struc       % brain time data structure as obtained by 
+%                    % bt_clocktobrain.
+%                    %
+%   - refdimension   % 'clocktime': find TGM recurrence as a function of
+%                    % clock time seconds in the brain time data.
+%                    % 'braintime': find TGM recurrence as a function of
+%                    % cycles of the warped frequency in the brain time
+%                     %data.
+%                    % 
+%   - figure         % 'yes' or 'no': display TGM, AC map, and primary
+%                    % frequency for all rows and columns in the AC map.
+%                    %
+% TGM                % TGM obtained by mv_classify_timextime
+%                    %
+% Output:            %
+% bt_quantTGM        % Data structure with: TGM, AC map, FFT information 
+%                    % of the AC map, and config details saved for later
+%                    % retrieval.
 
 Warp clock to brain time. The clock time data is resampled based on the
 % warping path from the brain time phase vector to the phase of a
@@ -120,6 +141,7 @@ if figopt == 1
     ylabel('AC Row or column')
 end
 
+%% Save basic info
 bt_quantTGM.toi = toi;
 bt_quantTGM.warpfreq = warpfreq;
 bt_quantTGM.acfft = acfft;

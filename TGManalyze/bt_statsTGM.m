@@ -8,13 +8,33 @@ function bt_statsTGM(config, bt_data, bt_quantTGM)
 %
 % Use:
 % bt_statsTGM(config, bt_data, bt_quantTGM)
+%
+% Input Arguments:
+% config
+%   - mvpacfg        % Load the same cfg file as used to generate empirical
+%                    % TGM. Critical: difference in shuffle and empirical
+%                    % data should not be caused by differences in
+%                    % classification parameters.
+%                    %
+%   - permlevels     % UPDATE THIS
+%                    % 
+%   - numperms1      % UPDATE THIS
+%                    %
+%   - statsrange     % Range of recurrence rates to be statistically tested
+%                    % in the TGM.
+%                    %
+% bt_data            % TGM obtained by mv_classify_timextime
+%                    %
+% bt_quantTGM        % Data structure obtained from bt_quantTGM. Contains:
+%                    % TGM, AC map, FFT information of the AC map, and
+%                    % config details saved for later retrieval.
 
-% Establish basic parameters
+%% Get information
 toi = bt_quantTGM.toi;
 warpfreq = bt_quantTGM.warpfreq;
-acfft = bt_quantTGM.acfft;
+acfft = bt_quantTGM.acfft; % AC map FFT information
 modefreq = bt_quantTGM.modefreq;
-modefreqind = bt_quantTGM.modefreqind;
+modefreqind = bt_quantTGM.modefreqind; %Index of the mode frequency
 TGM = bt_quantTGM.TGM;
 refdimension = bt_quantTGM.refdimension;
 timevec = bt_quantTGM.timevec;
@@ -28,6 +48,7 @@ else
     statsrange = 1:40;
 end
 
+%% statistically test TGM
 % Calculate autocorrelation map (AC)
 ac=autocorr2d(TGM);
 
@@ -79,7 +100,7 @@ end
 
 f=f(statsrange); %filter frequency vector based on range of interest
 
-%create confidence interval for each frequency bin
+%% Create confidence interval for each frequency bin
 for freq = 1:numel(f)
     
     %Grab data
@@ -100,7 +121,7 @@ for freq = 1:numel(f)
     freq_CI(freq,:) = temp_CI; % save CI
 end
 
-% Plot results
+%% Plot results
 % 1st plot: relationship empirical and shuffled amp at mode freq
 figure
 subplot(1,2,1)
