@@ -1,6 +1,13 @@
 function [bt_struc] = bt_clocktobrain(config, data, bt_comp)
-% Help to be added
+% Warp clock to brain time. The clock time data is resampled based on the
+% warping path from the brain time phase vector to the phase of a
+% stationary sinusoid.
+%
+% Use:
+% [bt_struc] = bt_analyzecomps(config,data,bt_comp)
 
+
+% Get basic info
 compoi = bt_comp{1};
 phs = bt_comp{2};
 comp = bt_comp{3};
@@ -16,10 +23,16 @@ else
     phs_sr = 512; %Default sampling rate
 end
 
-%remove the component from original data
+%remove the component from original data if desired (default = yes)
 cfg           = [];
 cfg.component = compoi;
-data          = ft_rejectcomponent (cfg, comp, data);
+if isfield(config,'removecomp')
+    if strcmp(config.removecomp,'yes')
+        data = ft_rejectcomponent (cfg, comp, data);
+    end
+else
+    data = ft_rejectcomponent (cfg, comp, data);
+end
 
 % cut out the time window of fft (from which the phase was extracted)
 cfg        = [];
@@ -43,17 +56,17 @@ for nt=1:size(phs{1},1)
     
     %how long is each cycle?
     cycles=zeros(1,length(iy));
-    for tp=2:length(iy)
+    cycles(1,end)=500;
+    for tp=1:length(iy)-1
         if rem(iy(tp),cycledur)==0
-            if iy(tp)~=iy(tp-1)
-                cycles(tp)=500; %label each cycle start with arbitrary number
+            if iy(tp)~=iy(tp+1)
+                cycles(tp)=500;
             end
         end
     end
-    [~, c]=find(cycles==500); 
+    [~, c]=find(cycles==500);
     
     %get equal samples by cycle
-    
     %First cycle
     cyl=bt_data.trial{1,nt}(:,ix(1:c(1)));
     tmpcy=imresize(cyl,[size(bt_data.label,1) cycledur]);
@@ -94,7 +107,7 @@ if strcmp(cutmethod,'cutartefact')
     end
 end
 
-% reformat data structure and include basic information
+% reformat data structure and include basic info
 bt_struc.data = bt_data;
 bt_struc.toi = [mintime maxtime];
 bt_struc.freq = warpfreq; %Warped frequency
