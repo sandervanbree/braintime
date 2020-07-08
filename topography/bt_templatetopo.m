@@ -1,4 +1,16 @@
 function bt_templatetopo(config)
+% Create a template topography that will be used in bt_analyzecomps
+% to bias component ranking toward the components' match to the desired
+% topography. The template topography is automatically  saved in
+% the /topography folder and loaded when using cfg.sortmethod = 'temptopo'
+% in bt_analyzecomps.
+%
+% Use:
+% bt_templatetopo(config)
+%
+% Input Arguments:
+% config
+%   - layout     % Layout file of the clock time data
 
 % create a figure
 figure;
