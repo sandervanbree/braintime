@@ -6,8 +6,62 @@ function [fft_comp] = bt_analyzecomps(config, comp)
 %
 % Use:
 % [fft_comp] = bt_analyzecomps(cfg,comp)
+%
+% Input Arguments:
+% config
+%   - mintime        % Start time window of interest
+%   - maxtime        % End time window of interest
+%   - minfft         % Lowest frequency analyzed in the components 
+%   - maxfft         % Highest frequency analyzed in the components
+%   - minfoi         % Lowest frequency of interest for the to be
+%                    % designated brain time oscillation (e.g. low alpha
+%                    % for attention)
+%   - maxfoi         % Highest frequency of interest for the to be
+%                    % designated brain time oscillation (e.g. high alpha
+%                    % for attention)
+%   - topcomp        % Number of best components to be filtered from the full amount
+%                    
+%   - cutmethod      % 'consistenttime': warp from mintime to maxtime.
+%                    % The upside of this method is that the final
+%                    % brain time data is equally long and of the same
+%                    % duration as intended (mintime to maxtime). The
+%                    % downside is an artefact in the first cycle
+%                    % caused by the warping requiring a repetition of data
+%                    % bins for alignment to the template oscillation.
+%                    % 
+%                    % 'cutartefact': warp from mintime-0.5sec to
+%                    % maxtime+0.5sec, later cut to mintime maxtime.
+%                    % The upside of this method is that the final brain
+%                    % time data has no artefact in the first cycle. The
+%                    % downside is that there is variance across trials
+%                    % in the brain time's start and end time, as well as
+%                    % the duration.
+%                             
+%   - sortmethod     % 'maxpow': sort components according to their average
+%                    % power in minfoi and maxfoi.
+%                    %
+%                    % 'temptopo': loads a template topography created
+%                    % using bt_templatetopo that is used to bias the
+%                    % power sorting to the each component's topography
+%                    % match to the template topography.
+%                    %
+%   - removecomp     % 'yes': removes component from the brain time data.
+%                    % When analyzing brain time data using your own
+%                    % analysis pipeline, you may wish to remove the 
+%                    % component to avoid circularity. See the brain time
+%                    % toolbox paper for more details.
+%                    %
+%                    % 'no': keeps component in the brain time data.
+%                    %
+% comp               % FieldTrip component data structure as obtained
+%                    % by applying ft_componentanalysis on clock time data.
+%                    %
+% Output:            %
+% fft_comp           % Data structure with: ranked components, their 
+%                    % time frequency information, and config details
+%                    % saved for later retrival.
 
-%% Get basic information
+%% Get information
 sampledur = (comp.time{1}(2)-comp.time{1}(1)); % Duration of each sample
 numcomp = size(comp.trial{1},1); % Number of components
 minfft = config.minfft;
@@ -113,11 +167,11 @@ else
 end
 comprank = comprank(1:numtopcomps,:); % take the top numcomp components
 
+%% Save information
 % Filter relevant frequency spectrum information
 fspecinfo.freq = fspec.freq;
 fspecinfo.time = fspec.time;
 
-%save basic information
 fft_comp{1} = comprank; %information about top components
 fft_comp{2} = [mintime_ind maxtime_ind];
 fft_comp{3} = [minfft maxfft];

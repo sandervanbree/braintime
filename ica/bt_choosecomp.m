@@ -6,9 +6,25 @@ function [bt_comp] = bt_choosecomp(config, fft_comp, comp)
 % representative of brain time.
 %
 % Use:
-% [bt_comp] = bt_analyzecomps(cfg,fft_comp,comp)
+% [bt_comp] = bt_choosecomps(cfg,fft_comp,comp)
+%
+% Input Arguments:
+% config
+%   - layout         % A layout file to plot component data at the channel
+%                    % level.
+%                    %
+% fft_comp           % Data structure with time frequency characteristics
+%                    % of all components as obtained by bt_analyzecomps.
+%                    %
+% comp               % FieldTrip component data structure as obtained
+%                    % by applying ft_componentanalysis on clock time data.
+%                    %
+% Output:            %
+% bt_comp            % Data structure with: chosen component, its 
+%                    % time frequency information, and config details
+%                    % saved for later retrieval.
 
-% Get basic info
+%% Get basic info
 topcomps = fft_comp{1}; %What are the top components?
 mintime_ind = fft_comp{2}(1);
 maxtime_ind = fft_comp{2}(2);
@@ -20,6 +36,7 @@ pspec = fft_comp{6};
 phs = fft_comp{7}; %Phase of all components
 cutmethod = fft_comp{8};
 
+%% Plot top components
 figure
 compoi = [];%component of interest
 caxislim=max(max(max(powtf(:,:,:)))); %establish axis limit
@@ -40,7 +57,7 @@ while compind <= numel(topcomps)
     subplot(5,2,[1 3 5 7 9]);
     cfg           = [];
     cfg.component = currcomp; % specify the component(s) that should be plotted
-    cfg.layout    = config.layoutfile; % specify the layout file that should be used for plotting
+    cfg.layout    = config.layout; % specify the layout file that should be used for plotting
     cfg.comment   = 'no';
     ft_topoplotIC(cfg, comp)
     colorbar
@@ -80,7 +97,7 @@ while compind <= numel(topcomps)
     compind = compind+1;
 end
 
-%Save basic info
+%% Save basic info
 bt_comp{1} = compoi; %chosen component
 bt_comp{2} = phs(compoi); %phase of chosen component
 bt_comp{3} = comp;
