@@ -47,9 +47,9 @@ bt_quantTGM         = bt_quantifyTGM(cfg,bt_TGM); %do once for brain time
 ct_quantTGM         = bt_quantifyTGM(cfg,ct_TGM); %compare with clock time
 
 %% Statistically test TGM recurrence (compare clock and brain time)
+cfg.mvpacfg         = cfg_mv;          %input previous mvpa light config structure
 cfg.permlevels      = 1;               %for data with multiple participants, two level.
 cfg.numperms1       = 10;              %number of permutations on the first level
-cfg.mvpacfg         = cfg_mv;          %input previous mvpa light config structure
 cfg.statsrange      = [1 20];          %range of tested recurrence rates
 cfg.clabel          = bt_struc.clabel;
 bt_statsTGM(cfg,bt_data,bt_quantTGM);  %brain time results (significant)
