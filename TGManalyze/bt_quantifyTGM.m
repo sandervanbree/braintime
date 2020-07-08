@@ -1,5 +1,19 @@
 function [bt_quantTGM] = bt_quantifyTGM(config, TGM)
-%help function to be added
+% Quantify the degree of cross-time recurrence in the TGM. Creates an 
+% autocorrelation map (AC map) of the TGM, and applies an FFT over each row
+% and column of the AC map. For each row and column, the maximum power
+% frequency will be displayed. The mode frequency represents the primary
+% recurrence rate present in the TGM.
+%
+% Use:
+% [bt_quantTGM = bt_quantifyTGM(cfg,TGM)
+
+Warp clock to brain time. The clock time data is resampled based on the
+% warping path from the brain time phase vector to the phase of a
+% stationary sinusoid.
+%
+% Use:
+% [bt_struc] = bt_analyzecomps(config,data,bt_comp)
 
 % Establish basic parameters
 toi = config.bt_struc.toi;

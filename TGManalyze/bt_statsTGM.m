@@ -1,5 +1,13 @@
 function bt_statsTGM(config, bt_data, bt_quantTGM)
-%help function to be added
+% Test whether quantified recurrence in the TGM is statistically reliable.
+% Performs one or two-level permutation testing, where null distributions
+% are created by shuffling the classification labels nperm1(*N) times and
+% collecting the power spectra from the resulting AC maps. The power
+% spectra of the empirical data are compared against this null
+% distribution.
+%
+% Use:
+% bt_statsTGM(config, bt_data, bt_quantTGM)
 
 % Establish basic parameters
 toi = bt_quantTGM.toi;
