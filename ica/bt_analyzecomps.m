@@ -1,5 +1,11 @@
 function [fft_comp] = bt_analyzecomps(config, comp)
-% Help function to be added here
+% Analyze the time frequency characteristics of all ICA components and
+% sort them based on average power in the frequency range of interest.
+% Optionally, this sorting can be biased by components' correlation
+% to a template topography created using bt_temptopo.
+%
+% Use:
+% [fft_comp] = bt_analyzecomps(cfg,comp)
 
 %% Get basic information
 sampledur = (comp.time{1}(2)-comp.time{1}(1)); % Duration of each sample

@@ -1,15 +1,23 @@
 function [bt_comp] = bt_choosecomp(config, fft_comp, comp)
-% Help to be added
+% Display the top components sorted by the characteristics of interest
+% (done by bt_analyzecomps). After component selection, the phase of
+% the oscillation with the most power in the frequency range of interest
+% will be extracted. The toolbox designates this phase vector as
+% representative of brain time.
+%
+% Use:
+% [bt_comp] = bt_analyzecomps(cfg,fft_comp,comp)
 
-topcomps = fft_comp{1}; %basic information about top components
+% Get basic info
+topcomps = fft_comp{1}; %What are the top components?
 mintime_ind = fft_comp{2}(1);
 maxtime_ind = fft_comp{2}(2);
 minfft = fft_comp{3}(1); 
 maxfft = fft_comp{3}(2);
-fspecinfo = fft_comp{4}; %basic information FFT
+fspecinfo = fft_comp{4}; %FFT characteristics
 powtf = fft_comp{5};
 pspec = fft_comp{6};
-phs = fft_comp{7}; %phase of components
+phs = fft_comp{7}; %Phase of all components
 cutmethod = fft_comp{8};
 
 figure
@@ -72,6 +80,7 @@ while compind <= numel(topcomps)
     compind = compind+1;
 end
 
+%Save basic info
 bt_comp{1} = compoi; %chosen component
 bt_comp{2} = phs(compoi); %phase of chosen component
 bt_comp{3} = comp;
