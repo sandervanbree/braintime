@@ -42,6 +42,7 @@ comp             = ft_componentanalysis(cfg ,ct_data);
 cfg = [];
 cfg.cutmethod    = 'cutartefact';    % 'cutartefact' or 'consistenttime' See "help bt_analyzecomps" or our paper for details
 cfg.sortmethod   = 'temptopo';       % sort by template topography
+cfg.removecomp   = 'yes';            % remove component from clock time data to avoid circularity (see paper)
 cfg.mintime      = 0;                % start time of interest
 cfg.maxtime      = 1;                % end time of interest
 cfg.topcomp      = 10;               % number of components to be considered
