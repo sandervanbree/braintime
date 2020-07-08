@@ -5,25 +5,41 @@ function [bt_struc] = bt_clocktobrain(config, data, bt_comp)
 %
 % Use:
 % [bt_struc] = bt_analyzecomps(config,data,bt_comp)
+%
+% Input Arguments:
+% config
+%   - btsrate        % Sampling rate of the brain time data.
+%                    %
+% data               % Preprocessed clock time data structure consisting of
+%                    % both classes.
+%                    %
+% bt_comp            % Data structure obtained from bt_choosecomp.
+%                    % Includes: time frequency information, and config
+%                    % details saved for later retrieval.
+%                    %
+% Output:            %
+% bt_struc           % Data structure with: chosen component, its 
+%                    % time frequency information, and config details
+%                    % saved for later retrival.
 
-
-% Get basic info
-compoi = bt_comp{1};
-phs = bt_comp{2};
-comp = bt_comp{3};
-topcomps = bt_comp{4};
+%% Get basic info
+compoi = bt_comp{1}; %component of interest
+phs = bt_comp{2}; %its phase
+comp = bt_comp{3}; %component number
+topcomps = bt_comp{4}; %top components
 mintime = bt_comp{5}.time(1);
 maxtime = bt_comp{5}.time(end);
 cutmethod = bt_comp{6};
-warpfreq = topcomps(2);
+warpfreq = topcomps(2); %warped frequency
 
+% Set up sampling rate
 if isfield(config,'btsrate')
     phs_sr = config.btsrate;
 else
     phs_sr = 512; %Default sampling rate
 end
 
-%remove the component from original data if desired (default = yes)
+%% Remove the component from original data if desired (default = yes)
 cfg           = [];
 cfg.component = compoi;
 if isfield(config,'removecomp')
@@ -34,15 +50,15 @@ else
     data = ft_rejectcomponent (cfg, comp, data);
 end
 
-% cut out the time window of fft (from which the phase was extracted)
+%% Cut out the time window of fft (from which the phase was extracted)
 cfg        = [];
 cfg.toilim = [mintime maxtime];
 data       = ft_redefinetrial(cfg, data);
 
-%% Step 8: Warp component's data to template phase vector (based on power oscillation)
+%% Warp component's data to template phase vector (based on power oscillation)
 % Re-Organize EEG data by phase
 bt_data=data;
-nsec=maxtime-mintime;
+nsec=maxtime-mintime; %number of seconds in the data
 Ncycles_pre=warpfreq*nsec; %number of cycles * seconds
 cycledur=round(phs_sr*nsec/Ncycles_pre); %samples for cycle
 tmp_sr=Ncycles_pre*cycledur/nsec;
