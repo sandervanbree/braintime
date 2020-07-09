@@ -4,7 +4,8 @@ Fs=SR;
 T =1/Fs;
 L =length(x);
 
-NFFT = 2^nextpow2(L); 
+% NFFT = 2^nextpow2(L);  %Old version
+NFFT = L; % New version. Slower, but otherwise we get into nasty problems
 Y=fft(x,NFFT)/L;
 f=Fs/2*linspace(0,1,NFFT/2);
 PS=2*abs(Y(1:NFFT/2));
