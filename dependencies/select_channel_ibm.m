@@ -219,6 +219,6 @@ if any(select)
   temptopo_path = fileparts(fileparts(mfilename('fullpath'))); %find correct path
   close
   
-  saveloc = strcat(temptopo_path,'\template\','temptopo'); %save
+  saveloc = strcat(temptopo_path,'\topography\','temptopo'); %save
   save(saveloc,'temptopo','-v7.3')
 end
