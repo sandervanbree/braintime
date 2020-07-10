@@ -35,6 +35,7 @@ powtf = fft_comp{5};
 pspec = fft_comp{6};
 phs = fft_comp{7}; %Phase of all components
 cutmethod = fft_comp{8};
+cutinfo = fft_comp{9};
 
 %% Plot top components
 figure
@@ -97,6 +98,7 @@ while compind <= numel(topcomps)
     compind = compind+1;
 end
 
+
 %% Save basic info
 bt_comp{1} = compoi; %chosen component
 bt_comp{2} = phs(compoi); %phase of chosen component
@@ -104,3 +106,4 @@ bt_comp{3} = comp;
 bt_comp{4} = topcomps(compoi,:);
 bt_comp{5} = fspecinfo;
 bt_comp{6} = cutmethod;
+bt_comp{7} = cutinfo;

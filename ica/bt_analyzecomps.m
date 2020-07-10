@@ -70,20 +70,21 @@ minfoi = config.minfoi;
 maxfoi = config.maxfoi;
 mintime = config.mintime;
 maxtime = config.maxtime;
+extracut = 1/minfoi; %cut slowest freq + two samples
 
 if strcmp(config.cutmethod,'consistenttime')
     mintime_fft = mintime;
     maxtime_fft = maxtime;
-elseif strcmp(config.cutmethod,'cutartefact') % Add an additional second that will later be cut
-    mintime_fft = config.mintime-0.5;
-    maxtime_fft = config.maxtime+0.5;
+elseif strcmp(config.cutmethod,'cutartefact') % cut additional time
+    mintime_fft = config.mintime-extracut; 
+    maxtime_fft = config.maxtime+extracut;
 end
 
 %% Calculate FFT
 cfgtf           = [];
 cfgtf.method    = 'wavelet';
 cfgtf.width     = 5;
-cfgtf.toi       = mintime_fft:sampledur:maxtime_fft; %Add 0.5s of data at each end, to be cut out later
+cfgtf.toi       = mintime_fft:sampledur:maxtime_fft;
 cfgtf.foi       = (minfft:1:maxfft);
 cfgtf.output    = 'fourier';
 fspec           = ft_freqanalysis(cfgtf,comp);
@@ -180,4 +181,5 @@ fft_comp{5} = powtf(:,:,comprank(:,1));
 fft_comp{6} = pspec(:,comprank(:,1));
 fft_comp{7} = phs(comprank(:,1)); %phase of the top components
 fft_comp{8} = config.cutmethod;
+fft_comp{9} = extracut;
 end
