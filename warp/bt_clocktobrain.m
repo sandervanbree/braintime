@@ -25,12 +25,13 @@ function [bt_struc] = bt_clocktobrain(config, data, bt_comp)
 %% Get basic info
 compoi = bt_comp{1}; %component of interest
 phs = bt_comp{2}; %its phase
-comp = bt_comp{3}; %component number
+comp = bt_comp{3}; %component structure from FieldTrip
 topcomps = bt_comp{4}; %top components
 mintime = bt_comp{5}.time(1);
 maxtime = bt_comp{5}.time(end);
 cutmethod = bt_comp{6};
 warpfreq = topcomps(2); %warped frequency
+extracut = bt_comp{7};
 
 % Set up sampling rate
 if isfield(config,'btsrate')
@@ -103,15 +104,15 @@ end
 % If method is cut artefact, cut right time window and adjust time vector
 if strcmp(cutmethod,'cutartefact')
     % correct time window of interest
-    mintime = mintime+0.5;
-    maxtime = maxtime-0.5;
+    mintime = mintime+extracut;
+    maxtime = maxtime-extracut;
     
     % cut out the extra cycles
     FreqDiff = (Ncycles_pre-((maxtime)-(mintime))*warpfreq)/2; % MARIA I think this is this better?
     %FreqDiff = (warpfreq*0.5)-warpfreq*((maxtime)-(mintime)); %How much is the time vector off?
     
-    startind = (phs_sr*0.5)+1; % first cycle of the time window of interest index
-    endind   = length(bt_data.time{1,1})-(phs_sr*0.5); %What's the index of the end of the desired new data?
+    startind = round((phs_sr*extracut)+1); % first cycle of the time window of interest index
+    endind   = length(bt_data.time{1,1})-round((phs_sr*extracut)); %What's the index of the end of the desired new data?
     
     cfg         = [];
     cfg.latency = [bt_data.time{1}(startind) bt_data.time{1}(endind)];
