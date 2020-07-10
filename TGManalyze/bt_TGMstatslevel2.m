@@ -90,7 +90,7 @@ sigind = find(pval<=0.05);
 p5 = plot(f(sigind),PS_emp(sigind),'r*','MarkerSize',10,'LineWidth',1.5);
 
 % legend
-legend([p1 p2 p3 p4 p5],{'Average emp spectrum','Average perm spectrum','Largest diff emp and shuff spectrum','-log10 pvalue', 'p<=0.05'});
+legend([p1 p2 p3 p4 p5],{'Average emp spectrum','Average perm spectrum','Largest diff emp and perm spectrum','-log10 pvalue', 'p<=0.05'});
 
 %% Adapt output variable
 % Add freq information to pval vector
