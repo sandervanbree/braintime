@@ -20,7 +20,7 @@ clabel             = bt_struc.clabel;
 % Use MVPA Light to visualize recurrence in a time generalization matrix (TGM)
 cfg_mv.classifier  = 'lda';
 cfg_mv.metric      = 'acc';     %accuracy
-cfg_mv.repeat      = 3;         %number of repetitions
+cfg_mv.repeat      = 1;         %number of repetitions; use higher than 1 for real data
 cfg_mv.cv          = 'kfold';
 cfg_mv.k           = 5;         %number of folds
 [ct_TGM, ~]        = mv_classify_timextime(cfg_mv, ct_data.trial, clabel);
@@ -43,15 +43,19 @@ cfg = [];
 cfg.bt_struc        = bt_struc;      %specify so that information can be retrieved
 cfg.refdimension    = 'braintime';   %quantify recurrence as a function of seconds in the data or the warped frequency
 cfg.figure          = 'yes';
-bt_quantTGM         = bt_quantifyTGM(cfg,bt_TGM); %do once for brain time
-ct_quantTGM         = bt_quantifyTGM(cfg,ct_TGM); %compare with clock time
+bt_TGMquant         = bt_TGMquantify(cfg,bt_TGM); %do once for brain time
+cfg.refdimension    = 'clocktime';   
+ct_TGMquant         = bt_TGMquantify(cfg,ct_TGM); %compare with clock time
 
-%% Statistically test TGM recurrence (compare clock and brain time)
+%% Statistically test TGM recurrence on the single subject level (compare clock and brain time)
+clabel = bt_struc.clabel;
+
 cfg.mvpacfg         = cfg_mv;          %input previous mvpa light config structure
-cfg.permlevels      = 1;               %for data with multiple participants, two level.
 cfg.numperms1       = 10;              %number of permutations on the first level
 cfg.statsrange      = [1 20];          %range of tested recurrence rates
-cfg.clabel          = bt_struc.clabel;
-bt_statsTGM(cfg,bt_data,bt_quantTGM);  %brain time results (significant)
-bt_statsTGM(cfg,ct_data,ct_quantTGM);  %clock time results (not significant)
+cfg.clabel          = clabel;
+[bt_TGMstats1] = bt_TGMstatslevel1(cfg,bt_data,bt_TGMquant);  %brain time results (significant)
+[ct_TGMstats1] = bt_TGMstatslevel1(cfg,ct_data,ct_TGMquant);  %clock time results (not significant)
 
+%% Save brain time TGM for tutorial 3
+save bt_TGM bt_TGMquant bt_data clabel cfg_mv
