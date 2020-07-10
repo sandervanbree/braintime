@@ -29,8 +29,9 @@ function [fft_comp] = bt_analyzecomps(config, comp)
 %                    % caused by the warping requiring a repetition of data
 %                    % bins for alignment to the template oscillation.
 %                    % 
-%                    % 'cutartefact': warp from mintime-0.5sec to
-%                    % maxtime+0.5sec, later cut to mintime maxtime.
+%                    % 'cutartefact': warp from mintime-one cycle to
+%                    % maxtime+one cycle of the minimum frequency
+%                    % of interest, later cut to mintime maxtime.
 %                    % The upside of this method is that the final brain
 %                    % time data has no artefact in the first cycle. The
 %                    % downside is that there is variance across trials
