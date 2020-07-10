@@ -4,7 +4,7 @@ function [bt_struc] = bt_clocktobrain(config, data, bt_comp)
 % stationary sinusoid.
 %
 % Use:
-% [bt_struc] = bt_analyzecomps(config,data,bt_comp)
+% [bt_struc] = bt_clocktobrain(config,data,bt_comp)
 %
 % Input Arguments:
 % config
@@ -107,7 +107,8 @@ if strcmp(cutmethod,'cutartefact')
     maxtime = maxtime-0.5;
     
     % cut out the extra cycles
-    FreqDiff = Ncycles_pre-(warpfreq*0.5)-warpfreq*((maxtime)-(mintime)); %How much is the time vector off?
+    FreqDiff = (Ncycles_pre-((maxtime)-(mintime))*warpfreq)/2; % MARIA I think this is this better?
+    %FreqDiff = (warpfreq*0.5)-warpfreq*((maxtime)-(mintime)); %How much is the time vector off?
     
     startind = (phs_sr*0.5)+1; % first cycle of the time window of interest index
     endind   = length(bt_data.time{1,1})-(phs_sr*0.5); %What's the index of the end of the desired new data?
