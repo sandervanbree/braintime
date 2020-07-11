@@ -69,7 +69,9 @@ while compind <= numel(topcomps)
         caxis([-lim lim])
     else
         delete(f1);
-        warning('As no layout was specified, the component''s topography will not be plotted. For MEG and EEG it is recommended to specify cfg.layout so that the brain time component can be chosen based on activity in regions of interest.');            
+        if compind == 1
+        warning('As no layout was specified in cfg.layout, the component''s topography will not be plotted. For MEG and EEG it is recommended to specify a layout so that the brain time component can be chosen based on activity in regions of interest.');            
+        end
     end
     
     title({[num2str(compind) '/' num2str(size(topcomps,1)) ' Components'] ['Component ' num2str(currcomp)]})
