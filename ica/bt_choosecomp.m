@@ -20,7 +20,7 @@ function [bt_comp] = bt_choosecomp(config, fft_comp, comp)
 %                    % by applying ft_componentanalysis on clock time data.
 %                    %
 % Output:            %
-% bt_comp            % Data structure with: chosen component, its 
+% bt_comp            % Data structure with: chosen component, its
 %                    % time frequency information, and config details
 %                    % saved for later retrieval.
 
@@ -28,7 +28,7 @@ function [bt_comp] = bt_choosecomp(config, fft_comp, comp)
 topcomps = fft_comp{1}; %What are the top components?
 mintime_ind = fft_comp{2}(1);
 maxtime_ind = fft_comp{2}(2);
-minfft = fft_comp{3}(1); 
+minfft = fft_comp{3}(1);
 maxfft = fft_comp{3}(2);
 fspecinfo = fft_comp{4}; %FFT characteristics
 powtf = fft_comp{5};
@@ -54,19 +54,26 @@ uiwait(msgbox({'Instructions to browse through components:';' ';...
 while compind <= numel(topcomps)
     currcomp = topcomps(compind);
     
-    % component topography
-    subplot(5,2,[1 3 5 7 9]);
-    cfg           = [];
-    cfg.component = currcomp; % specify the component(s) that should be plotted
-    cfg.layout    = config.layout; % specify the layout file that should be used for plotting
-    cfg.comment   = 'no';
-    ft_topoplotIC(cfg, comp)
-    colorbar
-    lim=max(abs(comp.topo(:,currcomp)));
-    lim=lim+(lim/100*10);
-    caxis([-lim lim])
+    f1 = subplot(5,2,[1 3 5 7 9]);    
+    % Only plot topography if layout is specified
+    if isfield(config,'layout')
+        % component topography
+        cfg           = [];
+        cfg.component = currcomp; % specify the component(s) that should be plotted
+        cfg.layout    = config.layout; % specify the layout file that should be used for plotting
+        cfg.comment   = 'no';
+        ft_topoplotIC(cfg, comp)
+        colorbar
+        lim=max(abs(comp.topo(:,currcomp)));
+        lim=lim+(lim/100*10);
+        caxis([-lim lim])
+    else
+        delete(f1);
+        warning('As no layout was specified, the component''s topography will not be plotted. For MEG and EEG it is recommended to specify cfg.layout so that the brain time component can be chosen based on activity in regions of interest.');            
+    end
+    
     title({[num2str(compind) '/' num2str(size(topcomps,1)) ' Components'] ['Component ' num2str(currcomp)]})
-   
+    
     % time-frequency plot
     subplot(5,2,[2 4 6 8]);
     pcolor(fspecinfo.time(mintime_ind:maxtime_ind),fspecinfo.freq,powtf(:,:,currcomp));
@@ -92,8 +99,8 @@ while compind <= numel(topcomps)
         disp(value);
         compind = compind-2;
     elseif strcmp(key,'q') %stop the loop if it is not necessesary to keep visualising  %CHECK
-      compind = (numel(topcomps))+1;
-      close
+        compind = (numel(topcomps))+1;
+        close
     end
     compind = compind+1;
 end
