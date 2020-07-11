@@ -7,7 +7,6 @@ Warp electrophysiological data from (default) clock time to brain time and test 
 Dependencies:
 - FieldTrip
 - MVPA Light
-- Psychtoolbox
 - MATLAB Signal Processing Toolbox
 - [Several functions](dependencies) included in the toolbox
 
