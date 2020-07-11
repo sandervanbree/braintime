@@ -82,7 +82,7 @@ while compind <= numel(topcomps)
     shading interp
     ylim([minfft maxfft]);
     caxis([0 caxislim])
-    title(sprintf('Power at %0.3fHz: %0.3f',topcomps(compind,2),topcomps(compind,4)))
+    title(sprintf('Component %d with power at %0.3fHz: %0.3f',currcomp,topcomps(compind,2),topcomps(compind,4)))
     
     % dominant oscillation plot
     subplot(5,2,10);
