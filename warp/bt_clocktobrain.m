@@ -10,6 +10,14 @@ function [bt_struc] = bt_clocktobrain(config, data, bt_comp)
 % config
 %   - btsrate        % Sampling rate of the brain time data.
 %                    %
+%   - removecomp     % 'yes': removes component from the brain time data.
+%                    % When analyzing brain time data using your own
+%                    % analysis pipeline, you may wish to remove the 
+%                    % component to avoid circularity. See the brain time
+%                    % toolbox paper for more details.
+%                    %
+%                    % 'no': keeps component in the brain time data.
+%                    %
 % data               % Preprocessed clock time data structure consisting of
 %                    % both classes.
 %                    %
