@@ -126,7 +126,7 @@ end
 
 if figopt == 1
     %% Create confidence interval for each frequency bin
-    for freq = f
+    for freq = 1:numel(f)
         
         %Grab data
         temp_data = fullspec_shuff(:,freq);
