@@ -169,12 +169,12 @@ if figopt == 1
     subplot(1,2,2); hold on
     low_CI = freq_CI(:,1)';
     hi_CI = freq_CI(:,2)';
-    p3 = area(f(1,srange),hi_CI);
+    p3 = area(f,hi_CI);
     p3(1).FaceColor = [0.8627 0.8627 0.8627];
     hold on
-    p2 = area(f(1,srange),low_CI);
+    p2 = area(f,low_CI);
     p2(1).FaceColor = [1 1 1];
-    p1 = plot(f(1,srange),fullspec_emp,'LineWidth',2,'Color','b');
+    p1 = plot(f,fullspec_emp,'LineWidth',2,'Color','b');
     p2 = plot(f,low_CI,'LineWidth',0.5,'Color','k');
     p3 = plot(f,hi_CI,'LineWidth',0.5,'Color','k');
     
