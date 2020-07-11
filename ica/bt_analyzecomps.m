@@ -46,14 +46,6 @@ function [fft_comp] = bt_analyzecomps(config, comp)
 %                    % power sorting to the each component's topography
 %                    % match to the template topography.
 %                    %
-%   - removecomp     % 'yes': removes component from the brain time data.
-%                    % When analyzing brain time data using your own
-%                    % analysis pipeline, you may wish to remove the 
-%                    % component to avoid circularity. See the brain time
-%                    % toolbox paper for more details.
-%                    %
-%                    % 'no': keeps component in the brain time data.
-%                    %
 % comp               % FieldTrip component data structure as obtained
 %                    % by applying ft_componentanalysis on clock time data.
 %                    %
@@ -162,8 +154,8 @@ if strcmp(config.sortmethod,'temptopo')
 end
 
 %% Take the 30 best components (or specified number)
-if isfield(config,'topcomps')
-    numtopcomps = min(config.topcomps,numcomp);
+if isfield(config,'topcomp')
+    numtopcomps = min(config.topcomp,numcomp);
 else
     numtopcomps = min(numcomp,30);
 end

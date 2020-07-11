@@ -78,15 +78,15 @@ while compind <= numel(topcomps)
     
     % time-frequency plot
     subplot(5,2,[2 4 6 8]);
-    pcolor(fspecinfo.time(mintime_ind:maxtime_ind),fspecinfo.freq,powtf(:,:,currcomp));
+    pcolor(fspecinfo.time(mintime_ind:maxtime_ind),fspecinfo.freq,powtf(:,:,compind));
     shading interp
     ylim([minfft maxfft]);
     caxis([0 caxislim])
-    title(sprintf('Power at %0.3fHz: %0.3f',topcomps(currcomp,2),topcomps(currcomp,4)))
+    title(sprintf('Power at %0.3fHz: %0.3f',topcomps(compind,2),topcomps(compind,4)))
     
     % dominant oscillation plot
     subplot(5,2,10);
-    plot(squeeze(pspec(:,currcomp,1)),fspecinfo.freq);
+    plot(squeeze(pspec(:,compind,1)),fspecinfo.freq);
     ylim([minfft maxfft]);
     xlim([0 caxislim])
     
@@ -95,7 +95,7 @@ while compind <= numel(topcomps)
     [~,~,keyCode] = KbCheck;
     key = KbName(find(keyCode));
     if (keydown == 0) %grab the component if click
-        compoi=currcomp;
+        compoi=compind;
         compind = compind-1;
     elseif value == 28 %go back previous component if press back arrow
         disp(value);
