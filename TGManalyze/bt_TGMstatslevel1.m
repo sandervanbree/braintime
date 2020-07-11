@@ -59,24 +59,31 @@ end
 % Calculate autocorrelation map (AC)
 ac=autocorr2d(TGM);
 
-% Run FFT over all rows and columns of the AC map
+% Size of all rows and columns
 nvecs=numel(ac(:,1));
 
+% Perform FFT over one row to get f and find out statsrange indices
+[~,f]=Powspek(ac(1,:),nvecs/normalizer);
+l = find(abs(statsrange(1)-f)==min(abs(statsrange(1)-f))); %minimum frequency to be tested
+h = find(abs(statsrange(end)-f)==min(abs(statsrange(end)-f))); %maximum frequency to be tested
+srange = l:h;
+
+% Run FFT over all rows and columns of the AC map
 for vec=1:nvecs
     %1st dimenssion
     [PS,f]=Powspek(ac(vec,:),nvecs/normalizer);
-    PS1(vec,:) = PS(statsrange);
+    PS1(vec,:) = PS(srange);
     
     %2nd dimension
     [PS,f]=Powspek(ac(:,vec),nvecs/normalizer);
-    PS2(vec,:) = PS(statsrange);
+    PS2(vec,:) = PS(srange);
     
 end
 avg_PS = mean(PS1,1)+mean(PS2,1); %Mean power spectra
 modepow_emp = avg_PS(modefreqind); %Mean power at mode freq
 fullspec_emp = avg_PS;
 
-
+% First level permutations
 for perm1 = 1:config.numperms1
     fprintf('First level permutation number %i\n', perm1);
     clabel = clabel(randperm(numel(clabel)));
@@ -91,11 +98,11 @@ for perm1 = 1:config.numperms1
     for vec=1:nvecs
         %1st dimenssion
         [PS,f]=Powspek(ac(vec,:),nvecs/normalizer);
-        PS1(vec,:) = PS(statsrange);
+        PS1(vec,:) = PS(srange);
         
         %2nd dimension
         [PS,f]=Powspek(ac(:,vec),nvecs/normalizer);
-        PS2(vec,:) = PS(statsrange);
+        PS2(vec,:) = PS(srange);
         
     end
     avg_PS = mean(PS1,1)+mean(PS2,1); %Mean power spectra
@@ -104,7 +111,7 @@ for perm1 = 1:config.numperms1
 end
 mean_modepow_shuff = mean(modepow_shuff);
 
-f=f(statsrange); %filter frequency vector based on range of interest
+f=f(l:f); %filter frequency vector based on range of interest
 
 % Only calculate confidence interval and plot stats if desired
 if isfield(config,'figure')
@@ -162,12 +169,12 @@ if figopt == 1
     subplot(1,2,2); hold on
     low_CI = freq_CI(:,1)';
     hi_CI = freq_CI(:,2)';
-    p3 = area(f(1,statsrange),hi_CI);
+    p3 = area(f(1,srange),hi_CI);
     p3(1).FaceColor = [0.8627 0.8627 0.8627];
     hold on
-    p2 = area(f(1,statsrange),low_CI);
+    p2 = area(f(1,srange),low_CI);
     p2(1).FaceColor = [1 1 1];
-    p1 = plot(f(1,statsrange),fullspec_emp,'LineWidth',2,'Color','b');
+    p1 = plot(f(1,srange),fullspec_emp,'LineWidth',2,'Color','b');
     p2 = plot(f,low_CI,'LineWidth',0.5,'Color','k');
     p3 = plot(f,hi_CI,'LineWidth',0.5,'Color','k');
     
