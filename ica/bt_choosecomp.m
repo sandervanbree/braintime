@@ -96,11 +96,12 @@ while compind <= numel(topcomps)
     key = KbName(find(keyCode));
     if (keydown == 0) %grab the component if click
         compoi=compind;
+        fprintf('Selected component number %d. Press ''q'' to quit.',currcomp)
         compind = compind-1;
     elseif value == 28 %go back previous component if press back arrow
-        disp(value);
         compind = compind-2;
     elseif strcmp(key,'q') %stop the loop if it is not necessesary to keep visualising  %CHECK
+        fprintf('Warping oscillation will be the %0.3fHz phase in component number %d. Press ''q'' to quit.',topcomps(compind,2),currcomp)
         compind = (numel(topcomps))+1;
         close
     end

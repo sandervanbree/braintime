@@ -9,15 +9,12 @@ function [fft_comp] = bt_analyzecomps(config, comp)
 %
 % Input Arguments:
 % config
-%   - mintime        % Start time window of interest
-%   - maxtime        % End time window of interest
-%   - minfft         % Lowest frequency analyzed in the components 
-%   - maxfft         % Highest frequency analyzed in the components
-%   - minfoi         % Lowest frequency of interest for the to be
-%                    % designated brain time oscillation (e.g. low alpha
-%                    % for attention)
-%   - maxfoi         % Highest frequency of interest for the to be
-%                    % designated brain time oscillation (e.g. high alpha
+%   - time           % Start and end of the time window of interest
+%   - fft            % Lowest and highest frequency analyzed in the
+%                    % components 
+%   - foi            % Lowest and highest frequency of interest for the to
+%                    % to be designated brain time oscillation (e.g.
+%                    % 8 to 12 for alpha oscillations)
 %                    % for attention)
 %   - topcomp        % Number of best components to be filtered from the full amount
 %                    
@@ -57,13 +54,13 @@ function [fft_comp] = bt_analyzecomps(config, comp)
 %% Get information
 sampledur = (comp.time{1}(2)-comp.time{1}(1)); % Duration of each sample
 numcomp = size(comp.trial{1},1); % Number of components
-minfft = config.minfft;
-maxfft = config.maxfft;
-minfoi = config.minfoi;
-maxfoi = config.maxfoi;
-mintime = config.mintime;
-maxtime = config.maxtime;
-extracut = 1/minfoi; %cut slowest freq + two samples
+minfft = config.fft(1);
+maxfft = config.fft(2);
+minfoi = config.foi(1);
+maxfoi = config.foi(2);
+mintime = config.time(1);
+maxtime = config.time(2);
+extracut = 1/minfoi; %cut slowest freq additionally (for cutartefact)
 
 if strcmp(config.cutmethod,'consistenttime')
     mintime_fft = mintime;
