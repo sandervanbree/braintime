@@ -111,7 +111,7 @@ for perm1 = 1:config.numperms1
 end
 mean_modepow_shuff = mean(modepow_shuff);
 
-f=f(l:f); %filter frequency vector based on range of interest
+f=f(l:h); %filter frequency vector based on range of interest
 
 % Only calculate confidence interval and plot stats if desired
 if isfield(config,'figure')
