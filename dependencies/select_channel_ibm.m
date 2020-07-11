@@ -1,10 +1,10 @@
 function ft_select_channel_ibm(handle, eventdata,  varargin)
-
+% Copyright (C) 2009, Robert Oostenveld  
+% ~~~~~~~ Modified Brain Time Toolbox version ~~~~~~~
+%
 % FT_SELECT_CHANNEL is a helper function that can be used as callback function
 % in a figure. It allows the user to select a channel. The channel labels
 % are returned. 
-%
-% ~~~~~~~ Modified for the Brain Time Toolbox ~~~~~~~
 % 
 % Use as
 %   label = ft_select_channel(h, eventdata, ...)
