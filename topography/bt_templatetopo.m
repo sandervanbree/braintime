@@ -27,7 +27,7 @@ guidata(gcf, info)
 
 uiwait(msgbox({'Draw a box around sensors of interest. Then, click in the box to continue.';' ';...
     'The component ranking will be biased by whether the component''s topography has an overlap with your sensors of interest';' ';...
-    'The resulting template topography will be saved in the toolbox''s topography subfolder for retrieval when you enter cfg.sortmethod = ''temptopo'' in bt_analyzecomps.'}));
+    'The resulting template topography will be saved in the toolbox''s topography subfolder for retrieval when you enter cfg.sortmethod = ''templatetopo'' in bt_analyzecomps.'}));
 
     % call to select_channel_ibm (slightly modified for the Brain Time Toolbox)
     set(gcf, 'WindowButtonDownFcn',   {@select_channel_ibm, 'multiple', true, 'callback', @disp, 'event', 'WindowButtonDownFcn'})
