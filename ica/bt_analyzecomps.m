@@ -2,7 +2,7 @@ function [fft_comp] = bt_analyzecomps(config, comp)
 % Analyze the time frequency characteristics of all ICA components and
 % sort them based on average power in the frequency range of interest.
 % Optionally, this sorting can be biased by components' correlation
-% to a template topography created using bt_temptopo.
+% to a template topography created using bt_templatetopo.
 %
 % Use:
 % [fft_comp] = bt_analyzecomps(cfg,comp)
@@ -38,7 +38,7 @@ function [fft_comp] = bt_analyzecomps(config, comp)
 %   - sortmethod     % 'maxpow': sort components according to their average
 %                    % power in minfoi and maxfoi.
 %                    %
-%                    % 'temptopo': loads a template topography created
+%                    % 'templatetopo': loads a template topography created
 %                    % using bt_templatetopo that is used to bias the
 %                    % power sorting to the each component's topography
 %                    % match to the template topography.
@@ -66,8 +66,8 @@ if strcmp(config.cutmethod,'consistenttime')
     mintime_fft = mintime;
     maxtime_fft = maxtime;
 elseif strcmp(config.cutmethod,'cutartefact') % cut additional time
-    mintime_fft = config.mintime-extracut; 
-    maxtime_fft = config.maxtime+extracut;
+    mintime_fft = mintime-extracut; 
+    maxtime_fft = maxtime+extracut;
 end
 
 %% Calculate FFT
@@ -107,7 +107,7 @@ end
 comprank=sortrows(oscmax,4,'descend'); % sort components from highest to lowest power
 
 % Template topography builds onto the variable comprank
-if strcmp(config.sortmethod,'temptopo')
+if strcmp(config.sortmethod,'templatetopo')
     try
         load temptopo
     catch
