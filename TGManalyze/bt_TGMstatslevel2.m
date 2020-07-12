@@ -79,6 +79,8 @@ if isfield(config,'multiplecorr')
     end
 end
 
+pval(pval>1)=1;
+
 logpval = -log10(pval);
 logpval(isinf(logpval)) = 4; %cap logpval on 4.
 
