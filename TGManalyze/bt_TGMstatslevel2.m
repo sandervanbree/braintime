@@ -14,6 +14,11 @@ function [pval] = bt_TGMstatslevel2(config, stats1)
 %   - numperms2      % Number of permutations on the second statistical
 %                    % level.
 %                    %
+%   - multiplecorr   % Correction method for multiple comparisons.
+%                    % 'none' (default), 'fdr' for adjusted p-values based
+%                    % on the False Discovery Rate, and 'bonferroni' for
+%                    % Bonferroni correction.
+%                    %
 % stats1             % Output structure obtained using bt_TGMstatslevel1.
 %                    % Each cell contains one participants' power spectra
 %                    % the empirical data, permutation data, the associated
@@ -64,6 +69,16 @@ perms2PS_avg = mean(perm2PS,1);
 for f_ind = 1:numel(f)
 pval(f_ind) = numel(find(perm2PS(:,f_ind)>=PS_emp(f_ind)))/numperms2;
 end
+
+%% Multiple comparisons correction
+if isfield(config,'multiplecorr')
+    if strcmp(config.multiplecorr,'fdr')
+        [~,~,~,pval] = fdr_bh(pval);   
+    elseif strcmp(config.multiplecorr,'bonferroni')
+        pval = pval*numel(pval);
+    end
+end
+
 logpval = -log10(pval);
 logpval(isinf(logpval)) = 4; %cap logpval on 4.
 

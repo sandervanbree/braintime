@@ -49,10 +49,16 @@ normalizer = bt_TGMquant.normalizer;
 clabel = config.clabel;
 cfg_mv = config.mvpacfg;
 
-if isfield(config,'statsrange') %What is the recurrence rate range of interest?
+% Set up recurrence range over which stats will be applied
+if isfield(config,'statsrange') 
     statsrange = config.statsrange(1):config.statsrange(2);
 else
     statsrange = 1:40;
+end
+
+% Adjust to be a factor of warped frequency in case of brain time ref dimension
+if strcmp(normalizer.dim,'braintime')
+    statsrange = statsrange/warpfreq;
 end
 
 %% statistically test TGM
@@ -63,7 +69,7 @@ ac=autocorr2d(TGM);
 nvecs=numel(ac(:,1));
 
 % Perform FFT over one row to get f and find out statsrange indices
-[~,f]=Powspek(ac(1,:),nvecs/normalizer);
+[~,f]=Powspek(ac(1,:),nvecs/normalizer.value);
 l = find(abs(statsrange(1)-f)==min(abs(statsrange(1)-f))); %minimum frequency to be tested
 h = find(abs(statsrange(end)-f)==min(abs(statsrange(end)-f))); %maximum frequency to be tested
 srange = l:h;
@@ -71,11 +77,11 @@ srange = l:h;
 % Run FFT over all rows and columns of the AC map
 for vec=1:nvecs
     %1st dimenssion
-    [PS,f]=Powspek(ac(vec,:),nvecs/normalizer);
+    [PS,f]=Powspek(ac(vec,:),nvecs/normalizer.value);
     PS1(vec,:) = PS(srange);
     
     %2nd dimension
-    [PS,f]=Powspek(ac(:,vec),nvecs/normalizer);
+    [PS,f]=Powspek(ac(:,vec),nvecs/normalizer.value);
     PS2(vec,:) = PS(srange);
     
 end
@@ -97,11 +103,11 @@ for perm1 = 1:config.numperms1
     
     for vec=1:nvecs
         %1st dimenssion
-        [PS,f]=Powspek(ac(vec,:),nvecs/normalizer);
+        [PS,f]=Powspek(ac(vec,:),nvecs/normalizer.value);
         PS1(vec,:) = PS(srange);
         
         %2nd dimension
-        [PS,f]=Powspek(ac(:,vec),nvecs/normalizer);
+        [PS,f]=Powspek(ac(:,vec),nvecs/normalizer.value);
         PS2(vec,:) = PS(srange);
         
     end

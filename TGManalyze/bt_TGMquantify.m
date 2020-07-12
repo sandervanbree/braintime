@@ -34,10 +34,12 @@ toi = config.bt_struc.toi;
 warpfreq = config.bt_struc.freq;
 duration = toi(2)-toi(1);
 if strcmp(config.refdimension,'braintime')
-    normalizer = duration*warpfreq; %normalize by cycles in the data
+    normalizer.value = duration*warpfreq; %normalize by cycles in the data
+    normalizer.dim = 'braintime';
     timevec = config.bt_struc.data.time{1};
 elseif strcmp(config.refdimension,'clocktime')
-    normalizer = duration; %normalize by seconds in the data
+    normalizer.value = duration; %normalize by seconds in the data
+    normalizer.dim = 'clocktime';
     timevec = linspace(toi(1),toi(2),numel(config.bt_struc.data.time{1}));
 end
 
@@ -49,7 +51,7 @@ nvecs=numel(ac(:,1));
 
 for vec=1:nvecs %Only for half is needed
     %1st dimenssion
-    [PS,f]=Powspek(ac(vec,:),nvecs/normalizer);
+    [PS,f]=Powspek(ac(vec,:),nvecs/normalizer.value);
     [pks,locs]=findpeaks(PS);
     maxpk=find(pks==max(pks));
     
@@ -57,7 +59,7 @@ for vec=1:nvecs %Only for half is needed
     acfft_dim1(2,vec)=f(locs(maxpk)); %What's the frequency of the peak?
     
     %2nd dimension
-    [PS,f]=Powspek(ac(:,vec),nvecs/normalizer);%timevec(end));
+    [PS,f]=Powspek(ac(:,vec),nvecs/normalizer.value);%timevec(end));
     [pks,locs]=findpeaks(PS);
     maxpk=find(pks==max(pks));
     
