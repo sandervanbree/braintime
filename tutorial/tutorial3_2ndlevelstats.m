@@ -50,12 +50,6 @@ title('Brain Time warped data results (SIGNIFICANT at simulated 8 Hz)')
 
 %% Untransformed Clock Time data
 % First level statistics (single subject level)
-cfg.mvpacfg         = cfg_mv;          %input previous mvpa light config structure
-cfg.figure          = 'no'; 
-cfg.numperms1       = 5;               %number of permutations on the first level (per participant)
-cfg.statsrange      = [1 20];          %range of tested recurrence rates
-cfg.clabel          = clabel;
-
 % Loop through all participants
 for subj = 1:4 
 data = eval(strcat('TGM_subj',num2str(subj),'.ct_data'));
@@ -64,7 +58,5 @@ TGM = eval(strcat('TGM_subj',num2str(subj),'.ct_TGM'));
 end
 
 % Apply second level statistics
-cfg.numperms2      = 1000;                    %number of second level Monte Carlo permutations
-cfg.multiplecorr   = 'fdr';                   %multiple correction option
 [ct_pval] = bt_TGMstatslevel2(cfg,ct_stats1); %output matrix contains p-values and associated frequencies
 title('Untransformed Clock Time data results (NOT SIGNIFICANT at simulated 8 Hz)')

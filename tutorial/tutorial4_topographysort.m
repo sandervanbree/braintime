@@ -5,7 +5,7 @@
 % Create template topography (saved in topography folder)
 load layout
 cfg.layout = layout;
-bt_templatetopo(cfg);
+bt_templatetopo(cfg); %The simulated pattern shows a frontal topography
 
 %% This section is unchanged from tutorial 1
 % Load two classes of data (see tutorial folder)
@@ -61,13 +61,12 @@ cfg.btsrate      = 128;              % determine sampling rate of bt data
 cfg.removecomp   = 'no';            % remove component from data to avoid circularity (see paper)
 [bt_struc]        = bt_clocktobrain(cfg,ct_data,bt_comp);
 
-% Save results (required for tutorial 2)
-save bt_struc bt_struc;
-
 % cut ct_data to the same window
 cfg        = [];
 cfg.toilim = [bt_struc.toi(1) bt_struc.toi(2)];
 ct_data       = ft_redefinetrial(cfg, ct_data);
-save ct_data ct_data;
+
+%% Save results
+save tutorial4_output bt_struc ct_data
 
 % Feel free to enter these data into tutorial 2 to test for recurrence with the new parameters.
