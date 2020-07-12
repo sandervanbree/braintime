@@ -47,14 +47,13 @@ cfg.layout       = layout;           % load template for topography plotting
 %% Warp original clock time data to brain time
 cfg              = [];
 cfg.btsrate      = 128;              % determine sampling rate of bt data
-cfg.removecomp   = 'no';            % remove component from data to avoid circularity (see paper)
+cfg.removecomp   = 'no';             % remove component from data to avoid circularity (see paper)
 [bt_struc]        = bt_clocktobrain(cfg,ct_data,bt_comp);
-
-%% Save results (required for tutorial 2)
-save bt_struc bt_struc;
 
 % cut ct_data to the same window
 cfg        = [];
 cfg.toilim = [bt_struc.toi(1) bt_struc.toi(2)];
 ct_data       = ft_redefinetrial(cfg, ct_data);
-save ct_data ct_data;
+
+%% Save results
+save tutorial1_output bt_struc ct_data

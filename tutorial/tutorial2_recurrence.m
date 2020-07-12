@@ -2,9 +2,8 @@
 %%% analyze recurrence present in it by applying cross-time
 %%% generalization.
 
-% Load previously created clock and brain time data (see tutorial folder)
-load ct_data
-load bt_struc
+% Load previously created clock and brain time data
+load tutorial1_output
 
 % Timelock analyze the data
 cfg = [];
@@ -34,18 +33,18 @@ cfg_mv.k           = 5;         %number of folds
 
 % Plot results
 figure; subplot(1,2,1)
-mv_plot_2D(bt_TGM);title('Brain time TGM')
-subplot(1,2,2)
 mv_plot_2D(ct_TGM);title('Clock time TGM')
+subplot(1,2,2)
+mv_plot_2D(bt_TGM);title('Brain time TGM')
 
 %% Quantify TGM recurrence (compare clock and brain time)
 cfg = [];
-cfg.bt_struc        = bt_struc;      %specify so that information can be retrieved
-cfg.refdimension    = 'braintime';   %quantify recurrence as a function of seconds in the data or the warped frequency
+cfg.bt_struc        = bt_struc;                   %specify so that information can be retrieved
 cfg.figure          = 'yes';
-bt_TGMquant         = bt_TGMquantify(cfg,bt_TGM); %do once for brain time
-cfg.refdimension    = 'clocktime';   
+cfg.refdimension    = 'clocktime';                %quantify recurrence as a function of seconds in the data
 ct_TGMquant         = bt_TGMquantify(cfg,ct_TGM); %compare with clock time
+cfg.refdimension    = 'braintime';                %quantify recurrence as a function the warped frequency
+bt_TGMquant         = bt_TGMquantify(cfg,bt_TGM); %do once for brain time
 
 %% Statistically test TGM recurrence on the single subject level (compare clock and brain time)
 clabel = bt_struc.clabel;
@@ -54,8 +53,9 @@ cfg.mvpacfg         = cfg_mv;          %input previous mvpa light config structu
 cfg.numperms1       = 10;              %number of permutations on the first level
 cfg.statsrange      = [1 20];          %range of tested recurrence rates
 cfg.clabel          = clabel;
-[bt_TGMstats1] = bt_TGMstatslevel1(cfg,bt_data,bt_TGMquant);  %brain time results (significant)
 [ct_TGMstats1] = bt_TGMstatslevel1(cfg,ct_data,ct_TGMquant);  %clock time results (not significant)
+[bt_TGMstats1] = bt_TGMstatslevel1(cfg,bt_data,bt_TGMquant);  %brain time results (significant)
+
 
 %% Save brain time TGM for tutorial 3
-save bt_TGM bt_TGMquant bt_data clabel cfg_mv
+save tutorial2_output ct_TGMquant bt_TGMquant ct_TGMstats1 bt_TGMstats1 ct_data bt_data clabel cfg_mv

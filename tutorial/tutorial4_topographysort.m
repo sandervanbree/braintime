@@ -39,30 +39,26 @@ comp             = ft_componentanalysis(cfg ,ct_data);
 % by their ranking on two factors: power and correlation to your template
 % topography.
 
-% Perform FFT over components to enable sorting by power and to enable phase extraction
 cfg = [];
-cfg.mintime      = 0;                % start time of interest
-cfg.maxtime      = 1;                % end time of interest
-cfg.minfft       = 2;                % minimum frequency of FFT
-cfg.maxfft       = 30;               % maximum frequency of FFT
-cfg.minfoi       = 6;                % lowest frequency of interest
-cfg.maxfoi       = 10;               % highest frequency of interest
+cfg.time         = [0 1];            % time window of interest
+cfg.fft          = [2 30];           % frequency range for the FFT
+cfg.foi          = [6 10];           % frequency range of interest for brain time
 cfg.topcomp      = 10;               % number of components to be considered
 cfg.cutmethod    = 'cutartefact';    % 'cutartefact' or 'consistenttime' See "help bt_analyzecomps" or our paper for details
-cfg.sortmethod   = 'temptopo';       % sort by template topography
-cfg.removecomp   = 'yes';            % remove component from clock time data to avoid circularity (see paper)
+cfg.sortmethod   = 'templatetopo';   % sort by power in frequency range of interest. Alternative: 'templatetopo' (see tutorial 2)
 [fft_comp]       = bt_analyzecomps(cfg,comp);
 
-% Designate component frequency as brain time
+%% Designate component frequency as brain time
 % Choose the first component
 load layout
 cfg              = [];
-cfg.layout   = layout;           % load template for topography plotting
+cfg.layout       = layout;           % load template for topography plotting
 [bt_comp]        = bt_choosecomp(cfg,fft_comp,comp);
 
-% Warp original clock time data to brain time
+%% Warp original clock time data to brain time
 cfg              = [];
 cfg.btsrate      = 128;              % determine sampling rate of bt data
+cfg.removecomp   = 'no';            % remove component from data to avoid circularity (see paper)
 [bt_struc]        = bt_clocktobrain(cfg,ct_data,bt_comp);
 
 % Save results (required for tutorial 2)
@@ -74,4 +70,4 @@ cfg.toilim = [bt_struc.toi(1) bt_struc.toi(2)];
 ct_data       = ft_redefinetrial(cfg, ct_data);
 save ct_data ct_data;
 
-% Feel free to enter these data into tutorial 2 to test for recurrence.
+% Feel free to enter these data into tutorial 2 to test for recurrence with the new parameters.
