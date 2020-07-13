@@ -23,8 +23,8 @@ function [pval] = bt_TGMstatslevel2(config, stats1)
 %                    % Each cell contains one participants' power spectra
 %                    % the empirical data, permutation data, the associated
 %                    % frequency vector, and the power at the mode freq.
-%                    % 
-% Output:            % 
+%                    %
+% Output:            %
 % pval               % Two row vectors. The first row vector contains the
 %                    % pvalues of the statistical comparison between the
 %                    % empirical power spectrum (averaged across
@@ -54,7 +54,7 @@ for perm2=1:numperms2
     fprintf('Second level permutation number %i\n', perm2);
     for subj = 1:numsubj
         idx=randperm(numperms1,1); %randomly grab with replacement
-        perm1PS(subj,:) = stats1{subj}.shuffspec(idx,:);        
+        perm1PS(subj,:) = stats1{subj}.shuffspec(idx,:);
     end
     perm2PS(perm2,:) = mean(perm1PS,1);
 end
@@ -62,25 +62,28 @@ end
 % Mean across all 2nd level permutations (for plotting)
 perms2PS_avg = mean(perm2PS,1);
 
-% Maximum difference between emp and shuff
-[~, max_f] = max(PS_emp-perms2PS_avg);
-
 %% Calculate p-values
 for f_ind = 1:numel(f)
-pval(f_ind) = numel(find(perm2PS(:,f_ind)>=PS_emp(f_ind)))/numperms2;
+    pval(f_ind) = numel(find(perm2PS(:,f_ind)>=PS_emp(f_ind)))/numperms2;
 end
 
 %% Multiple comparisons correction
 if isfield(config,'multiplecorr')
     if strcmp(config.multiplecorr,'fdr')
-        [~,~,~,pval] = fdr_bh(pval);   
+        [~,~,~,pval] = fdr_bh(pval);
     elseif strcmp(config.multiplecorr,'bonferroni')
         pval = pval*numel(pval);
     end
 end
 
-pval(pval>1)=1;
+pval(pval>1)=1; % for Bonferroni, prevent >1 p values.
 
+% Find the significant frequency with the highest empirical power
+[~, sigind] = find(pval<=0.05);
+[~, maxfreq] = max(PS_emp(sigind));
+maxfreq = sigind(maxfreq);
+
+% Get the negative logarithm
 logpval = -log10(pval);
 logpval(isinf(logpval)) = 4; %cap logpval on 4.
 
@@ -90,8 +93,16 @@ figure; hold on
 yyaxis left
 p1 = plot(f,PS_emp,'LineStyle','-','LineWidth',3,'Color','b'); %Mean across 2nd level perms
 p2 = plot(f,perms2PS_avg,'LineStyle','-','LineWidth',2,'Color',[0.3 0.3 0.3]); %Mean across 2nd level perms
-p3 = line([f(max_f) f(max_f)], [0 max(PS_emp)],'color',[1 0 1],'LineWidth',3); %Line at warped freq
-p3.Color(4) = 0.45;
+
+if isempty(maxfreq)~=1
+    p3 = line([f(maxfreq) f(maxfreq)], [0 max(PS_emp)],'color',[1 0 1],'LineWidth',3); %Line at maximum significant frequency
+    p3.Color(4) = 0.45;
+    title('Statistically significant recurrence present in TGM')
+else
+    p3 = line([0 0], [0 0],'color',[1 0 1],'LineWidth',3); 
+    title('No statistically significant recurrence in TGM')
+end
+
 xlabel('Recurrence frequency')
 ylabel('Mean power across participants')
 
@@ -107,7 +118,7 @@ sigind = find(pval<=0.05);
 p5 = plot(f(sigind),PS_emp(sigind),'r*','MarkerSize',10,'LineWidth',1.5);
 
 % legend
-legend([p1 p2 p3 p4 p5],{'Average emp spectrum','Average perm spectrum','Largest diff emp and perm spectrum','-log10 pvalue', 'p<=0.05'});
+legend([p1 p2 p3 p4 p5],{'Average emp spectrum','Average perm spectrum','Significant frequency with highest power','-log10 pvalue', 'p<=0.05'});
 
 %% Adapt output variable
 % Add freq information to pval vector
