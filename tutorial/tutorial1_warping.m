@@ -32,6 +32,7 @@ cfg = [];
 cfg.time         = [0 1];            % time window of interest
 cfg.fft          = [2 30];           % frequency range for the FFT
 cfg.foi          = [6 10];           % frequency range of interest for brain time
+cfg.waveletwidth = 5;                % wavelet width in number of cycles
 cfg.topcomp      = 10;               % number of components to be considered
 cfg.cutmethod    = 'consistenttime'; % 'cutartefact' or 'consistenttime' See "help bt_analyzecomps" or our paper for details
 cfg.sortmethod   = 'maxpow';         % sort by power in frequency range of interest. Alternative: 'templatetopo' (see tutorial 2)
@@ -39,7 +40,7 @@ cfg.sortmethod   = 'maxpow';         % sort by power in frequency range of inter
 
 %% Designate component frequency as brain time
 % Choose the first component
-load layout
+load layout_tutorial
 cfg              = [];
 cfg.layout       = layout;           % load template for topography plotting
 [bt_comp]        = bt_choosecomp(cfg,fft_comp,comp);
@@ -55,5 +56,5 @@ cfg        = [];
 cfg.toilim = [bt_struc.toi(1) bt_struc.toi(2)];
 ct_data       = ft_redefinetrial(cfg, ct_data);
 
-%% Save results
+%% Save results for tutorial 2
 save tutorial1_output bt_struc ct_data
