@@ -32,14 +32,15 @@ function [bt_struc] = bt_clocktobrain(config, data, bt_comp)
 
 %% Get basic info
 compoi = bt_comp{1}; %component of interest
-phs = bt_comp{2}; %its phase
+phs = cell2mat(bt_comp{2}); %its phase
 comp = bt_comp{3}; %component structure from FieldTrip
 topcomps = bt_comp{4}; %top components
 mintime = bt_comp{5}.time(1);
 maxtime = bt_comp{5}.time(end);
 cutmethod = bt_comp{6};
 warpfreq = topcomps(2); %warped frequency
-extracut = bt_comp{7};
+mintime_ind = bt_comp{7}(1);
+maxtime_ind = bt_comp{7}(2);
 
 % Set up sampling rate
 if isfield(config,'btsrate')
@@ -61,21 +62,27 @@ end
 
 %% Cut out the time window of fft (from which the phase was extracted)
 cfg        = [];
-cfg.toilim = [mintime maxtime];
+if strcmp(cutmethod,'cutartefact')
+    cyclesample = round((1/warpfreq)*comp.fsample); %Calculate how many samples one cycle consists of
+    cfg.toilim = [mintime+0.5-(1/warpfreq) maxtime-0.5+(1/warpfreq)]; %Cut to the time window of interest, plus one cycle
+    phs = phs(:,mintime_ind-cyclesample:maxtime_ind+cyclesample); %Cut to the time window of interest, plus one cycle
+elseif strcmp(cutmethod,'consistenttime')
+    cfg.toilim = [mintime maxtime];
+end
 data       = ft_redefinetrial(cfg, data);
 
 %% Warp component's data to template phase vector (based on power oscillation)
 % Re-Organize EEG data by phase
 bt_data=data;
-nsec=maxtime-mintime; %number of seconds in the data
+nsec=bt_data.time{1}(end)-bt_data.time{1}(1); %number of seconds in the data
 Ncycles_pre=warpfreq*nsec; %number of cycles * seconds
 cycledur=round(phs_sr*nsec/Ncycles_pre); %samples for cycle
 tmp_sr=Ncycles_pre*cycledur/nsec;
 tempphs=linspace(-pi,(2*pi*Ncycles_pre)-pi,tmp_sr*nsec);% set up phase bins for unwrapped phase (angular frequency)
 timephs=linspace(0,Ncycles_pre,phs_sr*nsec); %time vector of the unwrapper phase
 
-for nt=1:size(phs{1},1)
-    tmpphstrl=unwrap(phs{1}(nt,:));
+for nt=1:size(phs,1)
+    tmpphstrl=unwrap(phs(nt,:));
     % Warp phase of single trial onto template phase
     [~,ix,iy] = dtw(tmpphstrl,tempphs); %to get the equivalence index between template and trial phase
     
@@ -111,25 +118,21 @@ end
 
 % If method is cut artefact, cut right time window and adjust time vector
 if strcmp(cutmethod,'cutartefact')
-    % correct time window of interest
-    mintime = mintime+extracut;
-    maxtime = maxtime-extracut;
+    % correct time window of interest to true time
+    mintime = mintime+0.5;
+    maxtime = maxtime-0.5;
     
-    % cut out the extra cycles
-    FreqDiff = (Ncycles_pre-((maxtime)-(mintime))*warpfreq)/2; % MARIA I think this is this better?
-    %FreqDiff = (warpfreq*0.5)-warpfreq*((maxtime)-(mintime)); %How much is the time vector off?
-    
-    startind = round((phs_sr*extracut)+1); % first cycle of the time window of interest index
-    endind   = length(bt_data.time{1,1})-round((phs_sr*extracut)); %What's the index of the end of the desired new data?
+    startind = findnearest(bt_data.time{1},1); %Find index of first cycle in window of interest
+    endind = findnearest(bt_data.time{1},warpfreq*(maxtime-mintime)+1); %Find index of last cycle in window of interest
     
     cfg         = [];
-    cfg.latency = [bt_data.time{1}(startind) bt_data.time{1}(endind)];
+    cfg.latency = [bt_data.time{1}(startind) bt_data.time{1}(endind)]; % Cut to time window of interest
     bt_data  = ft_selectdata(cfg,bt_data);
     bt_data.trialinfo = data.trialinfo;
     
     % correct the cycles vector
     for trl = 1:numel(bt_data.trial)
-        bt_data.time{trl} = bt_data.time{trl}-FreqDiff;
+        bt_data.time{trl} = bt_data.time{trl}-1; %cycles vector is off by 1
     end
 end
 
