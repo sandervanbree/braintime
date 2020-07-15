@@ -54,7 +54,7 @@ cfg.removecomp   = 'no';             % remove component from data to avoid circu
 % cut ct_data to the same window
 cfg        = [];
 cfg.toilim = [bt_struc.toi(1) bt_struc.toi(2)];
-ct_data       = ft_redefinetrial(cfg, ct_data);
+ct_data    = ft_redefinetrial(cfg, ct_data);
 
 %% Save results for tutorial 2
 save tutorial1_output bt_struc ct_data

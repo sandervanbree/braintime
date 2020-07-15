@@ -3,9 +3,10 @@
 %%% We will also try different parameters in the pipeline
 
 % Create template topography (saved in topography folder)
-load layout
+% Draw the box over frontal areas, where the simulated patterns were induced
+load layout_tutorial
 cfg.layout = layout;
-bt_templatetopo(cfg); %The simulated pattern shows a frontal topography
+bt_templatetopo(cfg);
 
 %% This section is unchanged from tutorial 1
 % Load two classes of data (see tutorial folder)
@@ -43,14 +44,15 @@ cfg = [];
 cfg.time         = [0 1];            % time window of interest
 cfg.fft          = [2 30];           % frequency range for the FFT
 cfg.foi          = [6 10];           % frequency range of interest for brain time
+cfg.waveletwidth = 5;                % wavelet width in number of cycles
 cfg.topcomp      = 10;               % number of components to be considered
 cfg.cutmethod    = 'cutartefact';    % 'cutartefact' or 'consistenttime' See "help bt_analyzecomps" or our paper for details
 cfg.sortmethod   = 'templatetopo';   % sort by power in frequency range of interest. Alternative: 'templatetopo' (see tutorial 2)
 [fft_comp]       = bt_analyzecomps(cfg,comp);
 
 %% Designate component frequency as brain time
-% Choose the first component
-load layout
+% Choose component with a frontal topography at 8 Hz
+load layout_tutorial
 cfg              = [];
 cfg.layout       = layout;           % load template for topography plotting
 [bt_comp]        = bt_choosecomp(cfg,fft_comp,comp);
@@ -58,13 +60,13 @@ cfg.layout       = layout;           % load template for topography plotting
 %% Warp original clock time data to brain time
 cfg              = [];
 cfg.btsrate      = 128;              % determine sampling rate of bt data
-cfg.removecomp   = 'no';            % remove component from data to avoid circularity (see paper)
+cfg.removecomp   = 'yes';            % remove component from data to avoid circularity (see paper)
 [bt_struc]        = bt_clocktobrain(cfg,ct_data,bt_comp);
 
 % cut ct_data to the same window
 cfg        = [];
 cfg.toilim = [bt_struc.toi(1) bt_struc.toi(2)];
-ct_data       = ft_redefinetrial(cfg, ct_data);
+ct_data    = ft_redefinetrial(cfg, ct_data);
 
 %% Save results
 save tutorial4_output bt_struc ct_data
