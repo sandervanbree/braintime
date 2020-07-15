@@ -60,20 +60,20 @@ minfoi = config.foi(1);
 maxfoi = config.foi(2);
 mintime = config.time(1);
 maxtime = config.time(2);
-extracut = 1/minfoi; %cut slowest freq additionally (for cutartefact)
+width = config.waveletwidth;
 
 if strcmp(config.cutmethod,'consistenttime')
     mintime_fft = mintime;
     maxtime_fft = maxtime;
 elseif strcmp(config.cutmethod,'cutartefact') % cut additional time
-    mintime_fft = mintime-extracut; 
-    maxtime_fft = maxtime+extracut;
+    mintime_fft = mintime-0.5; 
+    maxtime_fft = maxtime+0.5;
 end
 
 %% Calculate FFT
 cfgtf           = [];
 cfgtf.method    = 'wavelet';
-cfgtf.width     = 5;
+cfgtf.width     = width;
 cfgtf.toi       = mintime_fft:sampledur:maxtime_fft;
 cfgtf.foi       = (minfft:1:maxfft);
 cfgtf.output    = 'fourier';
@@ -92,10 +92,10 @@ mintime_ind = find(abs(mintime-fspec.time)==min(abs(mintime-fspec.time))); % min
 maxtime_ind = find(abs(maxtime-fspec.time)==min(abs(maxtime-fspec.time))); % maximun time of interest index
 
 for cmp = 1:numcomp
-    powtf(:,:,cmp)=squeeze(nanmean(fspec.powspctrm(:,cmp,:,mintime_ind:maxtime_ind),1));
+    powtf(:,:,cmp)=squeeze(nanmean(fspec.powspctrm(:,cmp,:,:),1));
     pspec(:,cmp)=squeeze(nanmean(powtf(:,:,cmp),2)); % get power spectrum of components
     [maxpow, maxpowind]= max(pspec(minfoi_ind:maxfoi_ind,cmp)); % what's the highest power in the freq range of interest and its index in the freq range of interest vector?
-    oscmaxfreq(cmp) = (fspec.freq(foivec_ind(maxpowind))); % what´s the highest power oscillation?
+    oscmaxfreq(cmp) = (fspec.freq(foivec_ind(maxpowind))); % what's the highest power oscillation?
     [~, freqidx]=find(abs(oscmaxfreq(cmp)-fspec.freq)==min(abs(oscmaxfreq(cmp)-fspec.freq))); % what is the index of the highest power oscillation?
     foi_ind(cmp) = freqidx;
     oscmax(cmp,:) = [cmp,oscmaxfreq(cmp), foi_ind(cmp),maxpow]; % matrix with component number, freq, its index, and its power
@@ -171,5 +171,4 @@ fft_comp{5} = powtf(:,:,comprank(:,1));
 fft_comp{6} = pspec(:,comprank(:,1));
 fft_comp{7} = phs(comprank(:,1)); %phase of the top components
 fft_comp{8} = config.cutmethod;
-fft_comp{9} = extracut;
 end

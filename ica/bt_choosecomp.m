@@ -35,7 +35,6 @@ powtf = fft_comp{5};
 pspec = fft_comp{6};
 phs = fft_comp{7}; %Phase of all components
 cutmethod = fft_comp{8};
-cutinfo = fft_comp{9};
 
 %% Plot top components
 figure
@@ -63,7 +62,7 @@ while compind <= numel(topcomps)
         cfg.layout    = config.layout; % specify the layout file that should be used for plotting
         cfg.comment   = 'no';
         ft_topoplotIC(cfg, comp)
-        colorbar
+        colorbar;
         lim=max(abs(comp.topo(:,currcomp)));
         lim=lim+(lim/100*10);
         caxis([-lim lim])
@@ -74,21 +73,25 @@ while compind <= numel(topcomps)
         end
     end
     
-    title({[num2str(compind) '/' num2str(size(topcomps,1)) ' Components'] ['Component ' num2str(currcomp)]})
+    title({[num2str(compind) '/' num2str(size(topcomps,1)) ' Components']})
     
     % time-frequency plot
     subplot(5,2,[2 4 6 8]);
-    pcolor(fspecinfo.time(mintime_ind:maxtime_ind),fspecinfo.freq,powtf(:,:,compind));
+    pcolor(fspecinfo.time(mintime_ind:maxtime_ind),fspecinfo.freq,powtf(:,mintime_ind:maxtime_ind,compind));
     shading interp
     ylim([minfft maxfft]);
     caxis([0 caxislim])
-    title(sprintf('Component %d with power at %0.3fHz: %0.3f',currcomp,topcomps(compind,2),topcomps(compind,4)))
+    xlabel('Time (s)')
+    ylabel('Frequency')
+    title(sprintf('Comp: %d, freq: %0.2fHz, pow: %0.3f',currcomp,topcomps(compind,2),topcomps(compind,4)))
     
     % dominant oscillation plot
     subplot(5,2,10);
-    plot(squeeze(pspec(:,compind,1)),fspecinfo.freq);
-    ylim([minfft maxfft]);
-    xlim([0 caxislim])
+    plot(fspecinfo.freq,squeeze(pspec(:,compind,1)));
+    xlim([minfft maxfft]);
+    ylim([0 caxislim])
+    xlabel('Frequency')
+    ylabel('Power')
     
     keydown = waitforbuttonpress;
     value = double(get(gcf,'CurrentCharacter'));
@@ -101,13 +104,12 @@ while compind <= numel(topcomps)
     elseif value == 28 %go back previous component if press back arrow
         compind = compind-2;
     elseif strcmp(key,'q') %stop the loop if it is not necessesary to keep visualising  %CHECK
-        fprintf('Warping oscillation will be the %0.3fHz phase in component number %d. Press ''q'' to quit.',topcomps(compind,2),currcomp)
+        fprintf('Warping oscillation will be the %0.2fHz phase in component number %d.',topcomps(compind,2),currcomp)
         compind = (numel(topcomps))+1;
         close
     end
     compind = compind+1;
 end
-
 
 %% Save basic info
 bt_comp{1} = compoi; %chosen component
@@ -116,4 +118,4 @@ bt_comp{3} = comp;
 bt_comp{4} = topcomps(compoi,:);
 bt_comp{5} = fspecinfo;
 bt_comp{6} = cutmethod;
-bt_comp{7} = cutinfo;
+bt_comp{7} = [mintime_ind, maxtime_ind];
