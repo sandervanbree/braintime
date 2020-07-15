@@ -78,11 +78,6 @@ end
 
 pval(pval>1)=1; % for Bonferroni, prevent >1 p values.
 
-% Find the significant frequency with the highest empirical power
-[~, sigind] = find(pval<=0.05);
-[~, maxfreq] = max(PS_emp(sigind));
-maxfreq = sigind(maxfreq);
-
 % Get the negative logarithm
 logpval = -log10(pval);
 logpval(isinf(logpval)) = 4; %cap logpval on 4.
@@ -93,32 +88,22 @@ figure; hold on
 yyaxis left
 p1 = plot(f,PS_emp,'LineStyle','-','LineWidth',3,'Color','b'); %Mean across 2nd level perms
 p2 = plot(f,perms2PS_avg,'LineStyle','-','LineWidth',2,'Color',[0.3 0.3 0.3]); %Mean across 2nd level perms
-
-if isempty(maxfreq)~=1
-    p3 = line([f(maxfreq) f(maxfreq)], [0 max(PS_emp)],'color',[1 0 1],'LineWidth',3); %Line at maximum significant frequency
-    p3.Color(4) = 0.45;
-    title('Statistically significant recurrence present in TGM')
-else
-    p3 = line([0 0], [0 0],'color',[1 0 1],'LineWidth',3); 
-    title('No statistically significant recurrence in TGM')
-end
-
 xlabel('Recurrence frequency')
 ylabel('Mean power across participants')
 
 % p-value axis
 yyaxis right
-p4 = plot(f,logpval,'LineStyle','-','LineWidth',2,'Color',[0.7 0.2 0.2]);
-p4.Color(4) = 0.25;
+p3 = plot(f,logpval,'LineStyle','-','LineWidth',2,'Color',[0.7 0.2 0.2]);
+p3.Color(4) = 0.25;
 ylabel('-log10 p-value')
 
 % plot star at every significant frequency
 yyaxis left
 sigind = find(pval<=0.05);
-p5 = plot(f(sigind),PS_emp(sigind),'r*','MarkerSize',10,'LineWidth',1.5);
+p4 = plot(f(sigind),PS_emp(sigind),'r*','MarkerSize',10,'LineWidth',1.5);
 
 % legend
-legend([p1 p2 p3 p4 p5],{'Average emp spectrum','Average perm spectrum','Significant frequency with highest power','-log10 pvalue', 'p<=0.05'});
+legend([p1 p2 p3 p4],{'Average emp spectrum','Average perm spectrum','-log10 pvalue', 'p<=0.05'});
 
 %% Adapt output variable
 % Add freq information to pval vector

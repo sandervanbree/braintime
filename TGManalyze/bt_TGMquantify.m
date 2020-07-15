@@ -72,7 +72,6 @@ acfft=[acfft_dim1,acfft_dim2];
 
 % get the overall mode
 modefreq=mode(acfft(2,:));
-[~,modefreqind]=find(abs(modefreq-f)==min(abs(modefreq-f)));
 
 if isfield(config,'figure')
     if strcmp(config.figure,'yes')
@@ -143,6 +142,5 @@ bt_TGMquant.acfft = acfft;
 bt_TGMquant.timevec = timevec;
 bt_TGMquant.normalizer = normalizer;
 bt_TGMquant.modefreq = modefreq;
-bt_TGMquant.modefreqind = modefreqind;
 bt_TGMquant.TGM = TGM;
 bt_TGMquant.refdimension = config.refdimension;

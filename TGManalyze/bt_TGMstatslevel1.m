@@ -41,7 +41,6 @@ toi = bt_TGMquant.toi;
 warpfreq = bt_TGMquant.warpfreq;
 acfft = bt_TGMquant.acfft; % AC map FFT information
 modefreq = bt_TGMquant.modefreq;
-modefreqind = bt_TGMquant.modefreqind; %Index of the mode frequency
 TGM = bt_TGMquant.TGM;
 refdimension = bt_TGMquant.refdimension;
 timevec = bt_TGMquant.timevec;
@@ -82,9 +81,10 @@ for vec=1:nvecs
     
     %2nd dimension
     [PS,f]=Powspek(ac(:,vec),nvecs/normalizer.value);
-    PS2(vec,:) = PS(srange);
-    
+    PS2(vec,:) = PS(srange);    
 end
+f=f(l:h); %filter frequency vector based on range of interest
+modefreqind = findnearest(f,modefreq);
 avg_PS = mean(PS1,1)+mean(PS2,1); %Mean power spectra
 modepow_emp = avg_PS(modefreqind); %Mean power at mode freq
 fullspec_emp = avg_PS;
@@ -116,8 +116,8 @@ for perm1 = 1:config.numperms1
     fullspec_shuff(perm1,:) = avg_PS;
 end
 mean_modepow_shuff = mean(modepow_shuff);
-
 f=f(l:h); %filter frequency vector based on range of interest
+
 
 % Only calculate confidence interval and plot stats if desired
 if isfield(config,'figure')
