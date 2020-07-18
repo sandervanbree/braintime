@@ -4,13 +4,13 @@
 
 Warp electrophysiological data from clock time (default) to brain time and analyze the rate of recurrence of mental representations. By *Sander van Bree, María Melcón, Maria Wimber & Simon Hanslmayr*.
 
-### Dependencies:
+### Dependencies
 - FieldTrip
 - MVPA Light
 - MATLAB Signal Processing Toolbox
 - [Several functions](dependencies) included in the toolbox
 
-### Glossary:
+### Glossary
 | Term | Description |
 | --- | --- |
 | Clock time (CT) | data ordered by sequences of seconds |
