@@ -49,7 +49,7 @@ function [fft_comp] = bt_analyzecomps(config, comp)
 % Output:            %
 % fft_comp           % Data structure with: ranked components, their 
 %                    % time frequency information, and config details
-%                    % saved for later retrival.
+%                    % saved for later retrieval.
 
 %% Get information
 sampledur = (comp.time{1}(2)-comp.time{1}(1)); % Duration of each sample
