@@ -152,7 +152,7 @@ if strcmp(config.sortmethod,'templatetopo')
     chanrank=sortrows(chanrank,6,'descend'); % sort channels by index
     chanrank =chanrank(:,1:4);
 end
-
+    
 %% Take the 30 best channels (or specified number)
 if isfield(config,'topchan')
     numtopchans = min(config.topcarrier,numchans);

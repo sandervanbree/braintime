@@ -52,7 +52,13 @@ uiwait(msgbox({'Instructions to browse through channels:';' ';...
     'Press forward/back arrow to see the next/previous channel';...
     'Once you have decided for one channel, click on that channel and press Q to quit visualization'}))
 
-while chanind <= numel(topchans)
+while chanind <= size(topchans,1)+1
+    if chanind < 1 % make sure channel cannot go out of bounds
+        chanind = 1;
+    elseif chanind>size(topchans,1)
+        chanind = size(topchans,1);
+    end
+    
     currchan = topchans(chanind);
     
     f1 = subplot(5,2,[1 3 5 7 9]);    
@@ -110,18 +116,23 @@ while chanind <= numel(topchans)
     value = double(get(gcf,'CurrentCharacter'));
     [~,~,keyCode] = KbCheck;
     key = KbName(find(keyCode));
-    if (keydown == 0) %grab the carrier if click
+    if (keydown == 0) %grab the channel if click
         channeloi=chanind;
         fprintf('Selected carrier in channel number %d. Press ''q'' to quit.',currchan)
-        chanind = chanind-1;
+        chanind = chanind;
     elseif value == 28 %go back previous channel if press back arrow
-        chanind = chanind-2;
-    elseif strcmp(key,'q') %stop the loop if it is not necessesary to keep visualising 
+        chanind = chanind-1;
+    elseif value == 29 %go back previous channel if press back arrow
+        chanind = chanind+1;
+        if chanind > numel(topchans) % make sure channel cannot go out of bounds
+            chanind = 1;
+            disp('This is the last channel')
+        end
+    elseif strcmp(key,'q') %stop the loop if it is not necessesary to keep visualising
         fprintf('Carrier will be the %0.2fHz phase in channel number %d.',topchans(chanind,2),currchan)
         chanind = (numel(topchans))+1;
         close
     end
-    chanind = chanind+1;
 end
 
 %% Save basic info
