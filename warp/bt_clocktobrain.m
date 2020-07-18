@@ -1,10 +1,10 @@
-function [bt_struc] = bt_clocktobrain(config, data, bt_comp)
+function [bt_struc] = bt_clocktobrain(config, data, bt_carrier)
 % Warp clock to brain time. The clock time data is resampled based on the
 % warping path from the brain time phase vector to the phase of a
 % stationary sinusoid.
 %
 % Use:
-% [bt_struc] = bt_clocktobrain(config,data,bt_comp)
+% [bt_struc] = bt_clocktobrain(config,data,bt_carrier)
 %
 % Input Arguments:
 % config
@@ -21,26 +21,26 @@ function [bt_struc] = bt_clocktobrain(config, data, bt_comp)
 % data               % Preprocessed clock time data structure consisting of
 %                    % both classes.
 %                    %
-% bt_comp            % Data structure obtained from bt_choosecomp.
-%                    % Includes: time frequency information, and config
-%                    % details saved for later retrieval.
+% bt_carrier         % Data structure obtained from bt_choosecarrier.
+%                    % Includes: Carrier's time frequency information, and 
+%                    % config details saved for later retrieval.
 %                    %
 % Output:            %
-% bt_struc           % Data structure with: chosen component, its 
+% bt_struc           % Data structure with: brain time data, its 
 %                    % time frequency information, and config details
-%                    % saved for later retrival.
+%                    % saved for later retrieval.
 
 %% Get basic info
-compoi = bt_comp{1}; %component of interest
-phs = cell2mat(bt_comp{2}); %its phase
-comp = bt_comp{3}; %component structure from FieldTrip
-topcomps = bt_comp{4}; %top components
-mintime = bt_comp{5}.time(1);
-maxtime = bt_comp{5}.time(end);
-cutmethod = bt_comp{6};
-warpfreq = topcomps(2); %warped frequency
-mintime_ind = bt_comp{7}(1);
-maxtime_ind = bt_comp{7}(2);
+channeloi = bt_carrier{1}; %channel of interest
+phs = cell2mat(bt_carrier{2}); %its phase
+channels = bt_carrier{3}; %channel structure from FieldTrip
+topchans = bt_carrier{4}; %top components
+mintime = bt_carrier{5}.time(1);
+maxtime = bt_carrier{5}.time(end);
+cutmethod = bt_carrier{6};
+warpfreq = topchans(2); %warped frequency
+mintime_ind = bt_carrier{7}(1);
+maxtime_ind = bt_carrier{7}(2);
 
 % Set up sampling rate
 if isfield(config,'btsrate')
@@ -51,19 +51,22 @@ end
 
 %% Remove the component from original data if desired (default = yes)
 cfg           = [];
-cfg.component = compoi;
+cfg.component = channeloi;
 if isfield(config,'removecomp')
     if strcmp(config.removecomp,'yes')
-        data = ft_rejectcomponent (cfg, comp, data);
+        data = ft_rejectcomponent (cfg, channels, data);
     end
 else
-    data = ft_rejectcomponent (cfg, comp, data);
+    % if the removal option is not specified, remove by default
+    if strcmp(channels.cfg.method,'runica') %only makes sense if channel data are ICA components
+    data = ft_rejectcomponent (cfg, channels, data);
+    end
 end
 
 %% Cut out the time window of fft (from which the phase was extracted)
 cfg        = [];
 if strcmp(cutmethod,'cutartefact')
-    cyclesample = round((1/warpfreq)*comp.fsample); %Calculate how many samples one cycle consists of
+    cyclesample = round((1/warpfreq)*channels.fsample); %Calculate how many samples one cycle consists of
     cfg.toilim = [mintime+0.5-(1/warpfreq) maxtime-0.5+(1/warpfreq)]; %Cut to the time window of interest, plus one cycle
     phs = phs(:,mintime_ind-cyclesample:maxtime_ind+cyclesample); %Cut to the time window of interest, plus one cycle
 elseif strcmp(cutmethod,'consistenttime')
@@ -112,7 +115,7 @@ for nt=1:size(phs,1)
     end
     
     % Create warped trials
-    bt_data.trial{1,nt}=imresize(tmptrl,[size(tmptrl,1) phs_sr*nsec]);
+    bt_data.trial{1,nt}=imresize(tmptrl,[size(tmptrl,1) numel(timephs)]);
     bt_data.time{1,nt}=timephs;
 end
 
