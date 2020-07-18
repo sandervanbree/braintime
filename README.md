@@ -14,7 +14,7 @@ Warp electrophysiological data from clock time (default) to brain time and analy
 | Term | Description |
 | --- | --- |
 | Clock time (CT) | data ordered by sequences of seconds |
-| Brain time (BT) | data ordered by sequences of neural oscillations |
+| Brain time (BT) | data ordered by the phase of a neural oscillation |
 | Warping | a procedure to nonlinearly rescale time series |
 | Carrier | an oscillation to which clock time data can be warped |
 | Recurrence | rhythmic patterns of classification performance emerging from data trained on previous time points |
