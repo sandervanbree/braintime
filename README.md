@@ -11,12 +11,14 @@ Warp electrophysiological data from clock time (default) to brain time and analy
 - [Several functions](dependencies) included in the toolbox
 
 ### Glossary:
-- *Clock time (CT):*         &emsp; &emsp; &emsp;  &emsp; &emsp; &emsp;   &emsp;  &emsp;   &emsp;     data ordered by sequences of seconds
-- *Brain time (BT):*         &emsp; &emsp; &emsp;   &emsp; &emsp; &emsp;    &emsp; &emsp;  &emsp;   data ordered by the sequences of neural oscillations
-- *Warping:*                 &emsp;  &emsp; &emsp; &emsp; &emsp;  &emsp; &emsp; &emsp;   &emsp;  &emsp;  &emsp;  &emsp;            a procedure to nonlinearly rescale time series
-- *Carrier:*                &emsp;  &emsp; &emsp; &emsp; &emsp;  &emsp; &emsp; &emsp;   &emsp;  &emsp;   &emsp;  &emsp;           an oscillation to which clock time data can be warped
-- *Recurrence:*              &emsp; &emsp; &emsp;  &emsp; &emsp; &emsp;   &emsp;  &emsp;   &emsp;  &emsp;           rhythmic patterns of classification performance emerging from  &emsp;  &emsp; &emsp;  &emsp; &emsp;  &emsp; &emsp;  &emsp; data trained on previous time points
-- *Temporal Generalization Matrix (TGM):* &emsp; testing and training a classifier at all time points
+| Term | Description |
+| --- | --- |
+| Clock time (CT) | data ordered by sequences of seconds |
+| Brain time (BT) | data ordered by sequences of neural oscillations |
+| Warping | a procedure to nonlinearly rescale time series |
+| Carrier | an oscillation to which clock time data can be warped |
+| Recurrence | rhythmic patterns of classification performance emerging from data trained on previous time points |
+| Temporal Generalization Matrix (TGM): | testing and training a classifier at all time points |
 
 ## Table of contents
 [Installation](#installation)
