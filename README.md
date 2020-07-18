@@ -11,7 +11,7 @@ Warp electrophysiological data from clock time (default) to brain time and analy
 - [Several functions](dependencies) included in the toolbox
 
 ### Glossary:
-- *Clock time (CT):*                      data ordered by sequences of seconds
+- *Clock time (CT):*         &emsp;            data ordered by sequences of seconds
 - *Brain time (BT):*                      data ordered by the sequences of neural oscillations
 - *Warping:*                              a procedure to nonlinearly rescale time series
 - *Carrier:*                              an oscillation to which clock time data can be warped
