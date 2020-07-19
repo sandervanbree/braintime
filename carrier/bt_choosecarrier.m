@@ -42,6 +42,7 @@ cutmethod = fft_chans{8};
 figure
 channeloi = []; %channel of interest
 caxislim=max(max(max(powtf(:,:,:)))); %establish axis limit
+finish = 0;
 chanind=1;
 
 uiwait(msgbox({'The channels are sorted based on power or topography (depending on cfg.sortmethod). Please pick one channel, factoring in its:';' ';...
@@ -52,7 +53,7 @@ uiwait(msgbox({'Instructions to browse through channels:';' ';...
     'Press forward/back arrow to see the next/previous channel';...
     'Once you have decided for one channel, click on that channel and press Q to quit visualization'}))
 
-while chanind <= size(topchans,1)+1
+while finish==0
     if chanind < 1 % make sure channel cannot go out of bounds
         chanind = 1;
     elseif chanind>size(topchans,1)
@@ -131,6 +132,7 @@ while chanind <= size(topchans,1)+1
     elseif strcmp(key,'q') %stop the loop if it is not necessesary to keep visualising
         fprintf('Carrier will be the %0.2fHz phase in channel number %d.',topchans(chanind,2),currchan)
         chanind = (numel(topchans))+1;
+        finish = 1;
         close
     end
 end
