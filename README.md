@@ -5,8 +5,8 @@
 Warp electrophysiological data from clock time (default) to brain time and analyze the recurrence of mental representations. By *Sander van Bree, María Melcón, Maria Wimber & Simon Hanslmayr*.
 
 ### Dependencies
-- FieldTrip
-- MVPA Light
+- [FieldTrip](http://www.fieldtriptoolbox.org/download/)
+- [MVPA Light](https://github.com/treder/MVPA-Light)
 - MATLAB Signal Processing Toolbox
 - [Several functions](dependencies) included in the toolbox
 
