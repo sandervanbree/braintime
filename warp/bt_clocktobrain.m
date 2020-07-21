@@ -37,6 +37,7 @@ channels = bt_carrier{3}; %channel structure from FieldTrip
 topchans = bt_carrier{4}; %top components
 mintime = bt_carrier{5}.time(1);
 maxtime = bt_carrier{5}.time(end);
+sr = bt_carrier{5}.time(2)-bt_carrier{5}.time(1);
 cutmethod = bt_carrier{6};
 warpfreq = topchans(2); %warped frequency
 mintime_ind = bt_carrier{7}(1);
@@ -58,15 +59,17 @@ if isfield(config,'removecomp')
     end
 else
     % if the removal option is not specified, remove by default
-    if strcmp(channels.cfg.method,'runica') %only makes sense if channel data are ICA components
+    if isfield(channels.cfg,'method') %only makes sense if channel data are ICA components
+        if strcmp(channels.cfg.method,'runica')
     data = ft_rejectcomponent (cfg, channels, data);
+        end
     end
 end
 
 %% Cut out the time window of fft (from which the phase was extracted)
 cfg        = [];
 if strcmp(cutmethod,'cutartefact')
-    cyclesample = round((1/warpfreq)*channels.fsample); %Calculate how many samples one cycle consists of
+    cyclesample = round((1/warpfreq)*1/sr); %Calculate how many samples one cycle consists of
     cfg.toilim = [mintime+0.5-(1/warpfreq) maxtime-0.5+(1/warpfreq)]; %Cut to the time window of interest, plus one cycle
     phs = phs(:,mintime_ind-cyclesample:maxtime_ind+cyclesample); %Cut to the time window of interest, plus one cycle
 elseif strcmp(cutmethod,'consistenttime')
