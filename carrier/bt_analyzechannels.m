@@ -95,7 +95,7 @@ mintime_ind = find(abs(mintime-fspec.time)==min(abs(mintime-fspec.time))); % min
 maxtime_ind = find(abs(maxtime-fspec.time)==min(abs(maxtime-fspec.time))); % maximun time of interest index
 
 for chan = 1:numchans
-    powtf(:,:,chan)=squeeze(nanmean(fspec.powspctrm(:,chan,:,:),1));
+    powtf(:,:,chan)=squeeze(nanmean(fspec.powspctrm(:,chan,:,mintime_ind:maxtime_ind),1));
     pspec(:,chan)=squeeze(nanmean(powtf(:,:,chan),2)); % get power spectrum of channels
     [maxpow, maxpowind]= max(pspec(minfoi_ind:maxfoi_ind,chan)); % what's the highest power in the freq range of interest and its index in the freq range of interest vector?
     oscmaxfreq(chan) = (fspec.freq(foivec_ind(maxpowind))); % what's the highest power oscillation?

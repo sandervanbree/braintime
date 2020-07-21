@@ -97,7 +97,7 @@ while finish==0
     
     % time-frequency plot
     subplot(5,2,[2 4 6 8]);
-    pcolor(fspecinfo.time(mintime_ind:maxtime_ind),fspecinfo.freq,powtf(:,mintime_ind:maxtime_ind,chanind));
+    pcolor(fspecinfo.time(mintime_ind:maxtime_ind),fspecinfo.freq,powtf(:,:,chanind));
     shading interp
     ylim([minfft maxfft]);
     caxis([0 caxislim])
