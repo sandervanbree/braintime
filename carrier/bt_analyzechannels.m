@@ -16,7 +16,7 @@ function [fft_chans] = bt_analyzechannels(config, channels)
 %   - foi            % Lowest and highest frequency of interest for the to
 %                    % to be designated brain time oscillation (e.g.
 %                    % 8 to 12 for alpha oscillations for attention)
-%   - Ntop           % Number of best channels to be filtered from the full
+%   - Ntopchans      % Number of best channels to be filtered from the full
 %                    % amount.
 %                    
 %   - cutmethod      % 'consistenttime': warp from mintime to maxtime.
@@ -64,6 +64,7 @@ maxfoi = config.foi(2);
 mintime = config.time(1);
 maxtime = config.time(2);
 width = config.waveletwidth;
+Ntopchans = config.Ntopchans;
 
 if strcmp(config.cutmethod,'consistenttime')
     mintime_fft = mintime;
@@ -154,12 +155,12 @@ if strcmp(config.sortmethod,'templatetopo')
 end
     
 %% Take the 30 best channels (or specified number)
-if isfield(config,'topchan')
-    numtopchans = min(config.topcarrier,numchans);
+if isfield(config,'Ntopchans')
+    Ntopchans = min(config.Ntopchans,numchans);
 else
-    numtopchans = min(numchans,30);
+    Ntopchans = min(numchans,30);
 end
-chanrank = chanrank(1:numtopchans,:); % take the top numcarrier carriers
+chanrank = chanrank(1:Ntopchans,:); % take the top numcarrier carriers
 
 %% Save information
 % Filter relevant frequency spectrum information
