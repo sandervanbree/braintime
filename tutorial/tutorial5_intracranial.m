@@ -1,10 +1,10 @@
-%%% In tutorial 5 we will brain time warp intracranial EEG data,
-%%% where the clock time data and carrier oscillation come from
-%%% different recording sources. Clock time data are spike trains
-%%% convolved with a smoothing kernel. The channel data with electable
-%%% carrier oscillations are LFP recordings.
-%%% This differs from tutorial 1, where clock time data
-%%% and carrier channel data came from the same data structure. 
+%%% In tutorial 5 we will brain time warp intracranial data, based on
+%%% recordings with a Behnke Fried electrode. In this tutorial, the clock
+%%% time data and carrier oscillation come from different recording
+%%% sources. Clock time data are spike trains convolved with a smoothing
+%%% kernel. The channel data with electable carrier oscillations are LFP
+%%% recordings. This differs from tutorial 1, where clock time data
+%%% and carrier channel data came from the same data structure.
 
 % Load two classes of data and carrier LFP (see tutorial folder)
 load c1_data_tut5 % contains spike and LFP data for c1
@@ -35,7 +35,7 @@ cfg.time         = [0 1.5];          % time window of interest
 cfg.fft          = [2 30];           % frequency range for the FFT
 cfg.foi          = [4 8];            % for this dataset we will look at the theta range
 cfg.waveletwidth = 5;                % wavelet width in number of cycles
-cfg.Ntop         = 10;               % consider only the 10 best components
+cfg.Ntopchan     = 10;               % consider only the 10 best components
 cfg.cutmethod    = 'consistenttime'; % 'cutartefact' or 'consistenttime' See "help bt_analyzecarriers" or our paper for details
 cfg.sortmethod   = 'maxpow';         % sort by power in frequency range of interest. Alternative: 'templatetopo' (see tutorial 4)
 [fft_channels]    = bt_analyzechannels(cfg,carrier_data);
@@ -47,7 +47,7 @@ cfg              = [];
 
 %% Warp original clock time data to brain time
 cfg              = [];
-cfg.btsrate      = 128;              % determine sampling rate of bt data
+cfg.btsrate      = 80;              % determine sampling rate of bt data
 [bt_struc]       = bt_clocktobrain(cfg,ct_data,bt_carrier);
 
 % cut ct_data to the same window
