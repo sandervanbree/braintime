@@ -37,10 +37,9 @@ cfg.time         = [0 1];            % time window of interest
 cfg.fft          = [2 30];           % frequency range for the FFT
 cfg.foi          = [6 10];           % frequency range of interest for brain time
 cfg.waveletwidth = 5;                % wavelet width in number of cycles
-cfg.Ntop         = 10;               % consider only the 10 best components
-cfg.cutmethod    = 'consistenttime'; % 'cutartefact' or 'consistenttime' See "help bt_analyzecarriers" or our paper for details
-cfg.sortmethod   = 'maxpow';         % sort by power in frequency range of interest. Alternative: 'templatetopo' (see tutorial 4)
-[fft_channels]    = bt_analyzechannels(cfg,channels);
+cfg.Ntopchans    = 10;               % consider only the 10 best components
+cfg.cutmethod    = 'cutartefact'; % 'cutartefact' or 'consistenttime' See "help bt_analyzecarriers" or our paper for details
+[fft_channels]   = bt_analyzechannels(cfg,channels);
 
 %% Choose a carrier
 % Choose the first component's carrier (8 Hz)
