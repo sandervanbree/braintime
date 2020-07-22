@@ -77,6 +77,15 @@ elseif strcmp(cutmethod,'consistenttime')
 end
 data       = ft_redefinetrial(cfg, data);
 
+% Check whether phase and data are of the same length
+if length(phs) > length(data.time{1})
+    phs=phs(:,1:length(data.time{1}));
+elseif length(data.time{1}) > length(phs)
+    cfg       = [];
+    cfg.toilim = [data.time{1}(1,1) data.time{1}(1,length(phs))];
+    data      = ft_redefinetrial(cfg, data);
+end
+
 %% Warp component's data to template phase vector (based on power oscillation)
 % Re-Organize EEG data by phase
 bt_data=data;
