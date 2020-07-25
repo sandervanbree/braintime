@@ -89,12 +89,23 @@ fspec_old       = fspec;
 fspec           = uni_subtract1f(fspec); % apply 1/F subtraction. This is just temporary to find the right channel
 
 %% Find phase of chans in freq range of interest
+
+% Find indices of interest
 minfoi_ind = find(abs(minfoi-fspec.freq)==min(abs(minfoi-fspec.freq))); % minimun freq of interest index
 maxfoi_ind = find(abs(maxfoi-fspec.freq)==min(abs(maxfoi-fspec.freq))); % maximum freq of interest index
 foivec_ind = minfoi_ind:maxfoi_ind; % freq range of interest vector
 mintime_ind = find(abs(mintime-fspec.time)==min(abs(mintime-fspec.time))); % minimun time of interest index
 maxtime_ind = find(abs(maxtime-fspec.time)==min(abs(maxtime-fspec.time))); % maximun time of interest index
 
+% Pre-allocate
+powtf = zeros(size(fspec.powspctrm,3),maxtime_ind+1-mintime_ind,numchans);
+pspec = zeros(size(fspec.powspctrm,3),numchans);
+oscmaxfreq = zeros(numchans,1);
+foi_ind = zeros(numchans,1);
+oscmax = zeros(numchans,1);
+phs = cell(numchans,1);
+
+% For each channel, obtain time frequency information
 for chan = 1:numchans
     powtf(:,:,chan)=squeeze(nanmean(fspec.powspctrm(:,chan,:,mintime_ind:maxtime_ind),1));
     pspec(:,chan)=squeeze(nanmean(powtf(:,:,chan),2)); % get power spectrum of channels
@@ -119,7 +130,6 @@ if strcmp(config.sortmethod,'templatetopo')
     end
     
     % create final template topography
-    topo = zeros(numel(channels.topolabel));
     try
         topo_ind = contains(channels.topolabel,temptopo); % Find the indices of the chosen sensors in the channel's labels
     catch

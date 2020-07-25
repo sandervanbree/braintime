@@ -27,7 +27,7 @@ function [bt_carrier] = bt_choosecarrier(config, fft_chans, channels)
 %                    % saved for later retrieval.
 
 %% Get basic info
-topchans = fft_chans{1}; %What are the top channels?
+chanrank = fft_chans{1}; %What are the top channels?
 mintime_ind = fft_chans{2}(1);
 maxtime_ind = fft_chans{2}(2);
 minfft = fft_chans{3}(1);
@@ -56,11 +56,11 @@ uiwait(msgbox({'Instructions to browse through channels:';' ';...
 while finish==0
     if chanind < 1 % make sure channel cannot go out of bounds
         chanind = 1;
-    elseif chanind>size(topchans,1)
-        chanind = size(topchans,1);
+    elseif chanind>size(chanrank,1)
+        chanind = size(chanrank,1);
     end
     
-    currchan = topchans(chanind);
+    currchan = chanrank(chanind);
     
     f1 = subplot(5,2,[1 3 5 7 9]);    
     % Only plot topography if layout is specified
@@ -93,7 +93,7 @@ while finish==0
         end
     end
     
-    title({[num2str(chanind) '/' num2str(size(topchans,1)) ' channels']})
+    title({[num2str(chanind) '/' num2str(size(chanrank,1)) ' channels']})
     
     % time-frequency plot
     subplot(5,2,[2 4 6 8]);
@@ -103,7 +103,7 @@ while finish==0
     caxis([0 caxislim])
     xlabel('Time (s)')
     ylabel('Frequency')
-    title(sprintf('Channel %d | Carrier: %0.3f power at %0.2fHz',currchan,topchans(chanind,4),topchans(chanind,2)))
+    title(sprintf('Channel %d | Carrier: %0.3f power at %0.2fHz',currchan,chanrank(chanind,4),chanrank(chanind,2)))
     
     % dominant oscillation plot
     subplot(5,2,10);
@@ -120,18 +120,17 @@ while finish==0
     if (keydown == 0) %grab the channel if click
         channeloi=chanind;
         fprintf('Selected carrier in channel number %d. Press ''q'' to quit.',currchan)
-        chanind = chanind;
     elseif value == 28 %go back previous channel if press back arrow
         chanind = chanind-1;
     elseif value == 29 %go back previous channel if press back arrow
         chanind = chanind+1;
-        if chanind > numel(topchans) % make sure channel cannot go out of bounds
+        if chanind > numel(chanrank) % make sure channel cannot go out of bounds
             chanind = 1;
             disp('This is the last channel')
         end
     elseif strcmp(key,'q') %stop the loop if it is not necessesary to keep visualising
-        fprintf('Carrier will be the %0.2fHz phase in channel number %d.',topchans(chanind,2),currchan)
-        chanind = (numel(topchans))+1;
+        fprintf('Carrier will be the %0.2fHz phase in channel number %d.',chanrank(chanind,2),currchan)
+        chanind = (numel(chanrank))+1;
         finish = 1;
         close
     end
@@ -141,7 +140,7 @@ end
 bt_carrier{1} = channeloi; %chosen carrier
 bt_carrier{2} = phs(channeloi); %phase of chosen carrier
 bt_carrier{3} = channels;
-bt_carrier{4} = topchans(channeloi,:);
+bt_carrier{4} = chanrank(channeloi,:);
 bt_carrier{5} = fspecinfo;
 bt_carrier{6} = cutmethod;
 bt_carrier{7} = [mintime_ind, maxtime_ind];
