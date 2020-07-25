@@ -62,7 +62,7 @@ while finish==0
     
     currchan = chanrank(chanind);
     
-    f1 = subplot(5,2,[1 3 5 7 9]);    
+    f1 = subplot(5,2,[1 3 5 7 9]);
     % Only plot topography if layout is specified
     if isfield(config,'layout')
         % channel topography
@@ -89,7 +89,7 @@ while finish==0
     else
         delete(f1);
         if chanind == 1
-        warning('As no layout was specified in cfg.layout, the channels''s topography will not be plotted. For MEG and EEG it is recommended to specify a layout so that the brain time channel can be chosen based on activity in regions of interest.');            
+            warning('As no layout was specified in cfg.layout, the channels''s topography will not be plotted. For MEG and EEG it is recommended to specify a layout so that the brain time channel can be chosen based on activity in regions of interest.');
         end
     end
     
@@ -122,6 +122,7 @@ while finish==0
         fprintf('Selected carrier in channel number %d. Press ''q'' to quit.',currchan)
     elseif value == 28 %go back previous channel if press back arrow
         chanind = chanind-1;
+        disp('This is the first channel')
     elseif value == 29 %go back previous channel if press back arrow
         chanind = chanind+1;
         if chanind > numel(chanrank) % make sure channel cannot go out of bounds

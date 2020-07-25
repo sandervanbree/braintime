@@ -102,7 +102,6 @@ powtf = zeros(size(fspec.powspctrm,3),maxtime_ind+1-mintime_ind,numchans);
 pspec = zeros(size(fspec.powspctrm,3),numchans);
 oscmaxfreq = zeros(numchans,1);
 foi_ind = zeros(numchans,1);
-oscmax = zeros(numchans,1);
 phs = cell(numchans,1);
 
 % For each channel, obtain time frequency information
