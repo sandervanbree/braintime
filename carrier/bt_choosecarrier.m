@@ -144,3 +144,4 @@ bt_carrier{4} = chanrank(channeloi,:);
 bt_carrier{5} = fspecinfo;
 bt_carrier{6} = cutmethod;
 bt_carrier{7} = [mintime_ind, maxtime_ind];
+bt_carrier{8} = 'bt_choosecarrier'; %Label method used
