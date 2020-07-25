@@ -42,6 +42,8 @@ cutmethod = bt_carrier{6};
 warpfreq = chanrank(2); %warped frequency
 mintime_ind = bt_carrier{7}(1);
 maxtime_ind = bt_carrier{7}(2);
+analyzemethod = bt_carrier{8};
+
 
 % Set up sampling rate
 if isfield(config,'btsrate')
@@ -55,11 +57,15 @@ cfg           = [];
 cfg.component = channeloi;
 if isfield(config,'removecomp')
     if strcmp(config.removecomp,'yes')
+        if strcmp(analyzemethod,'bt_chooseanalyze')
         data = ft_rejectcomponent (cfg, channels, data);
+        else
+        error('For component analysis using bt_GEDanalyzechoose, you can remove the component by specifying cfg.removecomp to ''yes'' in bt_GEDanalyzechoose.')
+        end
     end
 else
     % if the removal option is not specified, remove by default
-    if isfield(channels.cfg,'method') %only makes sense if channel data are ICA components
+    if isfield(channels.cfg,'method')&&strcmp(analyzemethod,'bt_choosecarrier') %only makes sense if channel data are ICA components and if method was bt_chooseanalyze
         if strcmp(channels.cfg.method,'runica')
     data = ft_rejectcomponent (cfg, channels, data);
         end
