@@ -34,12 +34,12 @@ function [bt_struc] = bt_clocktobrain(config, data, bt_carrier)
 channeloi = bt_carrier{1}; %channel of interest
 phs = cell2mat(bt_carrier{2}); %its phase
 channels = bt_carrier{3}; %channel structure from FieldTrip
-topchans = bt_carrier{4}; %top components
+chanrank = bt_carrier{4}; %top components
 mintime = bt_carrier{5}.time(1);
 maxtime = bt_carrier{5}.time(end);
 sr = bt_carrier{5}.time(2)-bt_carrier{5}.time(1);
 cutmethod = bt_carrier{6};
-warpfreq = topchans(2); %warped frequency
+warpfreq = chanrank(2); %warped frequency
 mintime_ind = bt_carrier{7}(1);
 maxtime_ind = bt_carrier{7}(2);
 
