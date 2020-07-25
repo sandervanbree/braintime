@@ -44,7 +44,6 @@ mintime_ind = bt_carrier{7}(1);
 maxtime_ind = bt_carrier{7}(2);
 analyzemethod = bt_carrier{8};
 
-
 % Set up sampling rate
 if isfield(config,'btsrate')
     phs_sr = config.btsrate;
@@ -116,11 +115,11 @@ for nt=1:size(phs,1)
     for tp=1:length(iy)-1
         if rem(iy(tp),cycledur)==0
             if iy(tp)~=iy(tp+1)
-                cycles(tp)=500;
+                cycles(tp)=500; %label the start of each cycle with '500'
             end
         end
     end
-    [~, c]=find(cycles==500);
+    [~, c]=find(cycles==500); %find the indices of the starts
     
     %get equal samples by cycle
     %First cycle
@@ -135,7 +134,7 @@ for nt=1:size(phs,1)
         tmptrl(:,(cy-1)*cycledur+1:cy*cycledur)=tmpcy;
     end
     
-    % Create warped trials
+    %Create warped trials
     bt_data.trial{1,nt}=imresize(tmptrl,[size(tmptrl,1) numel(timephs)]);
     bt_data.time{1,nt}=timephs;
 end
