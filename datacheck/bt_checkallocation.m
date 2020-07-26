@@ -1,4 +1,7 @@
 function bt_checkallocation(config, data, bt_carrier_cons, bt_carrier_cut)
+%%% TO DEVS:
+%%% Documentation to follow
+%%% Script not yet finished
 
 % Set up sampling rate
 if isfield(config,'btsrate')
