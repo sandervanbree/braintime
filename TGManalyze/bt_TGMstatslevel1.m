@@ -37,16 +37,13 @@ function [stats1] = bt_TGMstatslevel1(config, bt_data, bt_TGMquant)
 %                    % frequency vector, and the power at the mode freq.
 
 %% Get information
-toi = bt_TGMquant.toi;
-warpfreq = bt_TGMquant.warpfreq;
-acfft = bt_TGMquant.acfft; % AC map FFT information
-modefreq = bt_TGMquant.modefreq;
-TGM = bt_TGMquant.TGM;
-refdimension = bt_TGMquant.refdimension;
-timevec = bt_TGMquant.timevec;
-normalizer = bt_TGMquant.normalizer;
-clabel = config.clabel;
-cfg_mv = config.mvpacfg;
+numperms1 = config.numperms1;                             % Number of first level permutations
+warpfreq = bt_TGMquant.warpfreq;                          % Warped frequency (frequency of the carrier) 
+modefreq = bt_TGMquant.modefreq;                          % The mode frequency across all rows and columns of the AC map 
+TGM = bt_TGMquant.TGM;                                    % Time Generalization Matrix of the data
+normalizer = bt_TGMquant.normalizer;                      % Reference dimension used
+clabel = config.clabel;                                   % Classification labels 
+cfg_mv = config.mvpacfg;                                  % MVPA Light configuration structured used to obtain TGM
 
 % Set up recurrence range over which stats will be applied
 if isfield(config,'statsrange') 
@@ -73,6 +70,10 @@ l = find(abs(statsrange(1)-f)==min(abs(statsrange(1)-f))); %minimum frequency to
 h = find(abs(statsrange(end)-f)==min(abs(statsrange(end)-f))); %maximum frequency to be tested
 srange = l:h;
 
+% Pre-allocate
+PS1 = zeros(nvecs,numel(srange));
+PS2 = zeros(nvecs,numel(srange));
+
 % Run FFT over all rows and columns of the AC map
 for vec=1:nvecs
     %1st dimenssion
@@ -89,8 +90,12 @@ avg_PS = mean(PS1,1)+mean(PS2,1); %Mean power spectra
 modepow_emp = avg_PS(modefreqind); %Mean power at mode freq
 fullspec_emp = avg_PS;
 
+% % Pre-allocate
+modepow_shuff = zeros(1,numel(srange));
+fullspec_shuff = zeros(1,numel(srange));
+
 % First level permutations
-for perm1 = 1:config.numperms1
+for perm1 = 1:numperms1
     fprintf('First level permutation number %i\n', perm1);
     clabel = clabel(randperm(numel(clabel)));
     [permTGM, ~] = mv_classify_timextime(cfg_mv, bt_data.trial, clabel);
@@ -117,7 +122,6 @@ for perm1 = 1:config.numperms1
 end
 mean_modepow_shuff = mean(modepow_shuff);
 f=f(l:h); %filter frequency vector based on range of interest
-
 
 % Only calculate confidence interval and plot stats if desired
 if isfield(config,'figure')
@@ -184,7 +188,7 @@ if figopt == 1
     p2 = plot(f,low_CI,'LineWidth',0.5,'Color','k');
     p3 = plot(f,hi_CI,'LineWidth',0.5,'Color','k');
     
-    if strcmp(refdimension,'braintime') %warp freq line is dependent on clock (warped freq) or brain time (1 hz)
+    if strcmp(normalizer.dim,'braintime') %warp freq line is dependent on clock (warped freq) or brain time (1 hz)
         p4 = line([1 1], [0 max(fullspec_emp)],'color',[1 0 1],'LineWidth',4); %Line at warped freq
         xlabel('Recurrence frequency (factor of warped freq)')
     else
@@ -200,8 +204,8 @@ if figopt == 1
 end
 
 %% Create output structure
-stats1.f = f; %frequency spectrum
-stats1.empspec = fullspec_emp; %power spectrum of average empirical data
-stats1.shuffspec = fullspec_shuff; %power spectrum of average permutation data
-stats1.empmode = modepow_emp; %power at mode freq of epirical data
-stats1.shuffmode = modepow_shuff; %power at mode freq of permutation data
+stats1.f = f;                                         % Frequency vector
+stats1.empspec = fullspec_emp;                        % Power spectrum of average empirical data
+stats1.shuffspec = fullspec_shuff;                    % Power spectrum of average permutation data
+stats1.empmode = modepow_emp;                         % Power at mode freq of epirical data
+stats1.shuffmode = modepow_shuff;                     % Power at mode freq of permutation data

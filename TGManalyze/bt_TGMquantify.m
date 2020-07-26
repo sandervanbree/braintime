@@ -29,10 +29,11 @@ function [bt_TGMquant] = bt_TGMquantify(config, TGM)
 %                    % of the AC map, and config details saved for later
 %                    % retrieval.
 
-% Establish basic parameters
-toi = config.bt_struc.toi;
-warpfreq = config.bt_struc.freq;
-duration = toi(2)-toi(1);
+%% Get basic info
+toi = config.bt_struc.toi;                            % Start and end time of interest
+warpfreq = config.bt_struc.freq;                      % Warped frequency (frequency of the carrier) 
+duration = toi(2)-toi(1);                             % Duration of the time window of interest
+
 if strcmp(config.refdimension,'braintime')
     normalizer.value = duration*warpfreq; %normalize by cycles in the data
     normalizer.dim = 'braintime';
@@ -49,21 +50,25 @@ ac=autocorr2d(TGM);
 % Run FFT over all rows and columns of the AC map
 nvecs=numel(ac(:,1));
 
-for vec=1:nvecs %Only for half is needed
-    %1st dimenssion
+% Pre-allocate
+acfft_dim1 = zeros(2,nvecs); 
+acfft_dim2 = zeros(2,nvecs);
+
+for vec=1:nvecs
+    % 1st dimenssion
     [PS,f]=Powspek(ac(vec,:),nvecs/normalizer.value);
     [pks,locs]=findpeaks(PS);
     maxpk=find(pks==max(pks));
     
-    acfft_dim1(1,vec)=pks(maxpk); %What's the amplitude of the peak?
+    acfft_dim1(1,vec)=pks(maxpk);     %What's the amplitude of the peak?
     acfft_dim1(2,vec)=f(locs(maxpk)); %What's the frequency of the peak?
     
-    %2nd dimension
-    [PS,f]=Powspek(ac(:,vec),nvecs/normalizer.value);%timevec(end));
+    % 2nd dimension
+    [PS,f]=Powspek(ac(:,vec),nvecs/normalizer.value);
     [pks,locs]=findpeaks(PS);
     maxpk=find(pks==max(pks));
     
-    acfft_dim2(1,vec)=pks(maxpk); %What's the amplitude of the peak?
+    acfft_dim2(1,vec)=pks(maxpk);     %What's the amplitude of the peak?
     acfft_dim2(2,vec)=f(locs(maxpk)); %What's the frequency of the peak
 end
 
@@ -136,11 +141,11 @@ if figopt == 1
 end
 
 %% Save basic info
-bt_TGMquant.toi = toi;
-bt_TGMquant.warpfreq = warpfreq;
-bt_TGMquant.acfft = acfft;
-bt_TGMquant.timevec = timevec;
-bt_TGMquant.normalizer = normalizer;
-bt_TGMquant.modefreq = modefreq;
-bt_TGMquant.TGM = TGM;
-bt_TGMquant.refdimension = config.refdimension;
+bt_TGMquant.toi = toi;                                  % Start and end time of interest
+bt_TGMquant.warpfreq = warpfreq;                        % Warped frequency (frequency of the carrier) 
+bt_TGMquant.acfft = acfft;                              % FFT of the TGM AC map
+bt_TGMquant.timevec = timevec;                          % Time vector (different for brain and clock time referencing)
+bt_TGMquant.normalizer = normalizer;                    % Reference dimension used
+bt_TGMquant.modefreq = modefreq;                        % The mode frequency across all rows and columns of the AC map
+bt_TGMquant.TGM = TGM;                                  % Time Generalization Matrix of the data
+

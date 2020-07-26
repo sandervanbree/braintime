@@ -33,14 +33,10 @@ function [pval] = bt_TGMstatslevel2(config, stats1)
 %                    % frequencies.
 
 %% Get information
-numsubj = numel(stats1); %number of participants
-numperms1 = size(stats1{1}.shuffspec,1); %number of first level permutations
-numperms2 = config.numperms2; %number of second level permutations
-f = stats1{1}.f; %frequency vector
-% fullspec_emp = stats1.empspec; %full power spectrum of empirical data
-% fullspec_shuff = stats1.shuffspec; %full power spectrum of shuffled data
-% modepow_emp = stats1.empmode; %mode power of empirical data
-% modepow_shuff = stats1.shuffmode; %mode power of shuffled data
+numsubj = numel(stats1);                             % Number of participants
+numperms1 = size(stats1{1}.shuffspec,1);             % Number of first level permutations
+numperms2 = config.numperms2;                        % Number of second level permutations
+f = stats1{1}.f;                                     % Frequency vector
 
 %% Get average recurrence power spectrum across participants
 PS_emp = zeros(numsubj,numel(f));
@@ -50,8 +46,11 @@ end
 PS_emp = mean(PS_emp,1);
 
 %% Second level statistics
+% Pre-allocate
+perm1PS = zeros(numsubj,numel(stats1{1}.f));
+perm2PS = zeros(numperms2,numel(stats1{1}.f));
+ 
 for perm2=1:numperms2
-    fprintf('Second level permutation number %i\n', perm2);
     for subj = 1:numsubj
         idx=randperm(numperms1,1); %randomly grab with replacement
         perm1PS(subj,:) = stats1{subj}.shuffspec(idx,:);
@@ -63,6 +62,7 @@ end
 perms2PS_avg = mean(perm2PS,1);
 
 %% Calculate p-values
+% For each frequency, find out the percentile of the empirical power in the shuffled distribution
 for f_ind = 1:numel(f)
     pval(f_ind) = numel(find(perm2PS(:,f_ind)>=PS_emp(f_ind)))/numperms2;
 end
@@ -78,12 +78,15 @@ end
 
 pval(pval>1)=1; % for Bonferroni, prevent >1 p values.
 
-% Get the negative logarithm
+% Get the negative logarithm for visualization purposes
 logpval = -log10(pval);
+if isinf(logpval)
+    disp('The empirical power of at least one frequency is higher than all shuffled power values; capping p-value');
 logpval(isinf(logpval)) = 4; %cap logpval on 4.
+end
 
 %% Plot results
-% relationship empirical and shuffled amp at all freq
+% Relationship empirical and shuffled amp at all freq
 figure; hold on
 yyaxis left
 p1 = plot(f,PS_emp,'LineStyle','-','LineWidth',3,'Color','b'); %Mean across 2nd level perms
