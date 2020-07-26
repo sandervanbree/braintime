@@ -42,16 +42,16 @@ mv_plot_2D(bt_TGM);title('Brain time TGM')
 cfg = [];
 cfg.bt_struc        = bt_struc;                   %specify so that information can be retrieved
 cfg.figure          = 'yes';
-cfg.refdimension    = 'clocktime';                %quantify recurrence as a function of seconds in the data
+cfg.refdimension    = 'braintime';                %quantify recurrence as a function of seconds in the data
 ct_TGMquant         = bt_TGMquantify(cfg,ct_TGM); %compare with clock time
-cfg.refdimension    = 'braintime';                %quantify recurrence as a function the warped frequency
+cfg.refdimension    = 'clocktime';                %quantify recurrence as a function the warped frequency
 bt_TGMquant         = bt_TGMquantify(cfg,bt_TGM); %do once for brain time
 
 %% Statistically test TGM recurrence on the single subject level (compare clock and brain time)
 clabel = bt_struc.clabel;
 
 cfg.mvpacfg         = cfg_mv;          %input previous mvpa light config structure
-cfg.numperms1       = 10;              %number of permutations on the first level
+cfg.numperms1       = 5;              %number of permutations on the first level
 cfg.statsrange      = [1 20];          %range of tested recurrence rates
 cfg.clabel          = clabel;
 [ct_TGMstats1] = bt_TGMstatslevel1(cfg,ct_data,ct_TGMquant);  %clock time results (not significant)

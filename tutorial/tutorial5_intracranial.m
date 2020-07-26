@@ -35,8 +35,8 @@ cfg.time         = [0 1.5];          % time window of interest
 cfg.fft          = [2 30];           % frequency range for the FFT
 cfg.foi          = [4 8];            % for this dataset we will look at the theta range
 cfg.waveletwidth = 5;                % wavelet width in number of cycles
-cfg.Ntopchan     = 10;               % consider only the 10 best components
-cfg.cutmethod    = 'consistenttime'; % 'cutartefact' or 'consistenttime' See "help bt_analyzecarriers" or our paper for details
+cfg.Ntopchans     = 10;               % consider only the 10 best components
+cfg.cutmethod    = 'cutartefact'; % 'cutartefact' or 'consistenttime' See "help bt_analyzecarriers" or our paper for details
 cfg.sortmethod   = 'maxpow';         % sort by power in frequency range of interest. Alternative: 'templatetopo' (see tutorial 4)
 [fft_channels]    = bt_analyzechannels(cfg,carrier_data);
 
@@ -47,7 +47,7 @@ cfg              = [];
 
 %% Warp original clock time data to brain time
 cfg              = [];
-cfg.btsrate      = 80;              % determine sampling rate of bt data
+cfg.btsrate      = 200;              % determine sampling rate of bt data
 [bt_struc]       = bt_clocktobrain(cfg,ct_data,bt_carrier);
 
 % cut ct_data to the same window

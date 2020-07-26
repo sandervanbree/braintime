@@ -1,4 +1,13 @@
-%%% In tutorial 7: data-to-cycle allocation. Not documented yet.
+%%% In tutorial 7, we will compare the two cutting
+%%% methods ('cutartefact' and 'consistenttime'), and see whether they
+%%% put the same data in the same cycles. This is an important data control
+%%% procedure, for users who want to compare the effect of the first cycle
+%%% artefact in the TGM. While cutartefact cuts this artefact out, the
+%%% longer time window implemented may destroy the data-to-cycle allocation
+%%% that the toolbox applied in consistenttime.
+%%%
+%%% TO DEVS: bt_checkallocation is not working yet as intended, help
+%%% needed. Until then, ignore this tutorial.
 
 % Load two classes of data (see tutorial folder)
 load c1_data
