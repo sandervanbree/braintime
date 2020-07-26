@@ -55,21 +55,22 @@ function [fft_chans] = bt_analyzechannels(config, channels)
 %                    % saved for later retrieval.
 
 %% Get information
-sampledur = (channels.time{1}(2)-channels.time{1}(1)); % Duration of each sample
-numchans = size(channels.trial{1},1); % Number of carriers
-minfft = config.fft(1);
-maxfft = config.fft(2);
-minfoi = config.foi(1);
-maxfoi = config.foi(2);
-mintime = config.time(1);
-maxtime = config.time(2);
-width = config.waveletwidth;
-Ntopchans = config.Ntopchans;
+sampledur = (channels.time{1}(2)-channels.time{1}(1));  % Duration of each sample
+numchans = size(channels.trial{1},1);                   % Number of channels
+minfft = config.fft(1);                                 % Lowest freq in FFT
+maxfft = config.fft(2);                                 % Highest freq in FFT
+minfoi = config.foi(1);                                 % Lowest freq of interest
+maxfoi = config.foi(2);                                 % Highest freq of interest
+mintime = config.time(1);                               % Minimum time of interest
+maxtime = config.time(2);                               % Maximum time of interest
+width = config.waveletwidth;                            % Amount of wavelet cycles
+Ntopchans = config.Ntopchans;                           % Number of best channels to be considered
 
+% Amount of time dependent on cut method
 if strcmp(config.cutmethod,'consistenttime')
     mintime_fft = mintime;
     maxtime_fft = maxtime;
-elseif strcmp(config.cutmethod,'cutartefact') % cut additional time
+elseif strcmp(config.cutmethod,'cutartefact')
     mintime_fft = mintime-0.5; 
     maxtime_fft = maxtime+0.5;
 end
@@ -84,16 +85,14 @@ cfgtf.output    = 'fourier';
 fspec           = ft_freqanalysis(cfgtf,channels);
 fspec.powspctrm = abs(fspec.fourierspctrm);
 
-% Apply temporary 1/F subtraction
 fspec_old       = fspec;
 fspec           = uni_subtract1f(fspec); % apply 1/F subtraction. This is just temporary to find the right channel
 
 %% Find phase of chans in freq range of interest
-
 % Find indices of interest
 minfoi_ind = find(abs(minfoi-fspec.freq)==min(abs(minfoi-fspec.freq))); % minimun freq of interest index
 maxfoi_ind = find(abs(maxfoi-fspec.freq)==min(abs(maxfoi-fspec.freq))); % maximum freq of interest index
-foivec_ind = minfoi_ind:maxfoi_ind; % freq range of interest vector
+foivec_ind = minfoi_ind:maxfoi_ind;                                     % freq range of interest vector
 mintime_ind = find(abs(mintime-fspec.time)==min(abs(mintime-fspec.time))); % minimun time of interest index
 maxtime_ind = find(abs(maxtime-fspec.time)==min(abs(maxtime-fspec.time))); % maximun time of interest index
 
@@ -165,7 +164,7 @@ end
     
 %% Take the 30 best channels (or specified number)
 if isfield(config,'Ntopchans')
-    Ntopchans = min(config.Ntopchans,numchans);
+    Ntopchans = min(Ntopchans,numchans);
 else
     Ntopchans = min(numchans,30);
 end
@@ -176,12 +175,12 @@ chanrank = chanrank(1:Ntopchans,:); % take the top numcarrier carriers
 fspecinfo.freq = fspec.freq;
 fspecinfo.time = fspec.time;
 
-fft_chans{1} = chanrank; %information about top channels
-fft_chans{2} = [mintime_ind maxtime_ind];
-fft_chans{3} = [minfft maxfft];
-fft_chans{4} = fspecinfo; %fft information about channels
-fft_chans{5} = powtf(:,:,chanrank(:,1));
-fft_chans{6} = pspec(:,chanrank(:,1));
-fft_chans{7} = phs(chanrank(:,1)); %phase of the top channels
-fft_chans{8} = config.cutmethod;
+fft_chans{1} = chanrank;                                  % Time freq data of chosen channel
+fft_chans{2} = [mintime_ind maxtime_ind];                 % Index of start and end time of interest (differs for cutartefact)
+fft_chans{3} = [minfft maxfft];                           % Lowest and highest freq in FFT
+fft_chans{4} = fspecinfo;                                 % FFT time and frequency vector
+fft_chans{5} = powtf(:,:,chanrank(:,1));                  % Power spectrum of channels
+fft_chans{6} = pspec(:,chanrank(:,1));                    % Power spectrum averaged across trials
+fft_chans{7} = phs(chanrank(:,1));                        % Phase of all channels for all trials
+fft_chans{8} = config.cutmethod;                          % Applied cutting method
 end

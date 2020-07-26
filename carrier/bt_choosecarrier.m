@@ -27,16 +27,16 @@ function [bt_carrier] = bt_choosecarrier(config, fft_chans, channels)
 %                    % saved for later retrieval.
 
 %% Get basic info
-chanrank = fft_chans{1}; %What are the top channels?
-mintime_ind = fft_chans{2}(1);
-maxtime_ind = fft_chans{2}(2);
-minfft = fft_chans{3}(1);
-maxfft = fft_chans{3}(2);
-fspecinfo = fft_chans{4}; %FFT characteristics
-powtf = fft_chans{5};
-pspec = fft_chans{6};
-phs = fft_chans{7}; %Phase of all channels
-cutmethod = fft_chans{8};
+chanrank = fft_chans{1};                             % Time freq data of top channels
+mintime_ind = fft_chans{2}(1);                       % Index of start time of interest (differs for cutartefact)
+maxtime_ind = fft_chans{2}(2);                       % Index of end time of interest
+minfft = fft_chans{3}(1);                            % Lowest freq in FFT
+maxfft = fft_chans{3}(2);                            % Highest freq in FFT
+fspecinfo = fft_chans{4};                            % FFT time and frequency vector
+powtf = fft_chans{5};                                % Power spectrum of channels
+pspec = fft_chans{6};                                % Power spectrum averaged across trials
+phs = fft_chans{7};                                  % Phase of all channels for all trials
+cutmethod = fft_chans{8};                            % Applied cutting method
 
 %% Plot top channels
 figure
@@ -138,11 +138,11 @@ while finish==0
 end
 
 %% Save basic info
-bt_carrier{1} = channeloi; %chosen carrier
-bt_carrier{2} = phs(channeloi); %phase of chosen carrier
-bt_carrier{3} = channels;
-bt_carrier{4} = chanrank(channeloi,:);
-bt_carrier{5} = fspecinfo;
-bt_carrier{6} = cutmethod;
-bt_carrier{7} = [mintime_ind, maxtime_ind];
-bt_carrier{8} = 'bt_choosecarrier'; %Label method used
+bt_carrier{1} = channeloi;                             % Channel which contains the carrier
+bt_carrier{2} = phs(channeloi);                        % Phase of all frequencies in this channel
+bt_carrier{3} = channels;                              % Channel data
+bt_carrier{4} = chanrank(channeloi,:);                 % Time freq data of chosen channel
+bt_carrier{5} = fspecinfo;                             % FFT time and frequency vector
+bt_carrier{6} = cutmethod;                             % Applied cutting method
+bt_carrier{7} = [mintime_ind, maxtime_ind];            % Index of start and end time of interest (differs for cutartefact) 
+bt_carrier{8} = 'bt_choosecarrier';                    % Save carrier choosing method
