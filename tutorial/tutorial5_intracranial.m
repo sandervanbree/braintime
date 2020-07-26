@@ -5,6 +5,11 @@
 %%% kernel. The channel data with electable carrier oscillations are LFP
 %%% recordings. This differs from tutorial 1, where clock time data
 %%% and carrier channel data came from the same data structure.
+%%%
+%%% TO DEVS: I have found intracranial data that is more suited (i.e. it
+%%% shows recurrence only in brain time), but it is too large for Github.
+%%% As soon as I found a way to properly downsample, I will replace
+%%% c1_data_tut5 and c2_data_tut5.
 
 % Load two classes of data and carrier LFP (see tutorial folder)
 load c1_data_tut5 % contains spike and LFP data for c1
