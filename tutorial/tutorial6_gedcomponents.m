@@ -7,7 +7,7 @@
 %%% 'bt_GEDanalyzechoose'. This output can be used in 'bt_clocktobrain'.
 %%%
 %%% TO DEVS: bt_GEDanalyzechoose is currently not working yet as intended.
-%%% Help needed. See the function for more details.
+%%% Help needed. See the function itself for more details.
 
 % Load two classes of data (see tutorial folder)
 load c1_data
