@@ -47,9 +47,9 @@ cfg_mv = config.mvpacfg;                                  % MVPA Light configura
 
 % Set up recurrence range over which stats will be applied
 if isfield(config,'statsrange') 
-    statsrange = config.statsrange(1):config.statsrange(2);
+    statsrange = config.statsrange;
 else
-    statsrange = 1:40;
+    statsrange = [1,40];
 end
 
 % Adjust to be a factor of warped frequency in case of brain time ref dimension
@@ -66,9 +66,9 @@ nvecs=numel(ac(:,1));
 
 % Perform FFT over one row to get f and find out statsrange indices
 [~,f]=Powspek(ac(1,:),nvecs/normalizer.value);
-l = find(abs(statsrange(1)-f)==min(abs(statsrange(1)-f))); %minimum frequency to be tested
-h = find(abs(statsrange(end)-f)==min(abs(statsrange(end)-f))); %maximum frequency to be tested
-srange = l:h;
+[~,l] = find(abs(statsrange(1)-f)==min(abs(statsrange(1)-f))); %minimum frequency to be tested
+[~,h] = find(abs(statsrange(end)-f)==min(abs(statsrange(end)-f))); %maximum frequency to be tested
+srange = f(l:h);
 
 % Pre-allocate
 PS1 = zeros(nvecs,numel(srange));
