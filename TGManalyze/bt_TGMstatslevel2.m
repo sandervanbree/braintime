@@ -36,10 +36,51 @@ function [pval] = bt_TGMstatslevel2(config, stats1)
 numsubj = numel(stats1);                             % Number of participants
 numperms1 = size(stats1{1}.shuffspec,1);             % Number of first level permutations
 numperms2 = config.numperms2;                        % Number of second level permutations
-f = stats1{1}.f;                                     % Frequency vector
+
+%% Scale the results to be of the same frequency range and length
+% Determine frequency ranges of participants
+for i = 1:numel(stats1)                              % Find each participant's min and max freq
+    minf(i)    = min(stats1{i}.f);
+    maxf(i)    = max(stats1{i}.f);
+    flength(i) = numel(stats1{i}.f);                 % And how long the frequency vector is
+end
+frange = [max(minf),min(maxf)];                      % What freq do all participants have in common?
+
+% Filter stats1 based on common frequencies across participants
+for i = 1:numel(stats1)    
+    st = nearest(stats1{i}.f,frange(1));             % Find nearest starting freq for each participant
+    en = nearest(stats1{i}.f,frange(2));             % Find nearest ending freq for each participant
+
+    ffix = @(x) x(st:en);                            % Filter all cells based on common frequencies
+    stats1{i}.f         = ffix(stats1{i}.f);
+    stats1{i}.empspec   = ffix(stats1{i}.empspec);
+    stats1{i}.shuffmode = ffix(stats1{i}.shuffmode);
+    
+    for i2 = 1:size(stats1{i}.shuffspec,1)           % Do that for each permutation
+    temp(i2,:) = ffix(stats1{i}.shuffspec(i2,:));
+    end
+    stats1{i}.shuffspec = temp;                % And replace  
+end
+
+% Resize stats1 cells to the same length
+res = @(x) imresize(x,[1 max(flength)]);                     % Create function that resizes all data to the same length
+for i = 1:numel(stats1)
+    stats1{i}.f         = res(stats1{i}.f);
+    fvec(i,:)           = stats1{i}.f;
+    stats1{i}.empspec   = res(stats1{i}.empspec);
+    stats1{i}.shuffmode = res(stats1{i}.shuffmode);
+    
+    for i2 = 1:size(stats1{i}.shuffspec,1)          % Do that for each permutation
+        temp2(i2,:) = res(stats1{i}.shuffspec(i2,:));
+    end
+    stats1{i}.shuffspec = temp2;                     % And replace                                                    
+end
+
+% Create new f
+f = nanmean(fvec,1);
 
 %% Get average recurrence power spectrum across participants
-PS_emp = zeros(numsubj,numel(f));
+% PS_emp = zeros(numsubj,numel(f));
 for subj = 1:numsubj
     PS_emp(subj,:) = stats1{subj}.empspec;
 end
@@ -47,9 +88,9 @@ PS_emp = mean(PS_emp,1);
 
 %% Second level statistics
 % Pre-allocate
-perm1PS = zeros(numsubj,numel(stats1{1}.f));
-perm2PS = zeros(numperms2,numel(stats1{1}.f));
- 
+perm1PS = zeros(numsubj,max(flength));
+perm2PS = zeros(numperms2,max(flength));
+
 for perm2=1:numperms2
     for subj = 1:numsubj
         idx=randperm(numperms1,1); %randomly grab with replacement
@@ -82,7 +123,7 @@ pval(pval>1)=1; % for Bonferroni, prevent >1 p values.
 logpval = -log10(pval);
 if isinf(logpval)
     disp('The empirical power of at least one frequency is higher than all shuffled power values; capping p-value');
-logpval(isinf(logpval)) = 4; %cap logpval on 4.
+    logpval(isinf(logpval)) = 4; %cap logpval on 4.
 end
 
 %% Plot results
