@@ -14,7 +14,7 @@ TGM_subj1.ct_data = ct_data;     % clock time electrophysiological data
 
 TGM_subj2.bt_TGM  = bt_TGMquant;
 TGM_subj2.bt_data = bt_data;
-TGM_subj2.ct_TGM  = bt_TGMquant;
+TGM_subj2.ct_TGM  = ct_TGMquant;
 TGM_subj2.ct_data = ct_data;
 
 TGM_subj3.bt_TGM  = bt_TGMquant;
