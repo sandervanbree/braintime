@@ -68,7 +68,7 @@ nvecs=numel(ac(:,1));
 [~,f]=Powspek(ac(1,:),nvecs/normalizer.value);
 [~,l] = find(abs(statsrange(1)-f)==min(abs(statsrange(1)-f))); %minimum frequency to be tested
 [~,h] = find(abs(statsrange(end)-f)==min(abs(statsrange(end)-f))); %maximum frequency to be tested
-srange = f(l:h);
+srange = l:h; %indices of frequency in statsrange
 
 % Pre-allocate
 PS1 = zeros(nvecs,numel(srange));
