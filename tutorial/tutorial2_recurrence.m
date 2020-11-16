@@ -20,16 +20,16 @@ clabel             = bt_struc.clabel;
 cfg_mv.classifier  = 'lda';
 cfg.preprocess     = 'yes';     %z-scoring the data can improve classification
 cfg_mv.metric      = 'acc';     %accuracy
-cfg_mv.repeat      = 1;         %number of repetitions; use higher than 1 for real data
+cfg_mv.repeat      = 3;         %number of repetitions; use higher than 1 for real data
 cfg_mv.cv          = 'kfold';
 cfg_mv.k           = 5;         %number of folds
 [ct_TGM, ~]        = mv_classify_timextime(cfg_mv, ct_data.trial, clabel);
 [bt_TGM, ~]        = mv_classify_timextime(cfg_mv, bt_data.trial, clabel); 
 
 % Optional: Smooth and Z-score TGMs
-% ct_TGM = zscore(ct_TGM,0,'all');  
+%  ct_TGM = zscore(ct_TGM,0,'all');  
 % ct_TGM = imgaussfilt(ct_TGM,0.2); %Smoothing TGM may accentuate recurrence
-% bt_TGM = zscore(bt_TGM,0,'all');
+%  bt_TGM = zscore(bt_TGM,0,'all');
 % bt_TGM = imgaussfilt(bt_TGM,0.2);
 
 % Plot results
@@ -42,9 +42,9 @@ mv_plot_2D(bt_TGM);title('Brain time TGM')
 cfg = [];
 cfg.bt_struc        = bt_struc;                   %specify so that information can be retrieved
 cfg.figure          = 'yes';
-cfg.refdimension    = 'braintime';                %quantify recurrence as a function of seconds in the data
+cfg.refdimension    = 'clocktime';                %quantify recurrence as a function of seconds in the data
 ct_TGMquant         = bt_TGMquantify(cfg,ct_TGM); %compare with clock time
-cfg.refdimension    = 'clocktime';                %quantify recurrence as a function the warped frequency
+cfg.refdimension    = 'braintime';                %quantify recurrence as a function the warped frequency
 bt_TGMquant         = bt_TGMquantify(cfg,bt_TGM); %do once for brain time
 
 %% Statistically test TGM recurrence on the single subject level (compare clock and brain time)
