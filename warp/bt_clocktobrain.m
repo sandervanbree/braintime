@@ -31,18 +31,18 @@ function [bt_struc] = bt_clocktobrain(config, data, bt_carrier)
 %                    % saved for later retrieval.
 
 %% Get basic info
-channeloi = bt_carrier{1}; %channel of interest
-phs = cell2mat(bt_carrier{2}); %its phase
-channels = bt_carrier{3}; %channel structure from FieldTrip
-chanrank = bt_carrier{4}; %top components
-mintime = bt_carrier{5}.time(1);
-maxtime = bt_carrier{5}.time(end);
-sr = bt_carrier{5}.time(2)-bt_carrier{5}.time(1);
-cutmethod = bt_carrier{6};
-warpfreq = chanrank(2); %warped frequency
-mintime_ind = bt_carrier{7}(1);
-maxtime_ind = bt_carrier{7}(2);
-analyzemethod = bt_carrier{8};
+channeloi = bt_carrier{1};                            % Channel which contains the carrier
+phs = cell2mat(bt_carrier{2});                        % Phase of all frequencies in this channel
+channels = bt_carrier{3};                             % Channel data 
+chanrank = bt_carrier{4};                             % Time freq data of chosen channel
+mintime = bt_carrier{5}.time(1);                      % Start time of interest
+maxtime = bt_carrier{5}.time(end);                    % End time of interest
+sr = bt_carrier{5}.time(2)-bt_carrier{5}.time(1);     % Sampling rate
+cutmethod = bt_carrier{6};                            % Applied cutting method 
+warpfreq = chanrank(2);                               % Warped frequency (frequency of the carrier)
+mintime_ind = bt_carrier{7}(1);                       % Index of start time of interest (differs for cutartefact)  
+maxtime_ind = bt_carrier{7}(2);                       % Index of end time of interest
+analyzemethod = bt_carrier{8};                        % Save carrier choosing method 
 
 % Set up sampling rate
 if isfield(config,'btsrate')
@@ -56,7 +56,7 @@ cfg           = [];
 cfg.component = channeloi;
 if isfield(config,'removecomp')
     if strcmp(config.removecomp,'yes')
-        if strcmp(analyzemethod,'bt_chooseanalyze')
+        if strcmp(analyzemethod,'bt_choosecarrier')
         data = ft_rejectcomponent (cfg, channels, data);
         else
         error('For component analysis using bt_GEDanalyzechoose, you can remove the component by specifying cfg.removecomp to ''yes'' in bt_GEDanalyzechoose.')
@@ -83,14 +83,14 @@ end
 data       = ft_redefinetrial(cfg, data);
 
 % Check whether phase and data are of the same length
-    if abs(length(data.time{1})-length(phs))>1
+    if abs(length(data.time{1})-size(phs,2))>1
         warning('Warning: phase vector and data differ in length by more than 1 sample.');
     end   
-if length(phs) > length(data.time{1})
+if size(phs,2) > length(data.time{1})
     phs=phs(:,1:length(data.time{1}));
-elseif length(data.time{1}) > length(phs)
+elseif length(data.time{1}) > size(phs,2)
     cfg       = [];
-    cfg.toilim = [data.time{1}(1,1) data.time{1}(1,length(phs))];
+    cfg.toilim = [data.time{1}(1,1) data.time{1}(1,size(phs,2))];
     data      = ft_redefinetrial(cfg, data);
 end
 
@@ -159,8 +159,8 @@ if strcmp(cutmethod,'cutartefact')
     end
 end
 
-% reformat data structure and include basic info
-bt_struc.data = bt_data;
-bt_struc.toi = [mintime maxtime];
-bt_struc.freq = warpfreq; %Warped frequency
-bt_struc.clabel = bt_data.trialinfo;
+%% Reformat data structure and include basic info
+bt_struc.data = bt_data;                                     % Brain time warped data
+bt_struc.toi = [mintime maxtime];                            % Start and end time of interest
+bt_struc.freq = warpfreq;                                    % Warped frequency (frequency of the carrier)
+bt_struc.clabel = bt_data.trialinfo;                         % Classification labels
