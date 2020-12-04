@@ -112,13 +112,13 @@ end
 %% Multiple comparisons correction
 if isfield(config,'multiplecorr')
     if strcmp(config.multiplecorr,'fdr')
-        [~,~,~,pval] = fdr_bh(pval);
+        [~,~,~,pval] = fdr_bh(pval,0.05,'dep');
     elseif strcmp(config.multiplecorr,'bonferroni')
         pval = pval*numel(pval);
     end
 end
 
-pval(pval>1)=1; % for FDR, prevent >1 p values.
+pval(pval>1)=1; % Prevent >1 p values.
 
 % Get the negative logarithm for visualization purposes
 logpval = -log10(pval);
