@@ -60,6 +60,7 @@ for i = 1:numel(stats1)
     temp(i2,:) = ffix(stats1{i}.shuffspec(i2,:));
     end
     stats1{i}.shuffspec = temp;                % And replace  
+    clear temp
 end
 
 % Resize stats1 cells to the same length
@@ -76,7 +77,7 @@ for i = 1:numel(stats1)
     stats1{i}.shuffspec = temp2;                     % And replace                                                    
 end
 
-% Create new f
+% Create new f - averaging slight variations
 f = nanmean(fvec,1);
 
 %% Get average recurrence power spectrum across participants
@@ -117,7 +118,7 @@ if isfield(config,'multiplecorr')
     end
 end
 
-pval(pval>1)=1; % for Bonferroni, prevent >1 p values.
+pval(pval>1)=1; % for FDR, prevent >1 p values.
 
 % Get the negative logarithm for visualization purposes
 logpval = -log10(pval);
