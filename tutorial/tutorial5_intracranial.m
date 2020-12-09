@@ -27,13 +27,6 @@ c2_carrier.trialinfo  = 2*ones(size(c2_carrier.trial,1),1);
 cfg                   = [];
 carrier_data          = ft_appenddata(cfg,c1_carrier,c2_carrier);
 
-% Filter the data
-cfg = [];
-cfg.bpfilter          = 'yes';
-cfg.bpfreq            = [2 30]; % Filter between x and y Hz
-ct_data               = ft_preprocessing(cfg,ct_data);
-carrier_data          = ft_preprocessing(cfg,carrier_data);
-
 %% Perform FFT over channels to enable sorting by power and to enable phase extraction
 cfg = [];
 cfg.time         = [0 1.5];          % time window of interest
