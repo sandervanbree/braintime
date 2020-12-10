@@ -39,20 +39,31 @@ phs = fft_chans{7};                                  % Phase of all channels for
 cutmethod = fft_chans{8};                            % Applied cutting method
 
 %% Plot top channels
-figure
+% Find out sorting type
+if isfield(config,'layout')
+    sorttype = 'topography of interest';
+else
+    sorttype = 'maximum power at frequency of interest';
+end
+
+% Prepare instruction message
+msg = ['The channels are sorted based on ',sorttype,newline,...
+    'Please pick the channel containing your carrier, based on:',newline,...
+    '(1) time frequency characteristics.',newline,...
+    '(2) topography of interest (if relevant).',newline,...
+    '(3) variance explained (for ICA components, lower channel number means higher r^2).',newline,newline,...
+     'INSTRUCTIONS:',newline,...
+     'Press \leftarrow or \rightarrow arrow to see the previous or next channel',newline,...
+     'Once you have decided for one channel, click on that channel and press ''Q'' to quit'];
+
+% Prepare figure
 channeloi = []; %channel of interest
 caxislim=max(max(max(powtf(:,:,:)))); %establish axis limit
 finish = 0;
 chanind=1;
+f1 = figure('units','normalized','outerposition',[0 0 1 1]);hold on;
 
-uiwait(msgbox({'The channels are sorted based on power or topography (depending on cfg.sortmethod). Please pick one channel, factoring in its:';' ';...
-    '(1) time frequency characteristics.';...
-    '(2) if relevant, topography of interest.';...
-    '(3) if channels are components, the variance explained (lower channel number means higher r^2).'}))
-uiwait(msgbox({'Instructions to browse through channels:';' ';...
-    'Press forward/back arrow to see the next/previous channel';...
-    'Once you have decided for one channel, click on that channel and press Q to quit visualization'}))
-
+% Create loop to browse through channels 
 while finish==0
     if chanind < 1 % make sure channel cannot go out of bounds
         chanind = 1;
@@ -62,7 +73,14 @@ while finish==0
     
     currchan = chanrank(chanind);
     
-    f1 = subplot(5,2,[1 3 5 7 9]);
+    if exist('ann','var') && keydown~=0
+        delete(ann);
+    end
+    
+    subplot(8,2,[1 3]);
+    text(0,0.5,msg,'FontName','Arial','FontSize',14); axis off
+    
+    subplot(8,2,[7 9 11 13 15]);
     % Only plot topography if layout is specified
     if isfield(config,'layout')
         % channel topography
@@ -95,31 +113,45 @@ while finish==0
     
     title({[num2str(chanind) '/' num2str(size(chanrank,1)) ' channels']})
     
-    % time-frequency plot
-    subplot(5,2,[2 4 6 8]);
+    % Time-frequency plot
+    subplot(8,2,[2 4 6 8]);
     pcolor(fspecinfo.time(mintime_ind:maxtime_ind),fspecinfo.freq,powtf(:,:,chanind));
     shading interp
     ylim([minfft maxfft]);
     caxis([0 caxislim])
     xlabel('Time (s)')
     ylabel('Frequency')
-    title(sprintf('Channel %d | Carrier: %0.3f power at %0.2fHz',currchan,chanrank(chanind,4),chanrank(chanind,2)))
+    yl = yline(chanrank(chanind,2),':',[num2str(chanrank(chanind,2)) 'Hz'],'LineWidth',4,'Color','r');
+    legend(yl','Carrier oscillation')
+    set(gca,'FontSize',14);
+    title(sprintf('Channel %d | Carrier: %0.3f power at %0.2fHz',currchan,chanrank(chanind,4),chanrank(chanind,2)),'FontSize',14)
+
+    % Dominant oscillation plot
+    subplot(8,2,[12 14 16]);
     
-    % dominant oscillation plot
-    subplot(5,2,10);
-    plot(fspecinfo.freq,squeeze(pspec(:,chanind,1)));
+    % Mark max pow
+    xvec = fspecinfo.freq;
+    yvec = squeeze(pspec(:,chanind,1));
+    maxpowloc = nearest(xvec,chanrank(chanind,2)); %Identify the carrier location (max power)
+ 
+    plot(xvec,yvec,'LineWidth',5);hold on
+    mrk = plot(xvec(maxpowloc),yvec(maxpowloc),'o','MarkerSize',15,'LineWidth',4,'Color','r');
+    xline(chanrank(chanind,2),':',[num2str(chanrank(chanind,2)) 'Hz'],'LineWidth',4,'Color','r');hold off
+    set(gca,'FontSize',14);
+    legend(mrk,'Carrier oscillation')
     xlim([minfft maxfft]);
     ylim([0 caxislim])
     xlabel('Frequency')
     ylabel('Power')
     
+    % Adapt figure based on keypress
     keydown = waitforbuttonpress;
     value = double(get(gcf,'CurrentCharacter'));
     [~,~,keyCode] = KbCheck;
     key = KbName(find(keyCode));
     if (keydown == 0) %grab the channel if click
         channeloi=chanind;
-        fprintf('Selected carrier in channel number %d. Press ''q'' to quit.',currchan)
+        ann = annotation('textbox',[0.13 0.22 .5 .5],'String',['Channel highlighted with ',num2str(chanrank(chanind,2)),' Hz carrier.',newline,'Press ''Q'' to select and quit, or continue browsing'],'FitBoxToText','on','Color','red','FontSize',20);axis off
     elseif value == 28 %go back previous channel if press back arrow
         chanind = chanind-1;
         disp('This is the first channel')
@@ -132,8 +164,8 @@ while finish==0
     elseif strcmp(key,'q') %stop the loop if it is not necessesary to keep visualising
         fprintf('Carrier will be the %0.2fHz phase in channel number %d.',chanrank(chanind,2),currchan)
         chanind = (numel(chanrank))+1;
-        finish = 1;
-        close
+        close(f1)
+        finish = 1;   
     end
 end
 
