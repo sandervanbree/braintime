@@ -32,11 +32,13 @@ mintime_ind = fft_chans{2}(1);                       % Index of start time of in
 maxtime_ind = fft_chans{2}(2);                       % Index of end time of interest
 minfft = fft_chans{3}(1);                            % Lowest freq in FFT
 maxfft = fft_chans{3}(2);                            % Highest freq in FFT
-fspecinfo = fft_chans{4};                            % FFT time and frequency vector
-powtf = fft_chans{5};                                % Power spectrum of channels
-pspec = fft_chans{6};                                % Power spectrum averaged across trials
-phs = fft_chans{7};                                  % Phase of all channels for all trials
-cutmethod = fft_chans{8};                            % Applied cutting method
+minfoi = fft_chans{4}(1);                            % Lowest freq of interest
+maxfoi = fft_chans{4}(2);                            % Highest freq of interest
+fspecinfo = fft_chans{5};                            % FFT time and frequency vector
+powtf = fft_chans{6};                                % Power spectrum of channels
+pspec = fft_chans{7};                                % Power spectrum averaged across trials
+phs = fft_chans{8};                                  % Phase of all channels for all trials
+cutmethod = fft_chans{9};                            % Applied cutting method
 
 %% Plot top channels
 % Find out sorting type
@@ -122,6 +124,7 @@ while finish==0
     xlabel('Time (s)')
     ylabel('Frequency')
     yl = yline(chanrank(chanind,2),':',[num2str(chanrank(chanind,2)) 'Hz'],'LineWidth',4,'Color','r');
+    rec1 = rectangle('Position',[fspecinfo.time(mintime_ind),minfoi,(fspecinfo.time(maxtime_ind)-fspecinfo.time(mintime_ind)),maxfoi-minfoi],'EdgeColor','k');
     legend(yl','Carrier oscillation')
     set(gca,'FontSize',14);
     title(sprintf('Channel %d | Carrier: %0.3f power at %0.2fHz',currchan,chanrank(chanind,4),chanrank(chanind,2)),'FontSize',14)
@@ -129,20 +132,24 @@ while finish==0
     % Dominant oscillation plot
     subplot(8,2,[12 14 16]);
     
-    % Mark max pow
+    % Mark max pow and frequency of interest window
     xvec = fspecinfo.freq;
     yvec = squeeze(pspec(:,chanind,1));
+    ymax = max(max(squeeze(pspec(:,:,1))));
     maxpowloc = nearest(xvec,chanrank(chanind,2)); %Identify the carrier location (max power)
- 
+    minfoiloc = nearest(xvec,minfoi);
+    maxfoiloc = nearest(xvec,maxfoi);    
     plot(xvec,yvec,'LineWidth',5);hold on
     mrk = plot(xvec(maxpowloc),yvec(maxpowloc),'o','MarkerSize',15,'LineWidth',4,'Color','r');
-    xline(chanrank(chanind,2),':',[num2str(chanrank(chanind,2)) 'Hz'],'LineWidth',4,'Color','r');hold off
+    mx = plot([xvec(maxpowloc) xvec(maxpowloc)],[min(yvec),ymax],'LineWidth',3,'Color','r');
+    text(xvec(maxpowloc)+(xvec(2)-xvec(1))/5,(ymax+min(yvec))/2,[num2str(chanrank(chanind,2)),' Hz'],'Color','red','FontSize',14);
+    rec2 = rectangle('Position',[minfoi,min(yvec),maxfoi-minfoi,ymax-min(yvec)],'FaceColor',[0, 0, 0, 0.15]);
     set(gca,'FontSize',14);
-    legend(mrk,'Carrier oscillation')
+    legend(mrk,'Carrier oscillation',['Carrier oscillation (',num2str(chanrank(chanind,2)),' Hz'])
     xlim([minfft maxfft]);
     ylim([0 caxislim])
     xlabel('Frequency')
-    ylabel('Power')
+    ylabel('Power'); hold off
     
     % Adapt figure based on keypress
     keydown = waitforbuttonpress;

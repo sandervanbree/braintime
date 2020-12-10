@@ -178,9 +178,10 @@ fspecinfo.time = fspec.time;
 fft_chans{1} = chanrank;                                  % Time freq data of chosen channel
 fft_chans{2} = [mintime_ind maxtime_ind];                 % Index of start and end time of interest (differs for cutartefact)
 fft_chans{3} = [minfft maxfft];                           % Lowest and highest freq in FFT
-fft_chans{4} = fspecinfo;                                 % FFT time and frequency vector
-fft_chans{5} = powtf(:,:,chanrank(:,1));                  % Power spectrum of channels
-fft_chans{6} = pspec(:,chanrank(:,1));                    % Power spectrum averaged across trials
-fft_chans{7} = phs(chanrank(:,1));                        % Phase of all channels for all trials
-fft_chans{8} = config.cutmethod;                          % Applied cutting method
+fft_chans{4} = [minfoi maxfoi];                           % Lowest and highest freq of interest
+fft_chans{5} = fspecinfo;                                 % FFT time and frequency vector
+fft_chans{6} = powtf(:,:,chanrank(:,1));                  % Power spectrum of channels
+fft_chans{7} = pspec(:,chanrank(:,1));                    % Power spectrum averaged across trials
+fft_chans{8} = phs(chanrank(:,1));                        % Phase of all channels for all trials
+fft_chans{9} = config.cutmethod;                          % Applied cutting method
 end
