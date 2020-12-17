@@ -226,4 +226,6 @@ maskedTGM(sig_i) = avgemp(sig_i); % Replace by values of average emp TGM
 figure;
 pcolor(1:nrow,1:ncol,maskedTGM);
 shading interp;
-title('TGM datapoints significantly higher than shuffled (FDR-corrected)');
+xlabel('Data points (train)');
+ylabel('Data points (test)');
+title('TGM data points significantly higher than shuffled (FDR-corrected)');
