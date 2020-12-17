@@ -29,24 +29,24 @@ TGM_subj4.ct_data = ct_data;
 
 %% Brain Time warped data
 % First level statistics (single subject level)
-cfg.mvpacfg         = cfg_mv;          %input previous mvpa light config structure
+cfg.mvpacfg         = cfg_mv;          % Input previous mvpa light config structure
 cfg.figure          = 'no'; 
-cfg.numperms1       = 5;               %number of permutations on the first level (per participant)
-cfg.statsrange      = [1 20];          %range of tested recurrence rates
+cfg.numperms1       = 5;               % Number of permutations on the first level (per participant)
+cfg.statsrange      = [1 20];          % Range of tested recurrence rates
 cfg.clabel          = clabel;
 
 % Loop through all participants
 for subj = 1:4 
 data = eval(strcat('TGM_subj',num2str(subj),'.bt_data'));
 TGM = eval(strcat('TGM_subj',num2str(subj),'.bt_TGM'));
-[bt_stats1{subj}] = bt_TGMstatslevel1(cfg,data,TGM); %bt_TGMstatslevel2 requires one cell for each participant
+[bt_stats1{subj}] = bt_TGMstatslevel1(cfg,data,TGM); % bt_TGMstatslevel2 requires one cell for each participant
 end
 
 % Apply second level statistics
-cfg.numperms2      = 1000;                    %number of second level Monte Carlo permutations
-cfg.multiplecorr   = 'fdr';                   %multiple correction option
-[bt_pval] = bt_TGMstatslevel2(cfg,bt_stats1); %output matrix contains p-values and associated frequencies
-title('Brain Time warped data results (SIGNIFICANT at simulated 8 Hz)')
+cfg.numperms2      = 1000;                      % Number of second level Monte Carlo permutations
+cfg.multiplecorr   = 'fdr';                     % Multiple correction option
+[bt_stats2] = bt_TGMstatslevel2(cfg,bt_stats1); % Output matrix contains p-values and associated frequencies
+fprintf('Brain Time warped data results (SIGNIFICANT at simulated 8 Hz)')
 
 %% Untransformed Clock Time data
 % First level statistics (single subject level)
@@ -58,5 +58,5 @@ TGM = eval(strcat('TGM_subj',num2str(subj),'.ct_TGM'));
 end
 
 % Apply second level statistics
-[ct_pval] = bt_TGMstatslevel2(cfg,ct_stats1); %output matrix contains p-values and associated frequencies
-title('Untransformed Clock Time data results (NOT SIGNIFICANT at simulated 8 Hz)')
+[ct_stats2] = bt_TGMstatslevel2(cfg,ct_stats1); % Output matrix contains p-values and associated frequencies
+fprintf('Untransformed Clock Time data results (NOT SIGNIFICANT at simulated 8 Hz)')

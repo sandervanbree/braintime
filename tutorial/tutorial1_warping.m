@@ -26,15 +26,24 @@ cfg.runica.pca   = 30;               % Optional: obtain N component to reduce ti
 channels         = ft_componentanalysis(cfg ,ct_data);
 
 %% Perform FFT over channels (components) to enable sorting by time frequency characteristics of interest
-cfg = [];
+
+% Toolbox configuration
+cfg              = [];               % Toolbox configuration structure
 cfg.time         = [0 1];            % time window of interest
-cfg.fft          = [2 30];           % frequency range for the FFT
-cfg.foi          = [6 10];           % frequency range of interest for brain time
-cfg.waveletwidth = 5;                % wavelet width in number of cycles
-cfg.Ntopchans    = 10;               % consider only the 10 best components
+cfg.warpfreqs    = [6 10];           % frequency range of interest for brain time
+cfg.correct1f    = 'yes';            % apply 1/f correction after FFT, for plotting purposes only
+cfg.ntopchans    = 10;               % consider only the 10 best components
 cfg.sortmethod   = 'maxpow';         % sort by power in frequency range of interest. Alternative: 'templatetopo' (see tutorial 4)
 cfg.cutmethod    = 'cutartefact';    % 'cutartefact' or 'consistenttime' See "help bt_analyzecarriers" or our paper for details
-[fft_channels]   = bt_analyzechannels(cfg,channels);
+
+% Fieldtrip configuration
+cfgFT            = [];               % FieldTrip configuration structure, input to ft_freqanalysis
+cfgFT.method     = 'wavelet';        % Frequency analysis method (see ft_freqanalyis)
+cfgFT.width      = 5;                % Number of wavelet cycles
+cfgFT.foi        = 2:30;             % Frequency range for FFT
+% cfgFT.time       = cfg.time        % The time variable is automatically grabbed from cfg.time
+
+[fft_channels]   = bt_analyzechannels(cfg,cfgFT,channels);
 
 %% Choose a carrier
 % Choose the first component's carrier (8 Hz)
