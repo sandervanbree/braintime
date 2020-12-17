@@ -24,16 +24,15 @@ function [bt_carrier] = bt_choosecarrier(config, fft_chans, channels)
 % Output:            %
 % bt_carrier         % Data structure with: chosen carrier, its
 %                    % time frequency information, and config details
-%                    % saved for later retrieval.
 
 %% Get basic info
 chanrank = fft_chans{1};                             % Time freq data of top channels
 mintime_ind = fft_chans{2}(1);                       % Index of start time of interest (differs for cutartefact)
 maxtime_ind = fft_chans{2}(2);                       % Index of end time of interest
-minfft = fft_chans{3}(1);                            % Lowest freq in FFT
-maxfft = fft_chans{3}(2);                            % Highest freq in FFT
-minfoi = fft_chans{4}(1);                            % Lowest freq of interest
-maxfoi = fft_chans{4}(2);                            % Highest freq of interest
+minfft = fft_chans{3}(1);                            % Lowest analyzed freq in FFT
+maxfft = fft_chans{3}(2);                            % Highest analyzed freq in FFT
+minfoi = fft_chans{4}(1);                            % Lowest possible warping frequency
+maxfoi = fft_chans{4}(2);                            % Highest possible warping frequency
 fspecinfo = fft_chans{5};                            % FFT time and frequency vector
 powtf = fft_chans{6};                                % Power spectrum of channels
 pspec = fft_chans{7};                                % Power spectrum averaged across trials
@@ -51,15 +50,15 @@ end
 % Prepare instruction message
 msg = ['The channels are sorted based on ',sorttype,newline,...
     'Please pick the channel containing your carrier, based on:',newline,...
-    '(1) time frequency characteristics.',newline,...
-    '(2) topography of interest (if relevant).',newline,...
-    '(3) variance explained (for ICA components, lower channel number means higher r^2).',newline,newline,...
+    '(1) time frequency characteristics',newline,...
+    '(2) topography of interest (if relevant)',newline,...
+    '(3) variance explained (for ICA components, lower channel value means higher r^2)',newline,newline,...
      'INSTRUCTIONS:',newline,...
      'Press \leftarrow or \rightarrow arrow to see the previous or next channel',newline,...
-     'Once you have decided for one channel, click on that channel and press ''Q'' to quit'];
+     'Click on a channel to highlight it, then keep browsing or press ''Q'' to select highlighted channel'];
 
 % Prepare figure
-channeloi = []; %channel of interest
+channeloi = -2; %channel of interest
 caxislim=max(max(max(powtf(:,:,:)))); %establish axis limit
 finish = 0;
 chanind=1;
@@ -73,12 +72,11 @@ while finish==0
         chanind = size(chanrank,1);
     end
     
+    % Establish current channel and its maximum frequency
     currchan = chanrank(chanind);
-    
-    if exist('ann','var') && keydown~=0
-        delete(ann);
-    end
-    
+    maxfreq = chanrank(chanind,2);
+  
+   
     subplot(8,2,[1 3]);
     text(0,0.5,msg,'FontName','Arial','FontSize',14); axis off
     
@@ -113,7 +111,7 @@ while finish==0
         end
     end
     
-    title({[num2str(chanind) '/' num2str(size(chanrank,1)) ' channels']})
+    title({['Channel ', num2str(currchan),' (',num2str(chanind) '/' num2str(size(chanrank,1)),')']},'FontName','Arial','FontSize',14)
     
     % Time-frequency plot
     subplot(8,2,[2 4 6 8]);
@@ -123,11 +121,11 @@ while finish==0
     caxis([0 caxislim])
     xlabel('Time (s)')
     ylabel('Frequency')
-    yl = yline(chanrank(chanind,2),':',[num2str(chanrank(chanind,2)) 'Hz'],'LineWidth',4,'Color','r');
+    yl = yline(maxfreq,':',[num2str(maxfreq) 'Hz'],'LineWidth',4,'Color','r');
     rec1 = rectangle('Position',[fspecinfo.time(mintime_ind),minfoi,(fspecinfo.time(maxtime_ind)-fspecinfo.time(mintime_ind)),maxfoi-minfoi],'EdgeColor','k');
     legend(yl','Carrier oscillation')
     set(gca,'FontSize',14);
-    title(sprintf('Channel %d | Carrier: %0.3f power at %0.2fHz',currchan,chanrank(chanind,4),chanrank(chanind,2)),'FontSize',14)
+    title(sprintf('Channel %d | Carrier: %0.3f power at %0.2fHz',currchan,chanrank(chanind,4),maxfreq),'FontSize',14)
 
     % Dominant oscillation plot
     subplot(8,2,[12 14 16]);
@@ -136,16 +134,14 @@ while finish==0
     xvec = fspecinfo.freq;
     yvec = squeeze(pspec(:,chanind,1));
     ymax = max(max(squeeze(pspec(:,:,1))));
-    maxpowloc = nearest(xvec,chanrank(chanind,2)); %Identify the carrier location (max power)
-    minfoiloc = nearest(xvec,minfoi);
-    maxfoiloc = nearest(xvec,maxfoi);    
+    maxpowloc = nearest(xvec,maxfreq); %Identify the carrier location (max power) 
     plot(xvec,yvec,'LineWidth',5);hold on
     mrk = plot(xvec(maxpowloc),yvec(maxpowloc),'o','MarkerSize',15,'LineWidth',4,'Color','r');
     mx = plot([xvec(maxpowloc) xvec(maxpowloc)],[min(yvec),ymax],'LineWidth',3,'Color','r');
-    text(xvec(maxpowloc)+(xvec(2)-xvec(1))/5,(ymax+min(yvec))/2,[num2str(chanrank(chanind,2)),' Hz'],'Color','red','FontSize',14);
+    text(xvec(maxpowloc)+(xvec(2)-xvec(1))/5,(ymax+min(yvec))/2,[num2str(maxfreq),' Hz'],'Color','red','FontSize',14);
     rec2 = rectangle('Position',[minfoi,min(yvec),maxfoi-minfoi,ymax-min(yvec)],'FaceColor',[0, 0, 0, 0.15]);
     set(gca,'FontSize',14);
-    legend(mrk,'Carrier oscillation',['Carrier oscillation (',num2str(chanrank(chanind,2)),' Hz'])
+    legend(mrk,'Carrier oscillation',['Carrier oscillation (',num2str(maxfreq),' Hz'])
     xlim([minfft maxfft]);
     ylim([0 caxislim])
     xlabel('Frequency')
@@ -156,20 +152,22 @@ while finish==0
     value = double(get(gcf,'CurrentCharacter'));
     [~,~,keyCode] = KbCheck;
     key = KbName(find(keyCode));
+
     if (keydown == 0) %grab the channel if click
         channeloi=chanind;
-        ann = annotation('textbox',[0.13 0.22 .5 .5],'String',['Channel highlighted with ',num2str(chanrank(chanind,2)),' Hz carrier.',newline,'Press ''Q'' to select and quit, or continue browsing'],'FitBoxToText','on','Color','red','FontSize',20);axis off
+        if exist('ann','var')
+            delete(ann)
+        end
+        ann = annotation('textbox',[0.18 0.19 .5 .5],'String',['Warping source ', num2str(currchan) ,' is highlighted'],'FitBoxToText','on','Color','red','FontSize',20);axis off
     elseif value == 28 %go back previous channel if press back arrow
         chanind = chanind-1;
-        disp('This is the first channel')
     elseif value == 29 %go back previous channel if press back arrow
         chanind = chanind+1;
         if chanind > numel(chanrank) % make sure channel cannot go out of bounds
             chanind = 1;
-            disp('This is the last channel')
         end
     elseif strcmp(key,'q') %stop the loop if it is not necessesary to keep visualising
-        fprintf('Carrier will be the %0.2fHz phase in channel number %d.',chanrank(chanind,2),currchan)
+        fprintf('Carrier will be the %0.2fHz phase in channel %d.',maxfreq,currchan)
         chanind = (numel(chanrank))+1;
         close(f1)
         finish = 1;   

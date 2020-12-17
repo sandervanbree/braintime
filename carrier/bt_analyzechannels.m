@@ -1,4 +1,4 @@
-function [fft_chans] = bt_analyzechannels(config, channels)
+function [fft_chans] = bt_analyzechannels(config,configFT,channels)
 % Analyze the time frequency characteristics of channels (e.g.
 % ICA components, virtual channels, LFP time series) in anticipation of
 % brain time carrier extraction in bt_choosecarrier. Sorting is based 
@@ -6,35 +6,34 @@ function [fft_chans] = bt_analyzechannels(config, channels)
 % correlation to a template topography (obtained with bt_templatetopo).
 
 % Use:
-% [fft_chans] = bt_analyzechannels(cfg, channels)
+% [fft_chans] = bt_analyzechannels(cfg,cfg.FT,channels)
 %
 % Input Arguments:
-% config
+% config             % TOOLBOX configuration structure with cells:
+%                    %
 %   - time           % Start and end of the time window of interest
-%   - fft            % Lowest and highest frequency analyzed in the
-%                    % channels 
-%   - foi            % Lowest and highest frequency of interest for the to
+%   - warpfreqs      % Lowest and highest frequency of interest for the to
 %                    % to be designated brain time oscillation (e.g.
 %                    % 8 to 12 for alpha oscillations for attention)
-%   - Ntopchans      % Number of best channels to be filtered from the full
+%   - correct1f      % (Optional). 'yes' to apply 1/F correction to
+%                    % visualized power spectrum (default: 'yes').
+%   - ntopchans      % Number of best channels to be filtered from the full
 %                    % amount.
-%                    
-%   - cutmethod      % 'consistenttime': warp from mintime to maxtime.
-%                    % The upside of this method is that the final
-%                    % brain time data is equally long and of the same
-%                    % duration as intended (mintime to maxtime). The
-%                    % downside is an artefact in the first cycle
-%                    % caused by the warping requiring a repetition of data
-%                    % bins for alignment to the template oscillation.
+%                    %
+%   - cutmethod      % 'consistenttime': warp from start to end of window
+%                    % of interest and no more. The upside of this method
+%                    % is that the final brain time data is of the exact
+%                    % intended duration. The downside is an artefact in
+%                    % the first cycle caused by the dynamic time warping
+%                    % algorithm.
 %                    % 
-%                    % 'cutartefact': warp from mintime-one cycle to
-%                    % maxtime+one cycle of the minimum frequency
-%                    % of interest, later cut to mintime maxtime.
-%                    % The upside of this method is that the final brain
-%                    % time data has no artefact in the first cycle. The
-%                    % downside is that there is variance across trials
-%                    % in the brain time's start and end time, as well as
-%                    % the duration.
+%                    % 'cutartefact': warp half a second before and after
+%                    % your time window of interest that is later cut. 
+%                    % The upside is that the first cycle artefact is 
+%                    % removed. The downside is variance across trials
+%                    % in the brain time data's start and end time, as well
+%                    % as the duration being slightly off to the window
+%                    % of interest.
 %                             
 %   - sortmethod     % 'maxpow': sort channels according to their average
 %                    % power in minfoi and maxfoi.
@@ -44,6 +43,26 @@ function [fft_chans] = bt_analyzechannels(config, channels)
 %                    % power sorting to the each channel's topography
 %                    % match to the template topography.
 %                    %
+% configFT           % FIELDTRIP configuration structure with cells:
+%                    %
+%   - foi            % [min max]: Lowest and highest frequency of interest
+%                    % analyzed by ft_freqanalysis. Choose frequencies
+%                    % significantly below and above your warping frequency
+%                    % of interest.
+%   - method         % 'string': Method used by ft_freqanalysis ('mtmfft',
+%                    % 'mtmconvol', 'wavelet', 'tfr', 'mvar'). See
+%                    % ft_freqanalysis for details.
+%   - pad            % (Optional). [number], 'nextpow2', or the default
+%                    % 'maxperlen'. See ft_freqanalysis for details.
+%   - padtype        % (Optional). 'string' of the padding type ('zero'
+%                    % by default. See ft_freqanalysis for details.
+%                    %
+%                    % configFT also requires method-specific parameters
+%                    % (e.g. 'tapsmofrq' for method 'mtmconvol'). Without
+%                    % necessary parameters, FieldTrip will throw an error
+%                    % and report on missing parameters. See
+%                    % ft_freqanalysis for details.
+%                    %
 % channels           % FieldTrip channel data structure that contains
 %                    % ICA components, virtual channels, or LFP time
 %                    % series. One channel contains the to be designated
@@ -52,19 +71,18 @@ function [fft_chans] = bt_analyzechannels(config, channels)
 % Output:            %
 % fft_chans          % Data structure with: ranked channels, their 
 %                    % time frequency information, and config details
-%                    % saved for later retrieval.
+
 
 %% Get information
 sampledur = (channels.time{1}(2)-channels.time{1}(1));  % Duration of each sample
 numchans = size(channels.trial{1},1);                   % Number of channels
-minfft = config.fft(1);                                 % Lowest freq in FFT
-maxfft = config.fft(2);                                 % Highest freq in FFT
-minfoi = config.foi(1);                                 % Lowest freq of interest
-maxfoi = config.foi(2);                                 % Highest freq of interest
+minfoi = config.warpfreqs(1);                           % Lowest freq of interest
+maxfoi = config.warpfreqs(2);                           % Highest freq of interest
 mintime = config.time(1);                               % Minimum time of interest
 maxtime = config.time(2);                               % Maximum time of interest
-width = config.waveletwidth;                            % Amount of wavelet cycles
-Ntopchans = config.Ntopchans;                           % Number of best channels to be considered
+cfgFT = configFT;                                       % FieldTrip config structure
+correct1f = config.correct1f;                           % Correct for 1/f in visualization of FFT option
+ntopchans = config.ntopchans;                           % Number of top channels to be considered
 
 % Amount of time dependent on cut method
 if strcmp(config.cutmethod,'consistenttime')
@@ -75,26 +93,30 @@ elseif strcmp(config.cutmethod,'cutartefact')
     maxtime_fft = maxtime+0.5;
 end
 
-%% Calculate FFT
-cfgtf           = [];
-cfgtf.method    = 'wavelet';
-cfgtf.width     = width;
-cfgtf.toi       = mintime_fft:sampledur:maxtime_fft;
-cfgtf.foi       = (minfft:1:maxfft);
-cfgtf.output    = 'fourier';
-fspec           = ft_freqanalysis(cfgtf,channels);
-fspec.powspctrm = abs(fspec.fourierspctrm);
+% Sanity check
+if minfoi<cfgFT.foi(1) || maxfoi>cfgFT.foi(end)
+error('Warping frequencies of interest detected outside specified FFT frequency range');    
+end
 
+%% Calculate FFT
+cfgFT.toi       = mintime_fft:sampledur:maxtime_fft;
+cfgFT.output    = 'fourier';
+fspec           = ft_freqanalysis(cfgFT,channels);
+
+fspec.powspctrm = abs(fspec.fourierspctrm);
 fspec_old       = fspec;
+
+if strcmp(correct1f,'yes')
 fspec           = uni_subtract1f(fspec); % apply 1/F subtraction. This is just temporary to find the right channel
+end
 
 %% Find phase of chans in freq range of interest
 % Find indices of interest
-minfoi_ind = find(abs(minfoi-fspec.freq)==min(abs(minfoi-fspec.freq))); % minimun freq of interest index
-maxfoi_ind = find(abs(maxfoi-fspec.freq)==min(abs(maxfoi-fspec.freq))); % maximum freq of interest index
-foivec_ind = minfoi_ind:maxfoi_ind;                                     % freq range of interest vector
-mintime_ind = find(abs(mintime-fspec.time)==min(abs(mintime-fspec.time))); % minimun time of interest index
-maxtime_ind = find(abs(maxtime-fspec.time)==min(abs(maxtime-fspec.time))); % maximun time of interest index
+minfoi_ind = nearest(fspec.freq,minfoi); % index of lowest warping frequency
+maxfoi_ind = nearest(fspec.freq,maxfoi); % index of highest warping frequency
+foivec_ind = minfoi_ind:maxfoi_ind;      % freq range of interest vector
+mintime_ind = nearest(fspec.time,mintime); % minimun time of interest index
+maxtime_ind = nearest(fspec.time,maxtime); % maximun time of interest index
 
 % Pre-allocate
 powtf = zeros(size(fspec.powspctrm,3),maxtime_ind+1-mintime_ind,numchans);
@@ -163,12 +185,12 @@ if strcmp(config.sortmethod,'templatetopo')
 end
     
 %% Take the 30 best channels (or specified number)
-if isfield(config,'Ntopchans')
-    Ntopchans = min(Ntopchans,numchans);
+if isfield(config,'ntopchans')
+    ntopchans = min(ntopchans,numchans);
 else
-    Ntopchans = min(numchans,30);
+    ntopchans = min(numchans,30);
 end
-chanrank = chanrank(1:Ntopchans,:); % take the top numcarrier carriers
+chanrank = chanrank(1:ntopchans,:); % take the top numcarrier carriers
 
 %% Save information
 % Filter relevant frequency spectrum information
@@ -177,8 +199,8 @@ fspecinfo.time = fspec.time;
 
 fft_chans{1} = chanrank;                                  % Time freq data of chosen channel
 fft_chans{2} = [mintime_ind maxtime_ind];                 % Index of start and end time of interest (differs for cutartefact)
-fft_chans{3} = [minfft maxfft];                           % Lowest and highest freq in FFT
-fft_chans{4} = [minfoi maxfoi];                           % Lowest and highest freq of interest
+fft_chans{3} = [cfgFT.foi(1) cfgFT.foi(end)];             % Lowest and highest analyzed freq in FFT
+fft_chans{4} = [minfoi maxfoi];                           % Lowest and highest possible warping frequency
 fft_chans{5} = fspecinfo;                                 % FFT time and frequency vector
 fft_chans{6} = powtf(:,:,chanrank(:,1));                  % Power spectrum of channels
 fft_chans{7} = pspec(:,chanrank(:,1));                    % Power spectrum averaged across trials

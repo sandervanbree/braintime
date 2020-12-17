@@ -40,8 +40,8 @@ maxtime = bt_carrier{5}.time(end);                    % End time of interest
 sr = bt_carrier{5}.time(2)-bt_carrier{5}.time(1);     % Sampling rate
 cutmethod = bt_carrier{6};                            % Applied cutting method 
 warpfreq = chanrank(2);                               % Warped frequency (frequency of the carrier)
-mintime_ind = bt_carrier{7}(1);                       % Index of start time of interest (differs for cutartefact)  
-maxtime_ind = bt_carrier{7}(2);                       % Index of end time of interest
+mintime_ind = bt_carrier{7}(1);                       % Index of start time of interest (differs for cutartefact) 
+maxtime_ind = bt_carrier{7}(2);                       % Index of end time of interest (differs for cutartefact)
 analyzemethod = bt_carrier{8};                        % Save carrier choosing method 
 
 % Set up sampling rate
@@ -145,8 +145,8 @@ if strcmp(cutmethod,'cutartefact')
     mintime = mintime+0.5;
     maxtime = maxtime-0.5;
     
-    startind = findnearest(bt_data.time{1},1); %Find index of first cycle in window of interest
-    endind = findnearest(bt_data.time{1},warpfreq*(maxtime-mintime)+1); %Find index of last cycle in window of interest
+    startind = nearest(bt_data.time{1},1); %Find index of first cycle in window of interest
+    endind = nearest(bt_data.time{1},warpfreq*(maxtime-mintime)+1); %Find index of last cycle in window of interest
     
     cfg         = [];
     cfg.latency = [bt_data.time{1}(startind) bt_data.time{1}(endind)]; % Cut to time window of interest
