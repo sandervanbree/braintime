@@ -35,12 +35,12 @@ warpfreq = config.bt_struc.freq;                      % Warped frequency (freque
 duration = toi(2)-toi(1);                             % Duration of the time window of interest
 
 if strcmp(config.refdimension,'braintime')
-    normalizer.value = duration*warpfreq; %normalize by cycles in the data
-    normalizer.dim = 'braintime';
+    refdimension.value = duration*warpfreq; %normalize by cycles in the data
+    refdimension.dim = 'braintime';
     timevec = config.bt_struc.data.time{1};
 elseif strcmp(config.refdimension,'clocktime')
-    normalizer.value = duration; %normalize by seconds in the data
-    normalizer.dim = 'clocktime';
+    refdimension.value = duration; %normalize by seconds in the data
+    refdimension.dim = 'clocktime';
     timevec = linspace(toi(1),toi(2),numel(config.bt_struc.data.time{1}));
 end
 
@@ -56,7 +56,7 @@ acfft_dim2 = zeros(2,nvecs);
 
 for vec=1:nvecs
     % 1st dimenssion
-    [PS,f]=Powspek(ac(vec,:),nvecs/normalizer.value);
+    [PS,f]=Powspek(ac(vec,:),nvecs/refdimension.value);
     [pks,locs]=findpeaks(PS);
     maxpk=find(pks==max(pks));
     
@@ -64,7 +64,7 @@ for vec=1:nvecs
     acfft_dim1(2,vec)=f(locs(maxpk)); %What's the frequency of the peak?
     
     % 2nd dimension
-    [PS,f]=Powspek(ac(:,vec),nvecs/normalizer.value);
+    [PS,f]=Powspek(ac(:,vec),nvecs/refdimension.value);
     [pks,locs]=findpeaks(PS);
     maxpk=find(pks==max(pks));
     
@@ -145,7 +145,7 @@ bt_TGMquant.toi = toi;                                  % Start and end time of 
 bt_TGMquant.warpfreq = warpfreq;                        % Warped frequency (frequency of the carrier) 
 bt_TGMquant.acfft = acfft;                              % FFT of the TGM AC map
 bt_TGMquant.timevec = timevec;                          % Time vector (different for brain and clock time referencing)
-bt_TGMquant.normalizer = normalizer;                    % Reference dimension used
+bt_TGMquant.refdimension = refdimension;                % Reference dimension used
 bt_TGMquant.modefreq = modefreq;                        % The mode frequency across all rows and columns of the AC map
 bt_TGMquant.TGM = TGM;                                  % Time Generalization Matrix of the data
 

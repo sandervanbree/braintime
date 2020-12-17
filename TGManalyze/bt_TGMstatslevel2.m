@@ -1,9 +1,15 @@
-function [pval] = bt_TGMstatslevel2(config, stats1)
-% Acquire second level statistics using the first level permutated
-% data. Numperm2 times, grab a random power spectrum of every participants'
-% numperm1 pool of permutated data and average. Then, for every frequency,
-% the pvalue is the percentile of the average empirical data's power in the
-% null distribution of the permuted data's power.
+function [stats2] = bt_TGMstatslevel2(config, stats1)
+% Performs second level statistics of recurrence power spectra, and tests
+% which TGM datapoints are significantly higher than the distribution of
+% shuffled TGMs.
+% - Second level statistics uses the first level permutated data. Numperm2
+% times, grab a random power spectrum of every participants' numperm1 pool
+% of permutated data and average. Then, for every frequency, the pvalue is
+% the percentile of the average empirical data's recurrence power spectra
+% in the null distribution of the permuted data's recurrence power spectra.
+% - TGM significance testing compares each empirical TGM datapoint to 
+% the same datapoint in the shuffled distribution and tests whether
+% classifier performance exceeds 5%.
 %
 % Use:
 % [pval] = bt_TGMstatslevel2(config, stats1), where stats1 has one cell
@@ -20,12 +26,14 @@ function [pval] = bt_TGMstatslevel2(config, stats1)
 %                    % Bonferroni correction.
 %                    %
 % stats1             % Output structure obtained using bt_TGMstatslevel1.
-%                    % Each cell contains one participants' power spectra
-%                    % the empirical data, permutation data, the associated
-%                    % frequency vector, and the power at the mode freq.
+%                    % Each cell contains one participants' empirical TGM,
+%                    % shuffled TGMs, recurrence power spectrum of the
+%                    % empirical and shuffled TGM, the associated frequency
+%                    % vector, and the empirical and shuffled results at 
+%                    % the mode frequency.
 %                    %
 % Output:            %
-% pval               % Two row vectors. The first row vector contains the
+% pval               % Three row vectors. The first row vector contains the
 %                    % pvalues of the statistical comparison between the
 %                    % empirical power spectrum (averaged across
 %                    % participants) and the numperm2 shuffled datasets.
@@ -37,6 +45,7 @@ numsubj = numel(stats1);                             % Number of participants
 numperms1 = size(stats1{1}.shuffspec,1);             % Number of first level permutations
 numperms2 = config.numperms2;                        % Number of second level permutations
 
+%% STEP 1: SECOND LEVEL STATISTICS OF RECURRENCE POWER SPECTRA
 %% Scale the results to be of the same frequency range and length
 % Determine frequency ranges of participants
 for i = 1:numel(stats1)                              % Find each participant's min and max freq
@@ -112,16 +121,16 @@ end
 %% Multiple comparisons correction
 if isfield(config,'multiplecorr')
     if strcmp(config.multiplecorr,'fdr')
-        [~,~,~,pval] = fdr_bh(pval,0.05,'dep');
+        [~,~,~,pval_corr] = fdr_bh(pval,0.05,'dep');
     elseif strcmp(config.multiplecorr,'bonferroni')
-        pval = pval*numel(pval);
+        pval_corr = pval*numel(pval);
     end
 end
 
-pval(pval>1)=1; % Prevent >1 p values.
+pval_corr(pval_corr>1)=1; % Prevent >1 p values.
 
 % Get the negative logarithm for visualization purposes
-logpval = -log10(pval);
+logpval = -log10(pval_corr);
 if isinf(logpval)
     disp('The empirical power of at least one frequency is higher than all shuffled power values; capping p-value');
     logpval(isinf(logpval)) = 4; %cap logpval on 4.
@@ -144,7 +153,7 @@ ylabel('-log10 p-value')
 
 % plot star at every significant frequency
 yyaxis left
-sigind = find(pval<=0.05);
+sigind = find(pval_corr<=0.05);
 p4 = plot(f(sigind),PS_emp(sigind),'r*','MarkerSize',10,'LineWidth',1.5);
 
 % legend
@@ -152,4 +161,69 @@ legend([p1 p2 p3 p4],{'Average emp spectrum','Average perm spectrum','-log10 pva
 
 %% Adapt output variable
 % Add freq information to pval vector
-pval(2,:) = f;
+stats2 = [];
+stats2.pval = pval;
+stats2.pval_corr = pval_corr;
+stats2.frequency = f;
+
+%% STEP 2: TEST SIGNIFICANCE OF TGM
+% Pre-allocate
+empset = zeros(numel(stats1),size(stats1{1}.empTGM,1),size(stats1{1}.empTGM,2));
+shuffset = zeros(numel(stats1),size(stats1{1}.shuffTGM,1),size(stats1{1}.shuffTGM,2),size(stats1{1}.shuffTGM,3));
+
+% Put each participant's empirical and shuffled data into one matrix
+for i = 1:numel(stats1)
+    empset(i,:,:) = stats1{i}.empTGM;
+    shuffset(i,:,:,:) = stats1{i}.shuffTGM;
+end    
+
+% Create average empirical TGM
+avgemp = squeeze(mean(empset,1));
+
+% Pre-allocate
+tempshuff = zeros(numsubj,size(shuffset,3),size(shuffset,4));
+distX = zeros(numperms2,size(shuffset,3),size(shuffset,4));
+
+% Loop through nperm2
+for perm2 = 1:numperms2
+    for s = 1:numsubj      % For each participant
+        idx = randperm(numperms1,1); % Grab a random first permutation
+        tempshuff(s,:,:) = squeeze(shuffset(s,idx,:,:));
+    end
+    distX(perm2,:,:) = squeeze(mean(tempshuff,1));
+end
+
+nrow = size(distX(1,:,:),2); 
+ncol = size(distX(1,:,:),3);
+
+% Get p-values of each TGM datapoint
+pval=zeros(nrow,ncol);
+for r=1:nrow
+    for c=1:ncol
+        pval(r,c)=1-(numel(find(avgemp(r,c)>=distX(:,r,c)))/numperms2);
+    end
+end
+
+% Multiple comparison correction
+pval_vec=pval(:);
+[~,~,~,pval_corr] = fdr_bh(pval_vec,0.05,'dep');
+pval_corr = reshape(pval_corr,nrow,ncol);
+
+% Logical mask based on significant points
+sigmask=zeros(nrow,ncol);
+for r=1:nrow
+    for c=1:ncol
+        if pval_corr(r,c)<=0.05 % Only let through significant points
+            sigmask(r,c)=1;
+        end
+    end
+end
+
+sig_i = find(sigmask==1); % Find only significant points
+maskedTGM = nan(nrow,ncol); % Prepare NaN TGM
+maskedTGM(sig_i) = avgemp(sig_i); % Replace by values of average emp TGM
+
+figure;
+pcolor(1:nrow,1:ncol,maskedTGM);
+shading interp;
+title('TGM datapoints significantly higher than shuffled (FDR-corrected)');
