@@ -209,15 +209,12 @@ if figopt == 1
     subplot(1,2,2); hold on
     low_CI = freq_CI(:,1)';
     hi_CI = freq_CI(:,2)';
-    p3 = area(f,hi_CI);
-    p3(1).FaceColor = [0.8627 0.8627 0.8627];
     hold on
-    p2 = area(f,low_CI);
-    p2(1).FaceColor = [1 1 1];
     p1 = plot(f,fullspec_emp,'LineWidth',2,'Color','b');
-    p2 = plot(f,low_CI,'LineWidth',0.5,'Color','k');
-    p3 = plot(f,hi_CI,'LineWidth',0.5,'Color','k');
-    
+    p2 = plot(f,low_CI,'LineStyle','-','LineWidth',0.5,'Color','k');
+    p3 = plot(f,hi_CI,'LineStyle','-','LineWidth',0.5,'Color','k');
+    patch([f fliplr(f)],[low_CI fliplr(hi_CI)], 1,'FaceColor', 'black', 'EdgeColor', 'none', 'FaceAlpha', 0.2);
+
     if strcmp(refdimension.dim,'braintime') %warp freq line is dependent on clock (warped freq) or brain time (1 hz)
         p4 = line([1 1], [0 max(fullspec_emp)],'color',[1 0 1],'LineWidth',4); %Line at warped freq
         xlabel('Recurrence frequency (factor of warped freq)')

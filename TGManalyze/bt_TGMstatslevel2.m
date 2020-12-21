@@ -168,13 +168,10 @@ ylabel('Mean power across participants')
 % Plot confidence interval
 low_CI = freq_CI(:,1)';
 hi_CI = freq_CI(:,2)';
-c3 = area(f,hi_CI);
-c3(1).FaceColor = [0.8627 0.8627 0.8627];
 hold on
-c2 = area(f,low_CI);
-c2(1).FaceColor = [1 1 1];
-c2 = plot(f,low_CI,'LineWidth',0.5,'Color','k');
-c3 = plot(f,hi_CI,'LineWidth',0.5,'Color','k');
+c2 = plot(f,low_CI,'LineStyle','-','LineWidth',0.5,'Color','k');
+c3 = plot(f,hi_CI,'LineStyle','-','LineWidth',0.5,'Color','k');
+patch([f fliplr(f)],[low_CI fliplr(hi_CI)], 1,'FaceColor', 'black', 'EdgeColor', 'none', 'FaceAlpha', 0.2);
 
 % p-value axis
 yyaxis right
