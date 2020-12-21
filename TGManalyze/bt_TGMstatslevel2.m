@@ -136,6 +136,26 @@ if isinf(logpval)
     logpval(isinf(logpval)) = 4; %cap logpval on 4.
 end
 
+%% Calculate confidence interval
+for freq = 1:numel(f)
+        %Grab data
+        temp_data = perm2PS(:,freq);
+        
+        %Calculate mean
+        temp_mean = mean(temp_data);
+        
+        %Calculate standard mean error (SEM)
+        temp_SEM = std(temp_data)/sqrt(length(temp_data));
+        
+        %Calculate t-score
+        temp_ts = tinv([0.025  0.975],length(temp_data)-1);
+        
+        %Calculate confidence interval (CI)
+        temp_CI = temp_mean + temp_ts*temp_SEM;
+        
+        freq_CI(freq,:) = temp_CI; % save CI 
+end
+
 %% Plot results
 % Relationship empirical and shuffled amp at all freq
 figure; hold on
@@ -144,6 +164,17 @@ p1 = plot(f,PS_emp,'LineStyle','-','LineWidth',3,'Color','b'); %Mean across 2nd 
 p2 = plot(f,perms2PS_avg,'LineStyle','-','LineWidth',2,'Color',[0.3 0.3 0.3]); %Mean across 2nd level perms
 xlabel('Recurrence frequency')
 ylabel('Mean power across participants')
+
+% Plot confidence interval
+low_CI = freq_CI(:,1)';
+hi_CI = freq_CI(:,2)';
+c3 = area(f,hi_CI);
+c3(1).FaceColor = [0.8627 0.8627 0.8627];
+hold on
+c2 = area(f,low_CI);
+c2(1).FaceColor = [1 1 1];
+c2 = plot(f,low_CI,'LineWidth',0.5,'Color','k');
+c3 = plot(f,hi_CI,'LineWidth',0.5,'Color','k');
 
 % p-value axis
 yyaxis right
