@@ -166,24 +166,19 @@ end
 
 if figopt == 1
     %% Create confidence interval for each frequency bin
-    for freq = 1:numel(f)
-        
-        %Grab data
-        temp_data = fullspec_shuff(:,freq);
-        
-        %Calculate mean
-        temp_mean = mean(temp_data);
-        
-        %Calculate standard mean error (SEM)
-        temp_SEM = std(temp_data)/sqrt(length(temp_data));
-        
-        %Calculate t-score
-        temp_ts = tinv([0.025  0.975],length(temp_data)-1);
-        
-        %Calculate confidence interval (CI)
-        temp_CI = temp_mean + temp_ts*temp_SEM;
-        
-        freq_CI(freq,:) = temp_CI; % save CI
+    createCI = true;
+    if numperms1 <100
+        warning('on');
+        warning('No confidence interval will be displayed as the number of first level permutations is too low (<100)')
+        createCI = false;
+    end
+    
+    if createCI == true
+        for f_ind = 1:numel(f)
+            % Confidence interval
+            low_CI(f_ind,:) = prctile(fullspec_shuff(:,f_ind),2.5);
+            hi_CI(f_ind,:) = prctile(fullspec_shuff(:,f_ind),97.5);
+        end
     end
     
     %% Plot results
@@ -207,27 +202,28 @@ if figopt == 1
     
     % 2nd plot: relationship empirical and shuffled amp at all freq
     subplot(1,2,2); hold on
-    low_CI = freq_CI(:,1)';
-    hi_CI = freq_CI(:,2)';
-    hold on
     p1 = plot(f,fullspec_emp,'LineWidth',2,'Color','b');
-    p2 = plot(f,low_CI,'LineStyle','-','LineWidth',0.5,'Color','k');
-    p3 = plot(f,hi_CI,'LineStyle','-','LineWidth',0.5,'Color','k');
-    patch([f fliplr(f)],[low_CI fliplr(hi_CI)], 1,'FaceColor', 'black', 'EdgeColor', 'none', 'FaceAlpha', 0.2);
-
+    
+    % Only create confidence intervals with more than 100 permutations
+    if createCI == true
+    plot(f,low_CI,'LineStyle','-','LineWidth',0.5,'Color','k');
+    plot(f,hi_CI,'LineStyle','-','LineWidth',0.5,'Color','k');
+    patch([f fliplr(f)],[low_CI' fliplr(hi_CI')], 1,'FaceColor', 'black', 'EdgeColor', 'none', 'FaceAlpha', 0.15);
+    end
+    
     if strcmp(refdimension.dim,'braintime') %warp freq line is dependent on clock (warped freq) or brain time (1 hz)
-        p4 = line([1 1], [0 max(fullspec_emp)],'color',[1 0 1],'LineWidth',4); %Line at warped freq
+        p2 = line([1 1], [0 max(fullspec_emp)],'color',[1 0 1],'LineWidth',4); %Line at warped freq
         xlabel('Recurrence frequency (factor of warped freq)')
     else
-        p4 = line([warpfreq warpfreq], [0 max(fullspec_emp)],'color',[1 0 1],'LineWidth',4); %Line at warped freq
+        p2 = line([warpfreq warpfreq], [0 max(fullspec_emp)],'color',[1 0 1],'LineWidth',4); %Line at warped freq
         xlabel('Recurrence frequency')
     end
-    p4.Color(4) = 0.45;
+    p2.Color(4) = 0.45;
     
     % set up axes
     ylabel('Mean amplitude')
     title(sprintf('Amplitude across recurrence rates'))
-    legend([p1 p2 p3 p4],{'Empirical amplitude','Lower limit CI','Higher limit CI','Warped frequency'});
+    legend([p1 p2],{'Empirical amplitude','Warped frequency'});
 end
 
 %% Create output structure

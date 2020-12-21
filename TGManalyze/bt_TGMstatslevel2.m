@@ -45,6 +45,11 @@ numsubj = numel(stats1);                             % Number of participants
 numperms1 = size(stats1{1}.shuffspec,1);             % Number of first level permutations
 numperms2 = config.numperms2;                        % Number of second level permutations
 
+% Sanity check
+if numperms2 <1000
+    warning('It is strongly recommended to use at least 1000 second level permutations');
+end
+
 %% STEP 1: SECOND LEVEL STATISTICS OF RECURRENCE POWER SPECTRA
 %% Scale the results to be of the same frequency range and length
 % Determine frequency ranges of participants
@@ -112,10 +117,16 @@ end
 % Mean across all 2nd level permutations (for plotting)
 perms2PS_avg = mean(perm2PS,1);
 
-%% Calculate p-values
+%% Calculate p-values and confidence intervals
 % For each frequency, find out the percentile of the empirical power in the shuffled distribution
 for f_ind = 1:numel(f)
+    
+    % p-value
     pval(f_ind) = numel(find(perm2PS(:,f_ind)>=PS_emp(f_ind)))/numperms2;
+    
+    % Confidence interval
+    low_CI(f_ind,:) = prctile(perm2PS(:,f_ind),2.5);
+    hi_CI(f_ind,:) = prctile(perm2PS(:,f_ind),97.5);
 end
 
 %% Multiple comparisons correction
@@ -138,26 +149,6 @@ if isinf(logpval)
     logpval(isinf(logpval)) = 4; %cap logpval on 4.
 end
 
-%% Calculate confidence interval
-for freq = 1:numel(f)
-        %Grab data
-        temp_data = perm2PS(:,freq);
-        
-        %Calculate mean
-        temp_mean = mean(temp_data);
-        
-        %Calculate standard mean error (SEM)
-        temp_SEM = std(temp_data)/sqrt(length(temp_data));
-        
-        %Calculate t-score
-        temp_ts = tinv([0.025  0.975],length(temp_data)-1);
-        
-        %Calculate confidence interval (CI)
-        temp_CI = temp_mean + temp_ts*temp_SEM;
-        
-        freq_CI(freq,:) = temp_CI; % save CI 
-end
-
 %% Plot results
 % Relationship empirical and shuffled amp at all freq
 figure; hold on
@@ -168,12 +159,9 @@ xlabel('Recurrence frequency')
 ylabel('Mean power across participants')
 
 % Plot confidence interval
-low_CI = freq_CI(:,1)';
-hi_CI = freq_CI(:,2)';
-hold on
 c2 = plot(f,low_CI,'LineStyle','-','LineWidth',0.5,'Color','k');
 c3 = plot(f,hi_CI,'LineStyle','-','LineWidth',0.5,'Color','k');
-patch([f fliplr(f)],[low_CI fliplr(hi_CI)], 1,'FaceColor', 'black', 'EdgeColor', 'none', 'FaceAlpha', 0.2);
+patch([f fliplr(f)],[low_CI' fliplr(hi_CI')], 1,'FaceColor', 'black', 'EdgeColor', 'none', 'FaceAlpha', 0.15);
 
 % p-value axis
 yyaxis right
