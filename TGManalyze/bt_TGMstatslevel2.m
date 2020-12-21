@@ -124,9 +124,9 @@ if isfield(config,'multiplecorr')
         [~,~,~,pval_corr] = fdr_bh(pval,0.05,'dep');
     elseif strcmp(config.multiplecorr,'bonferroni')
         pval_corr = pval*numel(pval);
-    else
-        pval_corr = pval;
     end
+else
+    pval_corr = pval;
 end
 
 pval_corr(pval_corr>1)=1; % Prevent >1 p values.
