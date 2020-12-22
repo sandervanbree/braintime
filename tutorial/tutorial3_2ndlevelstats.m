@@ -45,6 +45,7 @@ end
 % Apply second level statistics
 cfg.numperms2      = 1000;                      % Number of second level Monte Carlo permutations
 cfg.multiplecorr   = 'fdr';                     % Multiple correction option
+cfg.nfreqbins      = 20;                        % Number of frequency bins in the recurrence power spectra
 [bt_stats2] = bt_TGMstatslevel2(cfg,bt_stats1); % Output matrix contains p-values and associated frequencies
 fprintf('Brain Time warped data results (SIGNIFICANT at simulated 8 Hz)')
 
