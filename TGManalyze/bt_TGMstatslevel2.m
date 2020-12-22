@@ -24,6 +24,11 @@ function [stats2] = bt_TGMstatslevel2(config, stats1)
 %                    % 'none' (default), 'fdr' for adjusted p-values based
 %                    % on the False Discovery Rate, and 'bonferroni' for
 %                    % Bonferroni correction.
+%   - nfreqbins      % Number of frequency bins in the recurrence power
+%                    % spectra. More frequency bins yields better spectral
+%                    % resolution, but an increased chance of false
+%                    % positive results (in case of no correction) or 
+%                    % overcorrection(in case of Bonferroni).
 %                    %
 % stats1             % Output structure obtained using bt_TGMstatslevel1.
 %                    % Each cell contains one participants' empirical TGM,
@@ -44,6 +49,7 @@ function [stats2] = bt_TGMstatslevel2(config, stats1)
 numsubj = numel(stats1);                             % Number of participants
 numperms1 = size(stats1{1}.shuffspec,1);             % Number of first level permutations
 numperms2 = config.numperms2;                        % Number of second level permutations
+nfreqbins = config.nfreqbins;                        % Number of frequency bins in the recurrence power spectra
 
 % Sanity check
 if numperms2 <1000
@@ -78,7 +84,7 @@ for i = 1:numel(stats1)
 end
 
 % Resize stats1 cells to the same length
-res = @(x) imresize(x,[1 max(flength)]);                     % Create function that resizes all data to the same length
+res = @(x) imresize(x,[1 nfreqbins]);                % Create function that resizes all data to the same length
 for i = 1:numel(stats1)
     stats1{i}.f         = res(stats1{i}.f);
     fvec(i,:)           = stats1{i}.f;
@@ -103,8 +109,8 @@ PS_emp = mean(PS_emp,1);
 
 %% Second level statistics
 % Pre-allocate
-perm1PS = zeros(numsubj,max(flength));
-perm2PS = zeros(numperms2,max(flength));
+perm1PS = zeros(numsubj,nfreqbins);
+perm2PS = zeros(numperms2,nfreqbins);
 
 for perm2=1:numperms2
     for subj = 1:numsubj
