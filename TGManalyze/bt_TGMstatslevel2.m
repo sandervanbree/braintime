@@ -110,7 +110,7 @@ PS_emp = mean(PS_emp,1);
 %% Second level statistics
 % Pre-allocate
 perm1PS = zeros(numsubj,nfreqbins);
-perm2PS = zeros(numperms2,nfreqbins);
+perm2PS = zeros(numperms2,max(flength));
 
 for perm2=1:numperms2
     for subj = 1:numsubj
@@ -173,6 +173,7 @@ patch([f fliplr(f)],[low_CI' fliplr(hi_CI')], 1,'FaceColor', 'black', 'EdgeColor
 yyaxis right
 p3 = plot(f,logpval,'LineStyle','-','LineWidth',2,'Color',[0.7 0.2 0.2]);
 p3.Color(4) = 0.25;
+ylim([0,4])
 ylabel('-log10 p-value')
 
 % plot star at every significant frequency
