@@ -172,8 +172,8 @@ patch([f fliplr(f)],[low_CI' fliplr(hi_CI')], 1,'FaceColor', 'black', 'EdgeColor
 % p-value axis
 yyaxis right
 p3 = plot(f,logpval,'LineStyle','-','LineWidth',2,'Color',[0.7 0.2 0.2]);
-p3.Color(4) = 0.25;
-ylim([0,4])
+p3.Color(4) = 0.3;
+ylim([-0.05,4])
 ylabel('-log10 p-value')
 
 % plot star at every significant frequency
