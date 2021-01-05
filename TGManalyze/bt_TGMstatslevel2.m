@@ -110,7 +110,7 @@ PS_emp = mean(PS_emp,1);
 %% Second level statistics
 % Pre-allocate
 perm1PS = zeros(numsubj,nfreqbins);
-perm2PS = zeros(numperms2,max(flength));
+perm2PS = zeros(numperms2,nfreqbins);
 
 for perm2=1:numperms2
     for subj = 1:numsubj
