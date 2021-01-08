@@ -9,7 +9,8 @@ function [stats2] = bt_TGMstatslevel2(config, stats1)
 % in the null distribution of the permuted data's recurrence power spectra.
 % - TGM significance testing compares each empirical TGM datapoint to 
 % the same datapoint in the shuffled distribution and tests whether
-% classifier performance exceeds 5%.
+% classifier performance exceeds 5%. Empirical and shuffled TGMs are 
+% normalized using the mean and standard deviation of the shuffled TGMs.
 %
 % Use:
 % [pval] = bt_TGMstatslevel2(config, stats1), where stats1 has one cell
@@ -25,10 +26,10 @@ function [stats2] = bt_TGMstatslevel2(config, stats1)
 %                    % on the False Discovery Rate, and 'bonferroni' for
 %                    % Bonferroni correction.
 %   - nfreqbins      % Number of frequency bins in the recurrence power
-%                    % spectra. More frequency bins yields better spectral
-%                    % resolution, but an increased chance of false
-%                    % positive results (in case of no correction) or 
-%                    % overcorrection(in case of Bonferroni).
+%                    % spectra. More frequency bins yields better (pseudo)
+%                    % spectral resolution, but an increased chance of
+%                    % false positive results (in case of no correction) or 
+%                    % overcorrection(in case of FDR and Bonferroni).
 %                    %
 % stats1             % Output structure obtained using bt_TGMstatslevel1.
 %                    % Each cell contains one participants' empirical TGM,
@@ -149,8 +150,8 @@ pval_corr(pval_corr>1)=1; % Prevent >1 p values.
 
 % Get the negative logarithm for visualization purposes
 logpval = -log10(pval_corr);
-if isinf(logpval)
-    disp('The empirical power of at least one frequency is higher than all shuffled power values; capping p-value');
+if any(isinf(logpval))
+    disp('The empirical power of at least one frequency is higher than all shuffled power values');
     logpval(isinf(logpval)) = 4; %cap logpval on 4.
 end
 
@@ -195,10 +196,15 @@ stats2.frequency = f;
 empset = zeros(numel(stats1),size(stats1{1}.empTGM,1),size(stats1{1}.empTGM,2));
 shuffset = zeros(numel(stats1),size(stats1{1}.shuffTGM,1),size(stats1{1}.shuffTGM,2),size(stats1{1}.shuffTGM,3));
 
-% Put each participant's empirical and shuffled data into one matrix
+% Put each participant's empirical and shuffled data into one matrix, whilst z-scoring based on shuffled data
 for i = 1:numel(stats1)
-    empset(i,:,:) = stats1{i}.empTGM;
-    shuffset(i,:,:,:) = stats1{i}.shuffTGM;
+    % Calculate mean and std of the shuffled TGMs
+    mn = mean(stats1{i}.shuffTGM(:));
+    sd = std(stats1{i}.shuffTGM(:));
+    
+    % Subtract the mean and divide by std to normalize across participants
+    empset(i,:,:) = (stats1{i}.empTGM-mn)./sd;
+    shuffset(i,:,:,:) = (stats1{i}.shuffTGM-mn)./sd;
 end    
 
 % Create average empirical TGM
