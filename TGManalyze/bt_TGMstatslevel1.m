@@ -36,13 +36,12 @@ function [stats1] = bt_TGMstatslevel1(config, bt_data, bt_TGMquant)
 %                    %
 % Output:
 % stats1             % Output structure which contains power spectra of
-%                    % the empirical data, permutation data, the associated
-%                    % frequency vector, and the power at the mode freq.
+%                    % the empirical data, permutation data, and the
+%                    % associated frequency vector.
 
 %% Get information
 numperms1 = config.numperms1;                             % Number of first level permutations
 warpfreq = bt_TGMquant.warpfreq;                          % Warped frequency (frequency of the carrier)
-modefreq = bt_TGMquant.modefreq;                          % The mode frequency across all rows and columns of the AC map
 TGM = bt_TGMquant.TGM;                                    % Time Generalization Matrix of the data
 refdimension = bt_TGMquant.refdimension;                  % Reference dimension used
 clabel = config.clabel;                                   % Classification labels
@@ -68,7 +67,6 @@ end
 %% statistically test TGM
 % FIRST LEVEL PERMUTATION
 % % Pre-allocate
-modepow_shuff = zeros(1,numel(statsrange));
 fullspec_shuff = zeros(1,numel(statsrange));
 permTGM = zeros(numperms1,size(TGM,1),size(TGM,2));
 
@@ -120,11 +118,9 @@ for perm1 = 1:numperms1
         
     end
     avg_PS = mean(PS1,1)+mean(PS2,1); %Mean power spectra
-    modepow_shuff(perm1) = avg_PS(nearest(f,modefreq)); %Mean power spectra at mode freq
     fullspec_shuff(perm1,:) = avg_PS;
 end
 
-mean_modepow_shuff = mean(modepow_shuff);
 f=f(l:h); %filter frequency vector based on range of interest
 
 % EMPIRICAL DATA
@@ -150,7 +146,6 @@ for vec=1:nvecs
 end
 f=f(l:h); %filter frequency vector based on range of interest
 avg_PS = mean(PS1,1)+mean(PS2,1); %Mean power spectra
-modepow_emp = avg_PS(nearest(f,modefreq)); %Mean power at mode freq
 fullspec_emp = avg_PS;
 
 % Only calculate confidence interval and plot stats if desired
@@ -167,9 +162,9 @@ end
 if figopt == 1
     %% Create confidence interval for each frequency bin
     createCI = true;
-    if numperms1 <100
+    if numperms1 <20
         warning('on');
-        warning('No confidence interval will be displayed as the number of first level permutations is too low (<100)')
+        warning('No confidence interval will be displayed as the number of first level permutations is too low (<20)')
         createCI = false;
     end
     
@@ -182,48 +177,71 @@ if figopt == 1
     end
     
     %% Plot results
-    % 1st plot: relationship empirical and shuffled amp at mode freq
-    figure
-    subplot(1,2,1)
-    x = ones(1,numel(modepow_shuff));
-    plot(x,modepow_shuff,'k.','MarkerSize',25,'LineWidth',3);
-    grid on;
-    hold on;
-    plot(x(1),modepow_emp,'r.','MarkerSize',35,'LineWidth',3);
-    legend('Shuffled mode power','Empirical mode power')
-    ax = gca;
-    ax.XTick = 1;
-    ax.XTickLabels = {[' ']};
-    % Set up axes.
-    ylabel('Mean amplitude at mode frequency')
-    xlabel(sprintf('%.2f Hz',modefreq))
-    xlim([0.8, 1.2]);
-    title(sprintf('Amplitude of mode frequency (%.2f Hz)',modefreq))
+    figure('units','normalized','outerposition',[0 0 1 1]);hold on;
     
-    % 2nd plot: relationship empirical and shuffled amp at all freq
-    subplot(1,2,2); hold on
-    p1 = plot(f,fullspec_emp,'LineWidth',2,'Color','b');
-    
-    % Only create confidence intervals with more than 100 permutations
-    if createCI == true
-    plot(f,low_CI,'LineStyle','-','LineWidth',0.5,'Color','k');
-    plot(f,hi_CI,'LineStyle','-','LineWidth',0.5,'Color','k');
-    patch([f fliplr(f)],[low_CI' fliplr(hi_CI')], 1,'FaceColor', 'black', 'EdgeColor', 'none', 'FaceAlpha', 0.15);
+    if strcmp(refdimension.dim,'braintime') % Only for brain time, separate warped frequency
+        subplot(1,10,1:3)
+        wfreq = nearest(f,1); %Find the warped frequency (1 Hz)
+        plot(fullspec_emp(wfreq),'o','MarkerSize',6,'MarkerEdgeColor','blue','MarkerFaceColor','blue'); %Plot marker of empirical power
+        violinplot(fullspec_shuff(:,wfreq),'test','ShowData',false,'ViolinColor',[0.8 0.8 0.8],'MedianColor',[0 0 0],'BoxColor',[0.5 0.5 0.5],'EdgeColor',[0 0 0],'ViolinAlpha',0.8);
+        
+        % Set legend
+        h = get(gca,'Children');
+        l2 = legend(h([9 3]),'Empirical (emp) recurrence power','Permuted (perm) recurrence power');
+        set(l2,'Location','best');
+        
+        % Set up axes
+        ylabel('Recurrence power');
+        xticklabels(' ');
+        xlabel('Warped frequency (1 Hz)');
+        title(['1st level recurrence at warped frequency (1Hz)'])
+        
+        % Adapt font
+        set(gca,'FontName','Arial')
+        set(gca,'FontSize',16)
+        
+        % Now plot recurrence power spectrum
+        subplot(1,10,5:10)
+        hold on
     end
+    
+    yyaxis left
+    p1 = plot(f,fullspec_emp,'LineStyle','-','LineWidth',3,'Color','b'); %Mean across 1st level perms
+    p2 = plot(f,mean(fullspec_shuff,1),'LineStyle','-','LineWidth',2,'Color',[0.3 0.3 0.3]); %Mean across 1st level perms
+    xlabel('Recurrence frequency')
+    ylabel('Mean power across participants')
     
     if strcmp(refdimension.dim,'braintime') %warp freq line is dependent on clock (warped freq) or brain time (1 hz)
-        p2 = line([1 1], [0 max(fullspec_emp)],'color',[1 0 1],'LineWidth',4); %Line at warped freq
+        p3 = line([1 1], [0 max(fullspec_emp)],'color',[1 0 1],'LineWidth',4); %Line at warped freq
         xlabel('Recurrence frequency (factor of warped freq)')
     else
-        p2 = line([warpfreq warpfreq], [0 max(fullspec_emp)],'color',[1 0 1],'LineWidth',4); %Line at warped freq
+        p3 = line([warpfreq warpfreq], [0 max(fullspec_emp)],'color',[1 0 1],'LineWidth',4); %Line at warped freq
         xlabel('Recurrence frequency')
     end
-    p2.Color(4) = 0.45;
+    p3.Color(4) = 0.45;
     
-    % set up axes
-    ylabel('Mean amplitude')
-    title(sprintf('Amplitude across recurrence rates'))
-    legend([p1 p2],{'Empirical amplitude','Warped frequency'});
+    % Plot confidence interval
+    if createCI == true
+        c2 = plot(f,low_CI,'LineStyle','-','LineWidth',0.5,'Color','k');
+        c3 = plot(f,hi_CI,'LineStyle','-','LineWidth',0.5,'Color','k');
+        p4 = patch([f fliplr(f)],[low_CI' fliplr(hi_CI')], 1,'FaceColor', 'black', 'EdgeColor', 'none', 'FaceAlpha', 0.15);
+        
+        % legend
+        l2 = legend([p1 p2 p3 p4],{'Average emp spectrum','Average perm spectrum', 'Warped frequency', 'Conf. interv. perm spectrum'});
+    else
+        l2 = legend([p1 p2 p3],{'Average emp spectrum','Average perm spectrum','Warped frequency'});
+    end
+    set(l2,'Location','best')
+    
+    % add title
+    title('Recurrence power spectra (1st level stats)');
+    
+    % Adapt font
+    set(gca,'FontName','Arial')
+    set(gca,'FontSize',16)
+    
+    % Notify user about lack of p-values
+    disp('p-values are calculated in the second-level statistics (bt_TGMstatslevel2)');
 end
 
 %% Create output structure
@@ -232,5 +250,4 @@ stats1.empTGM = TGM;                                  % Empirical TGM
 stats1.shuffTGM = permTGM;                            % Nperm1 shuffled TGMs
 stats1.empspec = fullspec_emp;                        % Power spectrum of average empirical data
 stats1.shuffspec = fullspec_shuff;                    % Power spectrum of average permutation data
-stats1.empmode = modepow_emp;                         % Power at mode freq of epirical data
-stats1.shuffmode = modepow_shuff;                     % Power at mode freq of permutation data
+stats1.refdimension = refdimension;                   % Save reference dimension (clock or brain time)

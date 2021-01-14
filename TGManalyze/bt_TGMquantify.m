@@ -2,8 +2,7 @@ function [bt_TGMquant] = bt_TGMquantify(config, TGM)
 % Quantify the degree of cross-time recurrence in the time generalization
 % matrix (TGM). Creates an autocorrelation map (AC map) of the TGM, and
 % applies an FFT over each row and column of the AC map. For each row and
-% column, the maximum power frequency will be displayed. The mode frequency
-% represents the primary recurrence rate present in the TGM.
+% column, the maximum power frequency will be displayed.
 %
 % Use:
 % [bt_TGMquant] = bt_TGMquantify(config, TGM)
@@ -75,9 +74,6 @@ end
 % put together both dimensions
 acfft=[acfft_dim1,acfft_dim2];
 
-% get the overall mode
-modefreq=mode(acfft(2,:));
-
 if isfield(config,'figure')
     if strcmp(config.figure,'yes')
         figopt = 1;
@@ -97,15 +93,15 @@ if figopt == 1
     cfg_plot.y   = cfg_plot.x;
     mv_plot_2D(cfg_plot, TGM);
     cb = colorbar;
-    title(cb,'accuracy')
+    title(cb,'performance')
     xlim([timevec(1) timevec(end)]);
     ylim([timevec(1) timevec(end)]);
     xticks(yticks) % make ticks the same on the two axes
     title(['Time Generalization Matrix'])
-    if strcmp(config.refdimension,'braintime')
+    if strcmp(refdimension.dim,'braintime')
         xlabel('Test data (cycles)')
         ylabel('Training data (cycles)')
-    elseif strcmp(config.refdimension,'clocktime')
+    elseif strcmp(refdimension.dim,'clocktime')
         xlabel('Test data (seconds)')
         ylabel('Training data (seconds)')
     end
@@ -123,21 +119,14 @@ if figopt == 1
     caxis([-clim +clim])
     cb=colorbar;
     title(cb,'corr')
-    if strcmp(config.refdimension,'braintime')
+    if strcmp(refdimension.dim,'braintime')
         xlabel('Shift by x-cycle')
         ylabel('Shift by y-cycle')
-    elseif strcmp(config.refdimension,'clocktime')
+    elseif strcmp(refdimension.dim,'clocktime')
         xlabel('Shift by x-sec')
         ylabel('Shift by y-sec')
     end
     hold on
-    
-    % Plot mode frequency
-    subplot(2,2,3)
-    plot(acfft(2,:),1:nvecs*2,'.')
-    title(['Mode peak frequency: ',num2str(modefreq)])
-    xlabel('Peak frequency')
-    ylabel('AC Row or column')
 end
 
 %% Save basic info
@@ -146,6 +135,5 @@ bt_TGMquant.warpfreq = warpfreq;                        % Warped frequency (freq
 bt_TGMquant.acfft = acfft;                              % FFT of the TGM AC map
 bt_TGMquant.timevec = timevec;                          % Time vector (different for brain and clock time referencing)
 bt_TGMquant.refdimension = refdimension;                % Reference dimension used
-bt_TGMquant.modefreq = modefreq;                        % The mode frequency across all rows and columns of the AC map
 bt_TGMquant.TGM = TGM;                                  % Time Generalization Matrix of the data
 

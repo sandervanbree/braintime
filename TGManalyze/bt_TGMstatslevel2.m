@@ -34,9 +34,8 @@ function [stats2] = bt_TGMstatslevel2(config, stats1)
 % stats1             % Output structure obtained using bt_TGMstatslevel1.
 %                    % Each cell contains one participants' empirical TGM,
 %                    % shuffled TGMs, recurrence power spectrum of the
-%                    % empirical and shuffled TGM, the associated frequency
-%                    % vector, and the empirical and shuffled results at 
-%                    % the mode frequency.
+%                    % empirical and shuffled TGM, and the associated
+%                    % frequency vector.
 %                    %
 % Output:            %
 % pval               % Three row vectors. The first row vector contains the
@@ -51,6 +50,7 @@ numsubj = numel(stats1);                             % Number of participants
 numperms1 = size(stats1{1}.shuffspec,1);             % Number of first level permutations
 numperms2 = config.numperms2;                        % Number of second level permutations
 nfreqbins = config.nfreqbins;                        % Number of frequency bins in the recurrence power spectra
+refdimension = stats1{1}.refdimension;               % Find out the reference dimension (clock or brain time)
 
 % Sanity check
 if numperms2 <1000
@@ -75,7 +75,6 @@ for i = 1:numel(stats1)
     ffix = @(x) x(st:en);                            % Filter all cells based on common frequencies
     stats1{i}.f         = ffix(stats1{i}.f);
     stats1{i}.empspec   = ffix(stats1{i}.empspec);
-    stats1{i}.shuffmode = ffix(stats1{i}.shuffmode);
     
     for i2 = 1:size(stats1{i}.shuffspec,1)           % Do that for each permutation
     temp(i2,:) = ffix(stats1{i}.shuffspec(i2,:));
@@ -90,7 +89,6 @@ for i = 1:numel(stats1)
     stats1{i}.f         = res(stats1{i}.f);
     fvec(i,:)           = stats1{i}.f;
     stats1{i}.empspec   = res(stats1{i}.empspec);
-    stats1{i}.shuffmode = res(stats1{i}.shuffmode);
     
     for i2 = 1:size(stats1{i}.shuffspec,1)          % Do that for each permutation
         temp2(i2,:) = res(stats1{i}.shuffspec(i2,:));
@@ -112,8 +110,13 @@ PS_emp = mean(PS_emp,1);
 % Pre-allocate
 perm1PS = zeros(numsubj,nfreqbins);
 perm2PS = zeros(numperms2,nfreqbins);
+progbar = 0:1000:numperms2;
 
 for perm2=1:numperms2
+if ismember(perm2,progbar) % Print progress
+    disp(strcat((num2str(round((perm2/numperms2)*100,2))),'% of second level permutations completed'));
+end
+    
     for subj = 1:numsubj
         idx=randperm(numperms1,1); %randomly grab with replacement
         perm1PS(subj,:) = stats1{subj}.shuffspec(idx,:);
@@ -146,6 +149,15 @@ if isfield(config,'multiplecorr')
     end
 end
 
+% For brain time referenced data, exempt the warped frequency from multiple testing correction
+if strcmp(refdimension.dim,'braintime')
+wfreq = nearest(f,1); %Find the warped frequency (1 Hz)
+pval_corr(wfreq) = pval(wfreq);
+disp('##############################################################################%########')
+disp('The p-value at the warped frequency (1 Hz) is exempted from multiple testing correction');
+disp('#######################################################################################')
+end
+
 pval_corr(pval_corr>1)=1; % Prevent >1 p values.
 
 % Get the negative logarithm for visualization purposes
@@ -157,7 +169,33 @@ end
 
 %% Plot results
 % Relationship empirical and shuffled amp at all freq
-figure; hold on
+figure('units','normalized','outerposition',[0 0 1 1]);hold on;
+
+if strcmp(refdimension.dim,'braintime') % Only for brain time, separate warped frequency
+subplot(1,10,1:3)
+plot(PS_emp(wfreq),'o','MarkerSize',6,'MarkerEdgeColor','blue','MarkerFaceColor','blue'); %Plot marker of empirical power
+violinplot(perm2PS(:,wfreq),'test','ShowData',false,'ViolinColor',[0.8 0.8 0.8],'MedianColor',[0 0 0],'BoxColor',[0.5 0.5 0.5],'EdgeColor',[0 0 0],'ViolinAlpha',0.8);
+
+% Set legend
+h = get(gca,'Children');
+l2 = legend(h([9 3]),'Empirical (emp) recurrence power','Permuted (perm) recurrence power');
+set(l2,'Location','best');
+
+% Set up axes
+ylabel('Recurrence power');
+xticklabels(' ');
+xlabel('Warped frequency (1 Hz)');
+title(['P-value at warped frequency (1Hz): p = ',num2str(round(pval_corr(wfreq)),6)])
+
+% Adapt font
+set(gca,'FontName','Arial')
+set(gca,'FontSize',16)
+
+% Prepare new subplot
+subplot(1,10,5:10)
+hold on
+end
+
 yyaxis left
 p1 = plot(f,PS_emp,'LineStyle','-','LineWidth',3,'Color','b'); %Mean across 2nd level perms
 p2 = plot(f,perms2PS_avg,'LineStyle','-','LineWidth',2,'Color',[0.3 0.3 0.3]); %Mean across 2nd level perms
@@ -167,22 +205,30 @@ ylabel('Mean power across participants')
 % Plot confidence interval
 c2 = plot(f,low_CI,'LineStyle','-','LineWidth',0.5,'Color','k');
 c3 = plot(f,hi_CI,'LineStyle','-','LineWidth',0.5,'Color','k');
-patch([f fliplr(f)],[low_CI' fliplr(hi_CI')], 1,'FaceColor', 'black', 'EdgeColor', 'none', 'FaceAlpha', 0.15);
+p3 = patch([f fliplr(f)],[low_CI' fliplr(hi_CI')], 1,'FaceColor', 'black', 'EdgeColor', 'none', 'FaceAlpha', 0.15);
 
 % p-value axis
 yyaxis right
-p3 = plot(f,logpval,'LineStyle','-','LineWidth',2,'Color',[0.7 0.2 0.2]);
-p3.Color(4) = 0.3;
+p4 = plot(f,logpval,'LineStyle','-','LineWidth',2,'Color',[0.7 0.2 0.2]);
+p4.Color(4) = 0.3;
 ylim([-0.05,4])
 ylabel('-log10 p-value')
 
 % plot star at every significant frequency
 yyaxis left
 sigind = find(pval_corr<=0.05);
-p4 = plot(f(sigind),PS_emp(sigind),'r*','MarkerSize',10,'LineWidth',1.5);
+p5 = plot(f(sigind),PS_emp(sigind),'r*','MarkerSize',10,'LineWidth',1.5);
 
 % legend
-legend([p1 p2 p3 p4],{'Average emp spectrum','Average perm spectrum','-log10 pvalue', 'p<=0.05'});
+l2 = legend([p1 p2 p3 p4 p5],{'Average emp spectrum','Average perm spectrum', 'Conf. interv. perm spectrum', '-log10 p-value', 'p<=0.05'});
+set(l2,'Location','best')
+
+% add title
+title('Recurrence power spectra');
+
+% Adapt font
+set(gca,'FontName','Arial')
+set(gca,'FontSize',16)
 
 %% Adapt output variable
 % Add freq information to pval vector
