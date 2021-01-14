@@ -56,6 +56,5 @@ cfg.clabel          = clabel;
 [ct_TGMstats1] = bt_TGMstatslevel1(cfg,ct_data,ct_TGMquant);  % Clock time results (not significant)
 [bt_TGMstats1] = bt_TGMstatslevel1(cfg,bt_data,bt_TGMquant);  % Brain time results (significant)
 
-
 %% Save results for tutorial 3
 save tutorial2_output ct_TGMquant bt_TGMquant ct_TGMstats1 bt_TGMstats1 ct_data bt_data clabel cfg_mv

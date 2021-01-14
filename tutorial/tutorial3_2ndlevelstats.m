@@ -31,7 +31,7 @@ TGM_subj4.ct_data = ct_data;
 % First level statistics (single subject level)
 cfg.mvpacfg         = cfg_mv;          % Input previous mvpa light config structure
 cfg.figure          = 'no'; 
-cfg.numperms1       = 5;               % Number of permutations on the first level (per participant)
+cfg.numperms1       = 100;               % Number of permutations on the first level (per participant)
 cfg.statsrange      = [1 20];          % Range of tested recurrence rates
 cfg.clabel          = clabel;
 
@@ -43,7 +43,7 @@ TGM = eval(strcat('TGM_subj',num2str(subj),'.bt_TGM'));
 end
 
 % Apply second level statistics
-cfg.numperms2      = 1000;                      % Number of second level Monte Carlo permutations
+cfg.numperms2      = 10000;                      % Number of second level Monte Carlo permutations
 cfg.multiplecorr   = 'fdr';                     % Multiple correction option
 cfg.nfreqbins      = 20;                        % Number of frequency bins in the recurrence power spectra
 [bt_stats2] = bt_TGMstatslevel2(cfg,bt_stats1); % Output matrix contains p-values and associated frequencies
