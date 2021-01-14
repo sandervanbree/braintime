@@ -6,9 +6,9 @@
 - Separately, decide for "shuffled" versus "permuted" and make consistent
 - Resize second level power spectra to the right number of frequency bins, discuss together what that is
 
-LOW PRIORITY:
+LOW URGENCY:
 - Implement Cohen/Luca's GED scripts
-
+- In the paper, remind users to be very careful with high pass filtering; https://doi.org/10.1101/530220
 
 ### Start documentation:
 
