@@ -1,3 +1,16 @@
+### Current to do list (for devs)
+- Update tutorial 4 to 6
+- Make lingo consistent within toolbox, in line with SfN poster ("warping signal", "warping source", etc.)
+- Implement cluster correction TGM (Marije's code coming up)
+- Resize second level power spectra to the right number of frequency bins, discuss together what that is
+
+LOW PRIORITY:
+- Implement Cohen/Luca's GED scripts
+
+
+### Start documentation:
+
+
 # Brain Time Toolbox
 
 ![btlogo](https://i.imgur.com/cjhrUnt.png)
