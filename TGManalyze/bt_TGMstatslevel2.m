@@ -153,9 +153,11 @@ end
 if strcmp(refdimension.dim,'braintime')
 wfreq = nearest(f,1); %Find the warped frequency (1 Hz)
 pval_corr(wfreq) = pval(wfreq);
+fprintf(1, '\n');
 disp('##############################################################################%########')
 disp('The p-value at the warped frequency (1 Hz) is exempted from multiple testing correction');
 disp('#######################################################################################')
+fprintf(1, '\n');
 end
 
 pval_corr(pval_corr>1)=1; % Prevent >1 p values.
