@@ -31,7 +31,7 @@ TGM_subj4.ct_data = ct_data;
 % First level statistics (single subject level)
 cfg.mvpacfg         = cfg_mv;          % Input previous mvpa light config structure
 cfg.figure          = 'no'; 
-cfg.numperms1       = 100;               % Number of permutations on the first level (per participant)
+cfg.numperms1       = 5;               % Number of permutations on the first level (per participant)
 cfg.statsrange      = [1 20];          % Range of tested recurrence rates
 cfg.clabel          = clabel;
 
