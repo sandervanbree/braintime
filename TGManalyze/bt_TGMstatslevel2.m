@@ -229,7 +229,7 @@ l2 = legend([p1 p2 p3 p4 p5],{'Average emp spectrum','Average perm spectrum', 'C
 set(l2,'Location','best')
 
 % add title
-title('Recurrence power spectra');
+title('Recurrence power spectra (2nd level stats)');
 
 % Adapt font
 set(gca,'FontName','Arial')
