@@ -1,4 +1,5 @@
 function [bt_struc] = bt_clocktobrain(config, data, bt_carrier)
+% #### SCRIPT WORKING, LINGO UPDATED SOON ####
 % Warp clock to brain time. The clock time data is resampled based on the
 % warping path from the brain time phase vector to the phase of a
 % stationary sinusoid.
