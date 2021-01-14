@@ -165,7 +165,10 @@ pval_corr(pval_corr>1)=1; % Prevent >1 p values.
 % Get the negative logarithm for visualization purposes
 logpval = -log10(pval_corr);
 if any(isinf(logpval))
-    disp('The empirical power of at least one frequency is higher than all shuffled power values');
+    fprintf(1, '\n');
+    disp('The empirical power of at least one frequency is higher than all shuffled power values (yielding p = 0).');
+    disp('Consider increasing the number of 2nd level permutations');
+    fprintf(1, '\n');
     logpval(isinf(logpval)) = 4; %cap logpval on 4.
 end
 
