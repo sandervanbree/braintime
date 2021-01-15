@@ -2,13 +2,15 @@
 - random gaussian field theory to perform multiple testing correction over power spectra and TGMs?
 - Implement cluster correction TGM (Marije ter Wal's code is coming up soon in the lab's Github)
 - Update tutorial 4 to 6
-- Make lingo consistent within toolbox, in line with SfN poster ("warping signal", "warping source", etc.)
 - Separately, decide for "shuffled" versus "permuted" and make consistent
 - Resize second level power spectra to the right number of frequency bins, discuss together what that is
 
 LOW URGENCY:
 - Implement Cohen/Luca's GED scripts
 - In the paper, remind users to be very careful with high pass filtering; https://doi.org/10.1101/530220
+
+COMPLETED RECENTLY: 
+- Make lingo consistent within toolbox, in line with SfN poster ("warping signal", "warping source", etc.)
 
 ### Start documentation:
 
