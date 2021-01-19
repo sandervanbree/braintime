@@ -32,18 +32,22 @@ function [bt_source] = bt_selectsource(config, fft_sources, warpsources)
 
 %% Get basic info
 srcrank = fft_sources{1};                              % Time freq data of the ranked sources
-mintime_ind = fft_sources{2}(1);                       % Index of start time of interest (differs for cutartefact)
-maxtime_ind = fft_sources{2}(2);                       % Index of end time of interest
-minfft = fft_sources{3}(1);                            % Lowest analyzed freq in FFT
-maxfft = fft_sources{3}(2);                            % Highest analyzed freq in FFT
-minfoi = fft_sources{4}(1);                            % Lowest possible warping frequency
-maxfoi = fft_sources{4}(2);                            % Highest possible warping frequency
-fspecinfo = fft_sources{5};                            % FFT time and frequency vector
-powtf = fft_sources{6};                                % Power spectrum of warping sources
-pspec = fft_sources{7};                                % Power spectrum averaged across trials
-phs = fft_sources{8};                                  % Phase of all warping sources for all trials
-cutmethod = fft_sources{9};                            % Applied cutting method
-rankmethod = fft_sources{10};                          % Applied ranking method
+mintime = fft_sources{2}(1);                           % Start time of interest
+maxtime = fft_sources{2}(2);                           % End time of interest
+minfoi = fft_sources{3}(1);                            % Lowest possible warping frequency
+maxfoi = fft_sources{3}(2);                            % Highest possible warping frequency
+fspecinfo = fft_sources{4};                            % FFT time and frequency vector
+minfft = fspecinfo.freq(1);                            % Lowest analyzed freq in FFT
+maxfft = fspecinfo.freq(end);                            % Highest analyzed freq in FFT
+powtf = fft_sources{5};                                % Power spectrum of warping sources
+pspec = fft_sources{6};                                % Power spectrum averaged across trials
+phs = fft_sources{7};                                  % Phase of all warping sources for all trials
+cutmethod = fft_sources{8};                            % Applied cutting method
+rankmethod = fft_sources{9};                          % Applied ranking method
+
+mintime_ind = nearest(fspecinfo.time,mintime);             % Index of start time of interest (differs for cutartefact)
+maxtime_ind = nearest(fspecinfo.time,maxtime);             % Index of end time of interest
+
 
 %% Plot ranked warping sources
 % Find out ranking type
@@ -83,7 +87,7 @@ while finish==0
     maxfreq = srcrank(src_ind,2);
      
     subplot(8,2,[1 3]);
-    text(0,0.5,msg,'FontName','Arial','FontSize',12); axis off
+    text(0,0.5,msg,'FontName','Arial','FontSize',11.5); axis off
     
     subplot(8,2,[7 9 11 13 15]);
     % Only plot topography if layout is specified
@@ -131,8 +135,9 @@ while finish==0
     caxis([0 maxp])
     xlabel('Time (s)')
     ylabel('Frequency (Hz)')
-    yl = yline(maxfreq,':',[num2str(maxfreq) ' Hz'],'FontSize',14,'LineWidth',4,'Color','r');
-    rec1 = rectangle('Position',[fspecinfo.time(mintime_ind),minfoi,(fspecinfo.time(maxtime_ind)-fspecinfo.time(mintime_ind)),maxfoi-minfoi],'EdgeColor','k');
+    yl = line([mintime,maxtime],[maxfreq, maxfreq],'Color','r','LineWidth',4);
+    text((maxtime+mintime)/2,maxfreq+1,[num2str(maxfreq),'Hz'],'FontSize',14,'Color','r')
+    rec1 = rectangle('Position',[mintime,minfoi,maxtime-mintime,maxfoi-minfoi],'EdgeColor','k');
     legend(yl','Warping signal')
     set(gca,'FontSize',14);
     title(sprintf('Warping source %d | Warping signal: %0.3f power at %0.2fHz',currsrc,(srcrank(src_ind,4))/maxp,maxfreq),'FontSize',14) 

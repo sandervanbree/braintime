@@ -202,13 +202,12 @@ fspecinfo.freq = fspec.freq;
 fspecinfo.time = fspec.time;
 
 fft_sources{1} = srcrank;                                  % Time freq data of extracted warping sources
-fft_sources{2} = [mintime_ind maxtime_ind];                % Index of start and end time of interest (differs for cutartefact)
-fft_sources{3} = [cfgFT.foi(1) cfgFT.foi(end)];            % Lowest and highest analyzed freq in FFT
-fft_sources{4} = [minfoi maxfoi];                          % Lowest and highest possible warping frequency
-fft_sources{5} = fspecinfo;                                % FFT time and frequency vector
-fft_sources{6} = powtf(:,:,srcrank(:,1));                  % Power spectrum of warping sources
-fft_sources{7} = pspec(:,srcrank(:,1));                    % Power spectrum averaged across trials
-fft_sources{8} = phs(srcrank(:,1));                        % Phase of all warping sources for all trials
-fft_sources{9} = config.cutmethod;                         % Applied cutting method
-fft_sources{10} = config.rankmethod;                       % Applied ranking method
+fft_sources{2} = [mintime maxtime];                        % Start and end time of interest
+fft_sources{3} = [minfoi maxfoi];                          % Lowest and highest possible warping frequency
+fft_sources{4} = fspecinfo;                                % FFT time and frequency vector
+fft_sources{5} = powtf(:,:,srcrank(:,1));                  % Power spectrum of warping sources
+fft_sources{6} = pspec(:,srcrank(:,1));                    % Power spectrum averaged across trials
+fft_sources{7} = phs(srcrank(:,1));                        % Phase of all warping sources for all trials
+fft_sources{8} = config.cutmethod;                         % Applied cutting method
+fft_sources{9} = config.rankmethod;                       % Applied ranking method
 end
