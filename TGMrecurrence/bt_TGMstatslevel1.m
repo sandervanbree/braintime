@@ -182,19 +182,45 @@ if figopt == 1
     if strcmp(refdimension.dim,'braintime') % Only for brain time, separate warped frequency
         subplot(1,10,1:3)
         wfreq = nearest(f,1); %Find the warped frequency (1 Hz)
-        plot(fullspec_emp(wfreq),'o','MarkerSize',6,'MarkerEdgeColor','blue','MarkerFaceColor','blue'); %Plot marker of empirical power
-        violinplot(fullspec_shuff(:,wfreq),'test','ShowData',false,'ViolinColor',[0.8 0.8 0.8],'MedianColor',[0 0 0],'BoxColor',[0.5 0.5 0.5],'EdgeColor',[0 0 0],'ViolinAlpha',0.8);
-        
-        % Set legend
-        h = get(gca,'Children');
-        l2 = legend(h([9 3]),'Empirical (emp) recurrence power','Permuted (perm) recurrence power');
-        set(l2,'Location','best');
+        plot(fullspec_emp(wfreq),'o','MarkerSize',6,'MarkerEdgeColor','blue','MarkerFaceColor','blue');hold on; %Plot marker of empirical power
+               
+        % Create a Violin plot. If this does not work because of an older MATLAB version, make a boxplot instead
+        try
+            violinplot(fullspec_shuff(:,wfreq),'test','ShowData',false,'ViolinColor',[0.8 0.8 0.8],'MedianColor',[0 0 0],'BoxColor',[0.5 0.5 0.5],'EdgeColor',[0 0 0],'ViolinAlpha',0.8);
+            % Set legend
+            h = get(gca,'Children');
+            l2 = legend(h([9 3]),'Empirical (emp) recurrence power','Permuted (perm) recurrence power');
+            set(l2,'Location','best');
+        catch
+            boxplot(fullspec_shuff(:,wfreq))           
+            % Set up y-axis
+            maxy = max([fullspec_shuff(:,wfreq)',fullspec_emp(wfreq)]);
+            ylim([min(fullspec_shuff(:,wfreq))*0.9,maxy*1.1]); % slightly below min and max            
+            % Set legend
+            h = get(gca,'Children');
+            h(1).Children(1).Color = [1 1 1];
+            h(1).Children(2).LineWidth = 3;
+            h(1).Children(2).Color = [0 0 0];
+            h(1).Children(2).LineWidth = 6;
+            h(1).Children(3).Color = [0.6 0.6 0.6];
+            h(1).Children(3).LineWidth = 3;
+            h(1).Children(4).Color = [0.6 0.6 0.6];
+            h(1).Children(4).LineWidth = 3;
+            h(1).Children(5).Color = [0.6 0.6 0.6];
+            h(1).Children(5).LineWidth = 3;
+            h(1).Children(6).Color = [0.6 0.6 0.6];
+            h(1).Children(6).LineWidth = 3;
+            h(1).Children(7).Color = [0.6 0.6 0.6];
+            
+            l2 = legend([h(2),h(1).Children(2)],'Empirical (emp) recurrence power','Permuted (perm) recurrence power');
+            set(l2,'Location','best');
+        end
         
         % Set up axes
         ylabel('Recurrence power');
         xticklabels(' ');
         xlabel('Warped frequency (1 Hz)');
-        title(['1st level recurrence at warped frequency (1Hz)'])
+        title('1st level recurrence at warped frequency (1Hz)')
         
         % Adapt font
         set(gca,'FontName','Arial')

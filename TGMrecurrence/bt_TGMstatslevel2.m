@@ -19,17 +19,12 @@ function [stats2] = bt_TGMstatslevel2(config, stats1)
 % Input Arguments:
 % config
 %   - numperms2      % Number of permutations on the second statistical
-%                    % level.
+%                    % level. Default: 1000000.
 %                    %
 %   - multiplecorr   % Correction method for multiple comparisons.
 %                    % 'none' (default), 'fdr' for adjusted p-values based
 %                    % on the False Discovery Rate, and 'bonferroni' for
 %                    % Bonferroni correction.
-%   - nfreqbins      % Number of frequency bins in the recurrence power
-%                    % spectra. More frequency bins yields better (pseudo)
-%                    % spectral resolution, but an increased chance of
-%                    % false positive results (in case of no correction) or 
-%                    % overcorrection(in case of FDR and Bonferroni).
 %                    %
 % stats1             % Output structure obtained using bt_TGMstatslevel1.
 %                    % Each cell contains one participants' empirical TGM,
@@ -48,13 +43,17 @@ function [stats2] = bt_TGMstatslevel2(config, stats1)
 %% Get information
 numsubj = numel(stats1);                             % Number of participants
 numperms1 = size(stats1{1}.shuffspec,1);             % Number of first level permutations
-numperms2 = config.numperms2;                        % Number of second level permutations
-nfreqbins = config.nfreqbins;                        % Number of frequency bins in the recurrence power spectra
+if isfield(config,'numperms2')                       % Number of second level permutations
+    numperms2 = config.numperms2;
+else
+    numperms2 = 100000;                              % Default to 100000
+end
 refdimension = stats1{1}.refdimension;               % Find out the reference dimension (clock or brain time)
 
 % Sanity check
-if numperms2 <1000
-    warning('It is strongly recommended to use at least 1000 second level permutations');
+if numperms2 <100000
+    numperms2 = 100000;
+    warning(['Due to high variance in this statistical procedure, the number of second level permutations has been increased from ', num2str(numperms2),' to 100000.']);
 end
 
 %% STEP 1: SECOND LEVEL STATISTICS OF RECURRENCE POWER SPECTRA
@@ -63,7 +62,6 @@ end
 for i = 1:numel(stats1)                              % Find each participant's min and max freq
     minf(i)    = min(stats1{i}.f);
     maxf(i)    = max(stats1{i}.f);
-    flength(i) = numel(stats1{i}.f);                 % And how long the frequency vector is
 end
 frange = [max(minf),min(maxf)];                      % What freq do all participants have in common?
 
@@ -74,6 +72,7 @@ for i = 1:numel(stats1)
 
     ffix = @(x) x(st:en);                            % Filter all cells based on common frequencies
     stats1{i}.f         = ffix(stats1{i}.f);
+    nfbins(i)           = numel(stats1{i}.f);
     stats1{i}.empspec   = ffix(stats1{i}.empspec);
     
     for i2 = 1:size(stats1{i}.shuffspec,1)           % Do that for each permutation
@@ -84,7 +83,7 @@ for i = 1:numel(stats1)
 end
 
 % Resize stats1 cells to the same length
-res = @(x) imresize(x,[1 nfreqbins]);                % Create function that resizes all data to the same length
+res = @(x) imresize(x,[1 mode(nfbins)]);             % Resize to the most common number of frequency bins to minimize data interpolation
 for i = 1:numel(stats1)
     stats1{i}.f         = res(stats1{i}.f);
     fvec(i,:)           = stats1{i}.f;
@@ -149,7 +148,7 @@ if isfield(config,'multiplecorr')
     elseif strcmp(config.multiplecorr,'none')
         pval_corr = pval_corr;
     else
-        error(['Multiple correction option "',config.multiplecorr,'" not recognized. Please avoid capitalization or see help bt_TGMstatslevel2 for all options.'])
+        error(['Multiple correction option "',config.multiplecorr,'" is not recognized. Please avoid capital letters or see help bt_TGMstatslevel2 for all options.'])
     end
 end
 
