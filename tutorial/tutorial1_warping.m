@@ -41,11 +41,11 @@ cfg.warpfreqs    = [6 10];           % frequency range of interest for brain tim
 cfg.correct1f    = 'yes';            % apply 1/f correction after FFT, for plotting purposes only
 cfg.nwarpsources  = 10;              % consider only the 10 best warping sources
 cfg.rankmethod   = 'maxpow';         % sort warping sources by power in frequency range of interest. Alternative: 'templatetopo' (see tutorial 4)
-cfg.cutmethod    = 'cutartefact';    % 'cutartefact' or 'consistenttime' See "help bt_analyzecarriers" or our paper for details
+cfg.cutmethod    = 'consistenttime';    % 'cutartefact' or 'consistenttime' See "help bt_analyzecarriers" or our paper for details
 
 % Fieldtrip configuration
 cfgFT            = [];               % FieldTrip configuration structure, input to ft_freqanalysis
-cfgFT.method     = 'wavelet';        % frequency analysis method (see ft_freqanalyis)
+cfgFT.method     = 'wavelet';        % frequency analysis method (see help ft_freqanalysis for options)
 cfgFT.width      = 5;                % number of wavelet cycles
 cfgFT.foi        = 2:30;             % frequency range for FFT
 % cfgFT.time       = cfg.time        % the time variable is automatically grabbed from cfg.time
@@ -61,14 +61,14 @@ cfg.layout       = layout;           % load template for topography plotting
 
 %% Warp original clock time data to brain time
 cfg              = [];
-cfg.btsrate      = 128;              % determine sampling rate of bt data
+cfg.btsrate      = 128;              % specify the sampling rate of bt_data
 cfg.removecomp   = 'no';             % remove component when using brain time warped data outside the toolbox to avoid circularity
-[bt_struc]       = bt_clocktobrain(cfg,ct_data,bt_source);
+[bt_warpeddata]  = bt_clocktobrain(cfg,ct_data,bt_source);
 
 % cut ct_data to the same window
 cfg        = [];
-cfg.toilim = [bt_struc.toi(1) bt_struc.toi(2)];
+cfg.toilim = [bt_warpeddata.toi(1) bt_warpeddata.toi(2)];
 ct_data    = ft_redefinetrial(cfg, ct_data);
 
 %% Save results for tutorial 2
-save tutorial1_output bt_struc ct_data
+save tutorial1_output bt_warpeddata ct_data

@@ -10,10 +10,10 @@ cfg = [];
 cfg.keeptrials     = 'yes';
 cfg.removemean     = 'no';
 ct_data            = ft_timelockanalysis(cfg,ct_data);
-bt_data            = ft_timelockanalysis(cfg,bt_struc.data);
+bt_data            = ft_timelockanalysis(cfg,bt_warpeddata.data);
 
 % Extract classification labels (clabels)
-clabel             = bt_struc.clabel;
+clabel             = bt_warpeddata.clabel;
 
 %% Create Clock and Brain Time TGM
 % Use MVPA Light to visualize recurrence in a time generalization matrix (TGM)
@@ -26,10 +26,6 @@ cfg_mv.k           = 5;         % Number of folds
 [ct_TGM, ~]        = mv_classify_timextime(cfg_mv, ct_data.trial, clabel);
 [bt_TGM, ~]        = mv_classify_timextime(cfg_mv, bt_data.trial, clabel); 
 
-% Optional: Smooth TGMs
-% ct_TGM = imgaussfilt(ct_TGM,0.2); %Smoothing TGM may accentuate recurrence
-% bt_TGM = imgaussfilt(bt_TGM,0.2);
-
 % Plot results
 figure; subplot(1,2,1)
 mv_plot_2D(ct_TGM);title('Clock time TGM')
@@ -38,7 +34,7 @@ mv_plot_2D(bt_TGM);title('Brain time TGM')
 
 %% Quantify TGM recurrence (compare clock and brain time)
 cfg = [];
-cfg.bt_struc        = bt_struc;                   % Specify so that information can be retrieved
+cfg.bt_warpeddata   = bt_warpeddata;              % Specify so that information can be retrieved
 cfg.figure          = 'yes';
 cfg.refdimension    = 'clocktime';                % Quantify recurrence as a function of seconds in the data
 ct_TGMquant         = bt_TGMquantify(cfg,ct_TGM); % Compare with clock time
@@ -46,7 +42,7 @@ cfg.refdimension    = 'braintime';                % Quantify recurrence as a fun
 bt_TGMquant         = bt_TGMquantify(cfg,bt_TGM); % Do once for brain time
 
 %% Statistically test TGM recurrence on the single subject level (compare clock and brain time)
-clabel = bt_struc.clabel;
+clabel = bt_warpeddata.clabel;
 
 cfg.mvpacfg         = cfg_mv;          % Input previous mvpa light config structure
 cfg.numperms1       = 5;               % Number of permutations on the first level
