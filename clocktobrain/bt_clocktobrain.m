@@ -40,14 +40,23 @@ src_oi = bt_source{1};                               % Warping source which cont
 phs = cell2mat(bt_source{2});                        % Phase of all frequencies in this warping source
 warpsources = bt_source{3};                          % Warping source data 
 srcrank = bt_source{4};                              % Time freq data of selected warping signal
-mintime = bt_source{5}.time(1);                      % Start time of interest
-maxtime = bt_source{5}.time(end);                    % End time of interest
+mintime_fft = bt_source{5}.time(1);                  % Start time of interest
+maxtime_fft = bt_source{5}.time(end);                % End time of interest
 sr = bt_source{5}.time(2)-bt_source{5}.time(1);      % Sampling rate
 cutmethod = bt_source{6};                            % Applied cutting method 
+analyzemethod = bt_source{7};                        % Save warping source selection method 
 warpfreq = srcrank(2);                               % Warped frequency (frequency of the warping signal)
-mintime_ind = bt_source{7}(1);                       % Index of start time of interest (differs for cutartefact) 
-maxtime_ind = bt_source{7}(2);                       % Index of end time of interest (differs for cutartefact)
-analyzemethod = bt_source{8};                        % Save warping source selection method 
+
+if strcmp(cutmethod,'cutartefact')                   % Depending on cutmethod, specify original time window of interest
+    mintime = mintime_fft+0.5;
+    maxtime = maxtime_fft-0.5;
+else
+    mintime = mintime_fft;
+    maxtime = maxtime_fft;
+end
+
+mintime_ind = nearest(bt_source{5}.time,mintime);    % Index of start time of interest (differs for cutartefact)
+maxtime_ind = nearest(bt_source{5}.time,maxtime);    % Index of end time of interest
 
 % Set up sampling rate
 if isfield(config,'btsrate')
@@ -80,10 +89,10 @@ end
 cfg        = [];
 if strcmp(cutmethod,'cutartefact')
     cyclesample = round((1/warpfreq)*1/sr); % Calculate how many samples one cycle consists of
-    cfg.toilim = [mintime+0.5-(1/warpfreq) maxtime-0.5+(1/warpfreq)]; % Cut to the time window of interest, plus one cycle
+    cfg.toilim = [mintime_fft+0.5-(1/warpfreq) maxtime_fft-0.5+(1/warpfreq)]; % Cut to the time window of interest, plus one cycle
     phs = phs(:,mintime_ind-cyclesample:maxtime_ind+cyclesample); % Cut to the time window of interest, plus one cycle
 elseif strcmp(cutmethod,'consistenttime')
-    cfg.toilim = [mintime maxtime];
+    cfg.toilim = [mintime_fft maxtime_fft];
 end
 data       = ft_redefinetrial(cfg, data);
 
@@ -146,11 +155,11 @@ end
 % If cutmethod is cutartefact, slice out the right time window and adjust time vector
 if strcmp(cutmethod,'cutartefact')
     % Correct time window of interest to true time
-    mintime = mintime+0.5;
-    maxtime = maxtime-0.5;
+    min_t = mintime_fft+0.5;
+    max_t = maxtime_fft-0.5;
     
     startind = nearest(bt_data.time{1},1); % Find index of first cycle in window of interest
-    endind = nearest(bt_data.time{1},warpfreq*(maxtime-mintime)+1); %Find index of last cycle in window of interest
+    endind = nearest(bt_data.time{1},warpfreq*(max_t-min_t)+1); %Find index of last cycle in window of interest
     
     cfg         = [];
     cfg.latency = [bt_data.time{1}(startind) bt_data.time{1}(endind)]; % Cut to time window of interest
@@ -161,10 +170,13 @@ if strcmp(cutmethod,'cutartefact')
     for trl = 1:numel(bt_data.trial)
         bt_data.time{trl} = bt_data.time{trl}-1; % Cycles vector is off by 1
     end
+else
+    min_t = mintime_fft;
+    max_t = maxtime_fft;
 end
 
 %% Reformat data structure and include basic info
 bt_warpeddata.data = bt_data;                                     % Brain time warped data
-bt_warpeddata.toi = [mintime maxtime];                            % Start and end time of interest
+bt_warpeddata.toi = [min_t max_t];                            % Start and end time of interest
 bt_warpeddata.freq = warpfreq;                                    % Warped frequency (frequency of the warping signal)
 bt_warpeddata.clabel = bt_data.trialinfo;                         % Classification labels
