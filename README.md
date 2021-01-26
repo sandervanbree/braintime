@@ -3,7 +3,7 @@
 - Implement cluster correction TGM (Marije ter Wal's code is coming up soon in the lab's Github)
 - Update tutorial 4 to 6
 - Separately, decide for "shuffled" versus "permuted" and make consistent
-- Resize second level power spectra to the right number of frequency bins, discuss together what that is
+
 
 LOW URGENCY:
 - Implement Cohen/Luca's GED scripts
@@ -11,6 +11,7 @@ LOW URGENCY:
 
 COMPLETED RECENTLY: 
 - Make lingo consistent within toolbox, in line with SfN poster ("warping signal", "warping source", etc.)
+- Resize second level power spectra to the right number of frequency bins, discuss together what that is
 
 ### Start documentation:
 
