@@ -97,14 +97,14 @@ end
 data       = ft_redefinetrial(cfg, data);
 
 % Check whether phase and data are of the same length
-    if abs(length(data.time{1})-length(phs))>1
+    if abs(length(data.time{1})-size(phs,2))>1
         warning('phase vector and data differ in length by more than 1 sample. This may mean the wrong parameters were used during bt_analyzesources');
     end   
-if length(phs) > length(data.time{1})
+if size(phs,2) > length(data.time{1})
     phs=phs(:,1:length(data.time{1}));
-elseif length(data.time{1}) > length(phs)
+elseif length(data.time{1}) > size(phs,2)
     cfg       = [];
-    cfg.toilim = [data.time{1}(1,1) data.time{1}(1,length(phs))];
+    cfg.toilim = [data.time{1}(1,1) data.time{1}(1,size(phs,2))];
     data      = ft_redefinetrial(cfg, data);
 end
 
