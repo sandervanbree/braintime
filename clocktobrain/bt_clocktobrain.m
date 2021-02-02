@@ -98,7 +98,7 @@ data       = ft_redefinetrial(cfg, data);
 
 % Check whether phase and data are of the same length
     if abs(length(data.time{1})-length(phs))>1
-        warning('Warning: phase vector and data differ in length by more than 1 sample. This may mean the wrong parameters were used during bt_analyzesources');
+        warning('phase vector and data differ in length by more than 1 sample. This may mean the wrong parameters were used during bt_analyzesources');
     end   
 if length(phs) > length(data.time{1})
     phs=phs(:,1:length(data.time{1}));
