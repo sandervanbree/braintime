@@ -65,7 +65,7 @@ function [fft_sources] = bt_analyzesources(config,configFT,warpsources)
 %                    %
 % warpsources        % FieldTrip data structure that contains warping
 %                    % sources (ICA components, virtual channels,
-%                    % or LFP time). Each warping source contains a 
+%                    % or LFP). Each warping source contains a 
 %                    % warping signal, one of which will be selected later.
 %                    %
 % Output:            %
@@ -74,8 +74,6 @@ function [fft_sources] = bt_analyzesources(config,configFT,warpsources)
 
 
 %% Get information
-sampledur = (warpsources.time{1}(2)-warpsources.time{1}(1));  % Duration of each sample
-numsrc = size(warpsources.trial{1},1);                  % Number of warping sources
 minfoi = config.warpfreqs(1);                           % Lowest freq of interest
 maxfoi = config.warpfreqs(2);                           % Highest freq of interest
 mintime = config.time(1);                               % Minimum time of interest
@@ -83,6 +81,14 @@ maxtime = config.time(2);                               % Maximum time of intere
 cfgFT = configFT;                                       % FieldTrip config structure
 correct1f = config.correct1f;                           % Correct for 1/f in visualization of FFT option
 nwarpsources = config.nwarpsources;                     % Number of top sources to be considered
+
+try % For ICA components, this should work
+sampledur = (warpsources.time{1}(2)-warpsources.time{1}(1));  % Duration of each sample
+numsrc = size(warpsources.trial{1},1);                  % Number of warping sources
+catch % For virtual channels, this should work
+sampledur = (warpsources.time(2)-warpsources.time(1));  % Duration of each sample
+numsrc = size(warpsources.trial,2);                     % Number of warping sources  
+end
 
 % Amount of time dependent on cut method
 if strcmp(config.cutmethod,'consistenttime')
