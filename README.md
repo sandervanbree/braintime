@@ -3,6 +3,7 @@
 - Implement cluster correction TGM (Marije ter Wal's code is coming up soon in the lab's Github)
 - Update tutorial 4 to 6
 - Separately, decide for "shuffled" versus "permuted" and make consistent
+- Statistical masking requires too much memory
 
 
 LOW URGENCY:
