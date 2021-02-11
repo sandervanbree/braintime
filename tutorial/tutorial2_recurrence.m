@@ -18,7 +18,6 @@ clabel             = bt_warpeddata.clabel;
 %% Create Clock and Brain Time TGM
 % Use MVPA Light to visualize recurrence in a time generalization matrix (TGM)
 cfg_mv.classifier  = 'lda';
-cfg.preprocess     = 'yes';     % Z-scoring the data can improve classification
 cfg_mv.metric      = 'acc';     % Accuracy
 cfg_mv.repeat      = 3;         % Number of repetitions; use higher than 1 for real data
 cfg_mv.cv          = 'kfold';
@@ -36,6 +35,9 @@ mv_plot_2D(bt_TGM);title('Brain time TGM')
 cfg = [];
 cfg.bt_warpeddata   = bt_warpeddata;              % Specify so that information can be retrieved
 cfg.figure          = 'yes';
+cfg.mapmethod       = 'ac';                       % perform analysis over TGM's autocorrelation map
+cfg.recurrencefoi   = [1 20];                     % Range of tested recurrence rates
+
 cfg.refdimension    = 'clocktime';                % Quantify recurrence as a function of seconds in the data
 ct_TGMquant         = bt_TGMquantify(cfg,ct_TGM); % Compare with clock time
 cfg.refdimension    = 'braintime';                % Quantify recurrence as a function the warped frequency
@@ -46,8 +48,7 @@ clabel = bt_warpeddata.clabel;
 
 cfg.mvpacfg         = cfg_mv;          % Input previous mvpa light config structure
 cfg.numperms1       = 5;               % Number of permutations on the first level
-cfg.statsrange      = [1 20];          % Range of tested recurrence rates
-cfg.normalize       = 'yes';           % Normalize empirical and shuffled TGMs by the mean and std of shuffled TGMs 
+cfg.normalize       = 'yes';           % Normalize empirical and permuted TGMs by the mean and std of permuted TGMs 
 cfg.clabel          = clabel;
 [ct_TGMstats1] = bt_TGMstatslevel1(cfg,ct_data,ct_TGMquant);  % Clock time results (not significant)
 [bt_TGMstats1] = bt_TGMstatslevel1(cfg,bt_data,bt_TGMquant);  % Brain time results (significant)
