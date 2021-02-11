@@ -1,16 +1,18 @@
 function [stats2] = bt_TGMstatslevel2(config, stats1)
 % Performs second level statistics of recurrence power spectra, and tests
 % which TGM datapoints are significantly higher than the distribution of
-% shuffled TGMs.
+% permuted TGMs.
+%
 % - Second level statistics uses the first level permutated data. Numperm2
 % times, grab a random power spectrum of every participants' numperm1 pool
 % of permutated data and average. Then, for every frequency, the pvalue is
 % the percentile of the average empirical data's recurrence power spectra
 % in the null distribution of the permuted data's recurrence power spectra.
+%
 % - TGM significance testing compares each empirical TGM datapoint to 
-% the same datapoint in the shuffled distribution and tests whether
-% classifier performance exceeds 5%. Empirical and shuffled TGMs are 
-% normalized using the mean and standard deviation of the shuffled TGMs.
+% the same datapoint in the permuted distribution and tests whether
+% classifier performance exceeds 5%. Empirical and permuted  TGMs are 
+% normalized using the mean and standard deviation of the permuted TGMs.
 %
 % Use:
 % [pval] = bt_TGMstatslevel2(config, stats1), where stats1 has one cell
@@ -28,21 +30,21 @@ function [stats2] = bt_TGMstatslevel2(config, stats1)
 %                    %
 % stats1             % Output structure obtained using bt_TGMstatslevel1.
 %                    % Each cell contains one participants' empirical TGM,
-%                    % shuffled TGMs, recurrence power spectrum of the
-%                    % empirical and shuffled TGM, and the associated
+%                    % permuted TGMs, recurrence power spectrum of the
+%                    % empirical and permuted TGM, and the associated
 %                    % frequency vector.
 %                    %
 % Output:            %
 % pval               % Three row vectors. The first row vector contains the
 %                    % pvalues of the statistical comparison between the
 %                    % empirical power spectrum (averaged across
-%                    % participants) and the numperm2 shuffled datasets.
+%                    % participants) and the numperm2 permuted datasets.
 %                    % The second row vector contains the tested
 %                    % frequencies.
 
 %% Get information
 numsubj = numel(stats1);                             % Number of participants
-numperms1 = size(stats1{1}.shuffspec,1);             % Number of first level permutations
+numperms1 = size(stats1{1}.permspec,1);             % Number of first level permutations
 if isfield(config,'numperms2')                       % Number of second level permutations
     numperms2 = config.numperms2;
 else
@@ -75,10 +77,10 @@ for i = 1:numel(stats1)
     nfbins(i)           = numel(stats1{i}.f);
     stats1{i}.empspec   = ffix(stats1{i}.empspec);
     
-    for i2 = 1:size(stats1{i}.shuffspec,1)           % Do that for each permutation
-    temp(i2,:) = ffix(stats1{i}.shuffspec(i2,:));
+    for i2 = 1:size(stats1{i}.permspec,1)           % Do that for each permutation
+    temp(i2,:) = ffix(stats1{i}.permspec(i2,:));
     end
-    stats1{i}.shuffspec = temp;                % And replace  
+    stats1{i}.permspec = temp;                % And replace  
     clear temp
 end
 
@@ -89,10 +91,10 @@ for i = 1:numel(stats1)
     fvec(i,:)           = stats1{i}.f;
     stats1{i}.empspec   = res(stats1{i}.empspec);
     
-    for i2 = 1:size(stats1{i}.shuffspec,1)          % Do that for each permutation
-        temp2(i2,:) = res(stats1{i}.shuffspec(i2,:));
+    for i2 = 1:size(stats1{i}.permspec,1)          % Do that for each permutation
+        temp2(i2,:) = res(stats1{i}.permspec(i2,:));
     end
-    stats1{i}.shuffspec = temp2;                     % And replace                                                    
+    stats1{i}.permspec = temp2;                     % And replace                                                    
 end
 
 % Create new f - averaging slight variations
@@ -107,18 +109,19 @@ PS_emp = mean(PS_emp,1);
 
 %% Second level statistics
 % Pre-allocate
-perm1PS = zeros(numsubj,nfreqbins);
-perm2PS = zeros(numperms2,nfreqbins);
+perm1PS = zeros(numsubj,mode(nfbins));
+perm2PS = zeros(numperms2,mode(nfbins));
 progbar = 0:1000:numperms2;
 
+% Loop through numperms2
 for perm2=1:numperms2
 if ismember(perm2,progbar) % Print progress
-    disp(strcat((num2str(round((perm2/numperms2)*100,2))),'% of second level permutations completed'));
+    disp(strcat((num2str(round((perm2/numperms2)*100,2))),'% of second level permutations completed (for second-level stats)'));
 end
     
     for subj = 1:numsubj
         idx=randperm(numperms1,1); %randomly grab with replacement
-        perm1PS(subj,:) = stats1{subj}.shuffspec(idx,:);
+        perm1PS(subj,:) = stats1{subj}.permspec(idx,:);
     end
     perm2PS(perm2,:) = mean(perm1PS,1);
 end
@@ -127,7 +130,7 @@ end
 perms2PS_avg = mean(perm2PS,1);
 
 %% Calculate p-values and confidence intervals
-% For each frequency, find out the percentile of the empirical power in the shuffled distribution
+% For each frequency, find out the percentile of the empirical power in the permuted distribution
 for f_ind = 1:numel(f)
     
     % p-value
@@ -169,14 +172,14 @@ pval_corr(pval_corr>1)=1; % Prevent >1 p values.
 logpval = -log10(pval_corr);
 if any(isinf(logpval))
     fprintf(1, '\n');
-    disp('The empirical power of at least one frequency is higher than all shuffled power values (yielding p = 0).');
+    disp('The empirical power of at least one frequency is higher than all permuted power values (yielding p = 0).');
     disp('Consider increasing the number of 2nd level permutations');
     fprintf(1, '\n');
     logpval(isinf(logpval)) = 4; %cap logpval on 4.
 end
 
 %% Plot results
-% Relationship empirical and shuffled amp at all freq
+% Relationship empirical and empirical power at all freqs
 figure;hold on;set(gcf, 'WindowState', 'maximized'); % create full screen figure
 
 if strcmp(refdimension.dim,'braintime') % Only for brain time, separate warped frequency
@@ -248,33 +251,38 @@ stats2.frequency = f;
 %% STEP 2: TEST SIGNIFICANCE OF TGM
 % Pre-allocate
 empset = zeros(numel(stats1),size(stats1{1}.empTGM,1),size(stats1{1}.empTGM,2));
-shuffset = zeros(numel(stats1),size(stats1{1}.shuffTGM,1),size(stats1{1}.shuffTGM,2),size(stats1{1}.shuffTGM,3));
+permset = zeros(numel(stats1),size(stats1{1}.permTGM,1),size(stats1{1}.permTGM,2),size(stats1{1}.permTGM,3));
 
-% Put each participant's empirical and shuffled data into one matrix, whilst z-scoring based on shuffled data
+% Put each participant's empirical and permuted data into one matrix, whilst z-scoring based on permuted data
+disp('To test for significant points in the TGM, the toolbox normalizes to');
+disp('the mean and standard deviation of permuted TGMs');
 for i = 1:numel(stats1)
-    % Calculate mean and std of the shuffled TGMs
-    mn = mean(stats1{i}.shuffTGM(:));
-    sd = std(stats1{i}.shuffTGM(:));
+    % Calculate mean and std of the permuted TGMs
+    mn = mean(stats1{i}.permTGM(:));
+    sd = std(stats1{i}.permTGM(:));
     
     % Subtract the mean and divide by std to normalize across participants
     empset(i,:,:) = (stats1{i}.empTGM-mn)./sd;
-    shuffset(i,:,:,:) = (stats1{i}.shuffTGM-mn)./sd;
+    permset(i,:,:,:) = (stats1{i}.permTGM-mn)./sd;
 end    
 
 % Create average empirical TGM
 avgemp = squeeze(mean(empset,1));
 
 % Pre-allocate
-tempshuff = zeros(numsubj,size(shuffset,3),size(shuffset,4));
-distX = zeros(numperms2,size(shuffset,3),size(shuffset,4));
+tempperm = zeros(numsubj,size(permset,3),size(permset,4));
+distX = zeros(numperms2,size(permset,3),size(permset,4));
 
-% Loop through nperm2
+% Loop through numperms2
 for perm2 = 1:numperms2
+    if ismember(perm2,progbar) % Print progress
+        disp(strcat((num2str(round((perm2/numperms2)*100,2))),'% of second level permutations completed (for TGM significance testing)'));
+    end
     for s = 1:numsubj      % For each participant
         idx = randperm(numperms1,1); % Grab a random first permutation
-        tempshuff(s,:,:) = squeeze(shuffset(s,idx,:,:));
+        tempperm(s,:,:) = squeeze(permset(s,idx,:,:));
     end
-    distX(perm2,:,:) = squeeze(mean(tempshuff,1));
+    distX(perm2,:,:) = squeeze(mean(tempperm,1));
 end
 
 nrow = size(distX(1,:,:),2); 
@@ -284,7 +292,7 @@ ncol = size(distX(1,:,:),3);
 pval=zeros(nrow,ncol);
 for r=1:nrow
     for c=1:ncol
-        pval(r,c)=1-(numel(find(avgemp(r,c)>=distX(:,r,c)))/numperms2);
+        pval(r,c)=numel(find(distX(:,r,c)>=avgemp(r,c)))/numperms2;
     end
 end
 
@@ -312,4 +320,4 @@ pcolor(1:nrow,1:ncol,maskedTGM);
 shading interp;
 xlabel('Data points (train)');
 ylabel('Data points (test)');
-title('TGM data points significantly higher than shuffled (FDR-corrected)');
+title('TGM data points significantly higher than permuted (FDR-corrected)');
