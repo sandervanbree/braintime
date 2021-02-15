@@ -25,28 +25,25 @@ cfg_mv.k           = 5;         % Number of folds
 [ct_TGM, ~]        = mv_classify_timextime(cfg_mv, ct_data.trial, clabel);
 [bt_TGM, ~]        = mv_classify_timextime(cfg_mv, bt_data.trial, clabel); 
 
-% Plot results
-figure; subplot(1,2,1)
-mv_plot_2D(ct_TGM);title('Clock time TGM')
-subplot(1,2,2)
-mv_plot_2D(bt_TGM);title('Brain time TGM')
-
 %% Quantify TGM recurrence (compare clock and brain time)
 cfg = [];
 cfg.bt_warpeddata   = bt_warpeddata;              % Specify so that information can be retrieved
+cfg.MVPAcfg         = cfg_mv;                     % Input MVPA light config structure
 cfg.figure          = 'yes';
-cfg.mapmethod       = 'ac';                       % perform analysis over TGM's autocorrelation map
+cfg.mapmethod       = 'tgm';                       % perform analysis over TGM's autocorrelation map
 cfg.recurrencefoi   = [1 20];                     % Range of tested recurrence rates
 
 cfg.refdimension    = 'clocktime';                % Quantify recurrence as a function of seconds in the data
 ct_TGMquant         = bt_TGMquantify(cfg,ct_TGM); % Compare with clock time
+title('Clock time recurrence');
+
 cfg.refdimension    = 'braintime';                % Quantify recurrence as a function the warped frequency
 bt_TGMquant         = bt_TGMquantify(cfg,bt_TGM); % Do once for brain time
+title('Brain time recurrence');
 
 %% Statistically test TGM recurrence on the single subject level (compare clock and brain time)
 clabel = bt_warpeddata.clabel;
 
-cfg.mvpacfg         = cfg_mv;          % Input previous mvpa light config structure
 cfg.numperms1       = 5;               % Number of permutations on the first level
 cfg.normalize       = 'yes';           % Normalize empirical and permuted TGMs by the mean and std of permuted TGMs 
 cfg.clabel          = clabel;

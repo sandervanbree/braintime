@@ -61,7 +61,7 @@ cfg.layout       = layout;           % load template for topography plotting
 
 %% Warp original clock time data to brain time
 cfg              = [];
-cfg.btsrate      = 128;              % specify the sampling rate of bt_data
+cfg.btsrate      = 200;              % specify the sampling rate of bt_data
 cfg.removecomp   = 'no';             % remove component when using brain time warped data outside the toolbox to avoid circularity
 [bt_warpeddata]  = bt_clocktobrain(cfg,ct_data,bt_source);
 
