@@ -12,10 +12,6 @@ function [stats1] = bt_TGMstatslevel1(config, bt_data, bt_TGMquant)
 %
 % Input Arguments:
 % config
-%   - mvpacfg        % Load the same cfg file as used to generate empirical
-%                    % TGM. Critical: a difference in permuted and
-%                    % empirical analyses should not be caused by
-%                    % differences in classification parameters.
 %                    %
 %   - numperms1      % Number of permutations on the first statistical
 %                    % level.
@@ -29,8 +25,9 @@ function [stats1] = bt_TGMstatslevel1(config, bt_data, bt_TGMquant)
 %                    % TGM or its AC map, quantification of it, and config
 %                    % details saved for later retrieval.
 %                    %
-% bt_TGMquant        % Recurrence power spectrum, TGM, and mapmethod used
-%                    % to quantify recurrence.
+% bt_TGMquant        % MVPA configuration structure, recurrence power
+%                    % spectrum, TGM, and mapmethod used to quantify
+%                    % recurrence.
 %                    %
 % Output:            %
 % stats1             % Output structure which contains power spectra of
@@ -39,6 +36,7 @@ function [stats1] = bt_TGMstatslevel1(config, bt_data, bt_TGMquant)
 
 %% Get information
 numperms1 = config.numperms1;                             % Number of first level permutations
+MVPAcfg = bt_TGMquant.MVPAcfg;                            % MVPA Light configuration structured used to obtain TGM
 warpfreq = bt_TGMquant.warpfreq;                          % Warped frequency (frequency of the carrier)
 TGM = bt_TGMquant.TGM;                                    % Time Generalization Matrix of the data
 refdimension = bt_TGMquant.refdimension;                  % Reference dimension used
@@ -46,13 +44,6 @@ recurrencefoi = bt_TGMquant.recurrencefoi;                % Range of tested TGM 
 mapmethod = bt_TGMquant.mapmethod;                        % Check whether analysis is done over TGM or AC map
 pspec_emp = bt_TGMquant.pspec_emp;                        % Recurrence power spectrum of empirical data
 clabel = config.clabel;                                   % Classification labels
-cfg_mv = config.mvpacfg;                                  % MVPA Light configuration structured used to obtain TGM
-
-if isfield(config,'normalize')
-    normalize = config.normalize;                         % Normalize empirical and permuted TGMs by the mean and std of permuted TGMs
-else
-    normalize = 'yes';
-end
 
 % Set up recurrence range over which stats will be applied
 powspecrange = recurrencefoi;
@@ -67,7 +58,7 @@ permTGM = zeros(numperms1,size(TGM,1),size(TGM,2));
 for perm1 = 1:numperms1
     fprintf('First level permutation number %i\n', perm1);
     clabel = clabel(randperm(numel(clabel)));
-    [permTGM(perm1,:,:),~] = mv_classify_timextime(cfg_mv, bt_data.trial, clabel);
+    [permTGM(perm1,:,:),~] = mv_classify_timextime(MVPAcfg, bt_data.trial, clabel);
 end
 
 % Analyze first level permutation
@@ -87,28 +78,28 @@ for perm1 = 1:numperms1
     for row = 1:nrows % Perform FFT over rows
         
         if row == 1 % For the first row, perform a test analysis
-            [~,f]=Powspek(mp(1,:),nrows/refdimension.value);
+            [~,f]=Powspek(mp(1,:),nrows/refdimension.val);
             l = nearest(f,powspecrange(1)); %minimum frequency to be tested
             h = nearest(f,powspecrange(end)); %maximum frequency to be tested
             ps_range = l:h; % this is the range of frequencies desired
         end
         
         % 1st dimension
-        [PS,f]=Powspek(mp(row,:),nrows/refdimension.value);
+        [PS,f]=Powspek(mp(row,:),nrows/refdimension.val);
         PS1(row,:) = PS(ps_range); % restrict do desired range
     end
     
     for col = 1:ncols % Perform FFT over columns
         
         if col == 1 % For the first column, perform a test analysis
-            [~,f]=Powspek(mp(1,:),ncols/refdimension.value);
+            [~,f]=Powspek(mp(1,:),ncols/refdimension.val);
             l = nearest(f,powspecrange(1)); %minimum frequency to be tested
             h = nearest(f,powspecrange(end)); %maximum frequency to be tested
             ps_range = l:h; % this is the range of frequencies desired
         end
         
         % 2nd dimension
-        [PS,f]=Powspek(mp(:,col),ncols/refdimension.value);
+        [PS,f]=Powspek(mp(:,col),ncols/refdimension.val);
         PS2(col,:) = PS(ps_range); % restrict do desired range
     end
     
@@ -144,55 +135,95 @@ if figopt == 1
         end
     end
     
+    if strcmp(refdimension.dim,'braintime')
+        %Find the warped frequency (1 Hz)
+        wfreq_i = nearest(f,1);
+        
+        % Find harmonics
+        if f(1) - 0.5 < 0.1 % Is half the warped frequency in the tested range?
+        wfreq_half_i = nearest(f,0.5); %Find half the warped frequency (0.5 Hz)
+        else
+            warning("Recurrence may appear at 0.5x the warped frequency, but this is outside the tested range.");
+        end
+        
+        if f(end) - 2 > -0.1 % Is double the warped frequency in the tested range?
+        wfreq_double_i = nearest(f,2); %Find double the warped frequency (2 Hz)
+        else
+            warning("Recurrence may appear at 2x the warped frequency, but this is outside the tested range.");
+        end
+    end
+        
     %% Plot results
     figure;hold on;set(gcf, 'WindowState', 'maximized'); % create full screen figure
 
     if strcmp(refdimension.dim,'braintime') % Only for brain time, separate warped frequency
         subplot(1,10,1:3)
-        wfreq = nearest(f,1); %Find the warped frequency (1 Hz)
-        plot(pspec_emp(wfreq),'o','MarkerSize',6,'MarkerEdgeColor','blue','MarkerFaceColor','blue');hold on; %Plot marker of empirical power
-               
+        
+        % Plot the warped freq
+        wfreq_emp = pspec_emp(:,wfreq_i); % Empirical data at warped freq
+        wfreq_perm = pspec_perm(:,wfreq_i); % Permuted data at warped freq
+        plot(2,wfreq_emp,'o','MarkerSize',6,'MarkerEdgeColor','blue','MarkerFaceColor','blue');hold on; %Plot marker of empirical power
+        
+        if exist('wfreq_half_i','var') == 1 %Plot half the warped freq?
+        half_wfreq_emp = pspec_emp(:,wfreq_half_i);
+        half_wfreq_perm = pspec_perm(:,wfreq_half_i);
+        plot(1,half_wfreq_emp,'o','MarkerSize',6,'MarkerEdgeColor','blue','MarkerFaceColor','blue');hold on; %Plot marker of empirical power
+        else
+        half_wfreq_emp = zeros(size(wfreq_emp));
+        half_wfreq_perm = zeros(size(wfreq_perm));
+        end
+        
+        if exist('wfreq_double_i','var') == 1 %Plot double the warped freq?
+        double_wfreq_emp = pspec_emp(:,wfreq_double_i);
+        double_wfreq_perm = pspec_perm(:,wfreq_double_i);
+        plot(3,double_wfreq_emp,'o','MarkerSize',6,'MarkerEdgeColor','blue','MarkerFaceColor','blue');hold on; %Plot marker of empirical power
+        else 
+        double_wfreq_emp = zeros(size(wfreq_emp));
+        double_wfreq_perm = zeros(size(wfreq_perm));
+        end
+        
+        % Put all the three frequencies in one matrix
+        allPerm = [half_wfreq_perm,wfreq_perm,double_wfreq_perm];
+        allEmp = [half_wfreq_emp,wfreq_emp,double_wfreq_emp];
+        
         % Create a Violin plot. If this does not work because of an older MATLAB version, make a boxplot instead
         try
-            violinplot(pspec_perm(:,wfreq),'test','ShowData',false,'ViolinColor',[0.8 0.8 0.8],'MedianColor',[0 0 0],'BoxColor',[0.5 0.5 0.5],'EdgeColor',[0 0 0],'ViolinAlpha',0.8);
-            % Set legend
+           violinplot(allPerm,'test','ShowData',false,'ViolinColor',[0.8 0.8 0.8],'MedianColor',[0 0 0],'BoxColor',[0.5 0.5 0.5],'EdgeColor',[0 0 0],'ViolinAlpha',0.3);
+           % Set legend
             h = get(gca,'Children');
-            l2 = legend(h([9 3]),'Empirical (emp) recurrence power','Permuted (perm) recurrence power');
+            l2 = legend(h([numel(h) 3]),'Empirical (emp) recurrence power','Permuted (perm) recurrence power');
             set(l2,'Location','best');
         catch
-            boxplot(pspec_perm(:,wfreq))           
+            boxplot(allPerm)           
             % Set up y-axis
-            maxy = max([pspec_perm(:,wfreq)',pspec_emp(wfreq)]);
-            ylim([min(pspec_perm(:,wfreq))*0.9,maxy*1.1]); % slightly below min and max            
+            maxy = max([allPerm(:);allEmp(:)]);
+            miny = min([allPerm(:);allEmp(:)]);
+            ylim([miny*0.9,maxy*1.1]); % slightly below min and max            
             % Set legend
+            toMark = findobj('Color','red','LineStyle','-');
             h = get(gca,'Children');
-            h(1).Children(1).Color = [1 1 1];
-            h(1).Children(2).LineWidth = 3;
-            h(1).Children(2).Color = [0 0 0];
-            h(1).Children(2).LineWidth = 6;
-            h(1).Children(3).Color = [0.6 0.6 0.6];
-            h(1).Children(3).LineWidth = 3;
-            h(1).Children(4).Color = [0.6 0.6 0.6];
-            h(1).Children(4).LineWidth = 3;
-            h(1).Children(5).Color = [0.6 0.6 0.6];
-            h(1).Children(5).LineWidth = 3;
-            h(1).Children(6).Color = [0.6 0.6 0.6];
-            h(1).Children(6).LineWidth = 3;
-            h(1).Children(7).Color = [0.6 0.6 0.6];
-            
-            l2 = legend([h(2),h(1).Children(2)],'Empirical (emp) recurrence power','Permuted (perm) recurrence power');
+            l2 = legend([h(2),toMark(1)],'Empirical (emp) recurrence power','Permuted (perm) recurrence power');
             set(l2,'Location','best');
         end
         
-        % Set up axes
+        % Set up labels
         ylabel('Recurrence power');
-        xticklabels(' ');
-        xlabel('Warped frequency (1 Hz)');
-        title('1st level recurrence at warped frequency (1Hz)')
+        title('1st level recurrence')
+        
+        % Adapt xticklabels depending on which freqs are in range
+        if sum(half_wfreq_emp) == 0 && sum(double_wfreq_emp) == 0
+            xticklabels({'0.5Hz (UNTESTED)','1Hz (warp)','2Hz (UNTESTED)'});
+        elseif sum(half_wfreq_emp) ~= 0 && sum(double_wfreq_emp) == 0
+            xticklabels({'0.5Hz','1Hz (warp)','2Hz (UNTESTED)'});
+        elseif sum(half_wfreq_emp) == 0 && sum(double_wfreq_emp) ~= 0
+            xticklabels({'0.5Hz (UNTESTED)','1Hz (warp)','2Hz'});
+        elseif sum(half_wfreq_emp) ~= 0 && sum(double_wfreq_emp) ~= 0
+            xticklabels({'0.5Hz','1Hz (warp)','2Hz'});
+        end
         
         % Adapt font
         set(gca,'FontName','Arial')
-        set(gca,'FontSize',16)
+        set(gca,'FontSize',15)
         
         % Now plot recurrence power spectrum
         subplot(1,10,5:10)
