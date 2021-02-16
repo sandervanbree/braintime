@@ -30,8 +30,8 @@ cfg = [];
 cfg.bt_warpeddata   = bt_warpeddata;              % Specify so that information can be retrieved
 cfg.MVPAcfg         = cfg_mv;                     % Input MVPA light config structure
 cfg.figure          = 'yes';
-cfg.mapmethod       = 'ac';                       % perform analysis over TGM's autocorrelation map
-cfg.recurrencefoi   = [6 20];                     % Range of tested recurrence rates
+cfg.mapmethod       = 'tgm';                       % perform analysis over TGM's autocorrelation map
+cfg.recurrencefoi   = [1 20];                     % Range of tested recurrence rates
 
 cfg.refdimension    = 'clocktime';                % Quantify recurrence as a function of seconds in the data
 ct_TGMquant         = bt_TGMquantify(cfg,ct_TGM); % Compare with clock time
