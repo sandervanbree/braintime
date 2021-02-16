@@ -30,8 +30,8 @@ cfg = [];
 cfg.bt_warpeddata   = bt_warpeddata;              % Specify so that information can be retrieved
 cfg.MVPAcfg         = cfg_mv;                     % Input MVPA light config structure
 cfg.figure          = 'yes';
-cfg.mapmethod       = 'tgm';                       % perform analysis over TGM's autocorrelation map
-cfg.recurrencefoi   = [1 20];                     % Range of tested recurrence rates
+cfg.mapmethod       = 'ac';                       % perform analysis over TGM's autocorrelation map
+cfg.recurrencefoi   = [6 20];                     % Range of tested recurrence rates
 
 cfg.refdimension    = 'clocktime';                % Quantify recurrence as a function of seconds in the data
 ct_TGMquant         = bt_TGMquantify(cfg,ct_TGM); % Compare with clock time
@@ -45,7 +45,6 @@ title('Brain time recurrence');
 clabel = bt_warpeddata.clabel;
 
 cfg.numperms1       = 5;               % Number of permutations on the first level
-cfg.normalize       = 'yes';           % Normalize empirical and permuted TGMs by the mean and std of permuted TGMs 
 cfg.clabel          = clabel;
 [ct_TGMstats1] = bt_TGMstatslevel1(cfg,ct_data,ct_TGMquant);  % Clock time results (not significant)
 [bt_TGMstats1] = bt_TGMstatslevel1(cfg,bt_data,bt_TGMquant);  % Brain time results (significant)
