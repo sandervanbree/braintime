@@ -135,6 +135,7 @@ if figopt == 1
         end
     end
     
+    %% Get the indices of warping frequency harmonics 
     if strcmp(refdimension.dim,'braintime')
         %Find the warped frequency (1 Hz)
         wfreq_i = nearest(f,1);

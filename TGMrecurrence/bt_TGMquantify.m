@@ -121,14 +121,14 @@ if strcmp(mapmethod,'tgm') || strcmp(mapmethod,'ac')
     for row = 1:nrows % Perform FFT over rows
         
         if row == 1 % For the first row, perform a test analysis
-            [~,f]=Powspek(mp(1,:),nrows/val);
+            [~,f]=Powspek(mp(1,:),nrows/refdimension.val);
             l = nearest(f,powspecrange(1)); %minimum frequency to be tested
             h = nearest(f,powspecrange(end)); %maximum frequency to be tested
             ps_range = l:h; % this is the range of frequencies desired
         end
         
         % 1st dimension
-        [PS,f]=Powspek(mp(row,:),nrows/val);
+        [PS,f]=Powspek(mp(row,:),nrows/refdimension.val);
         PS1(row,:) = PS(ps_range); % restrict do desired range
     end
     
