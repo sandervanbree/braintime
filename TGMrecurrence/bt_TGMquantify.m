@@ -32,7 +32,11 @@ function [bt_TGMquant] = bt_TGMquantify(config, TGM)
 %                    % be quantified and statistically tested.
 %                    %
 %                    %
-%   - mapmethod      % 'ac' (default): perform recurrence analysis over the
+%   - mapmethod      % 'diag' (default): perform recurrence analysis over
+%                    % the diagonal of the TGM. This ignores cross-temporal
+%                    % recurrence.
+%                    % 
+%                    % 'ac': perform recurrence analysis over the
 %                    % autocorrelation map of the TGM. This accentuates
 %                    % the primary recurrence frequency in the TGM, but may
 %                    % drown out other frequencies.
@@ -56,7 +60,7 @@ warpfreq = config.bt_warpeddata.freq;                 % Warped frequency (freque
 duration = toi(2)-toi(1);                             % Duration of the time window of interest
 mapmethod = config.mapmethod;                         % Perform the analysis over TGM or its autocorrelation map?
 MVPAcfg = config.MVPAcfg;                             % MVPA Light configuration structured used to obtain TGM
-refdimension.dim = config.refdimension;                   % Extract reference dimension (clock or brain time)
+refdimension.dim = config.refdimension;               % Extract reference dimension (clock or brain time)
 
 % Set up recurrence range over which stats will be applied
 if isfield(config,'recurrencefoi')
