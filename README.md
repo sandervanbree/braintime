@@ -20,7 +20,7 @@ COMPLETED RECENTLY:
 
 # Brain Time Toolbox
 
-![btlogo](https://i.imgur.com/OAEVqgM.png = 250x250)
+![btlogo](https://i.imgur.com/OAEVqgM.png | width=100)
 
 Warp electrophysiological data from clock time (default) to brain time and analyze the recurrence of mental representations. By *Sander van Bree, María Melcón, Maria Wimber & Simon Hanslmayr*.
 
