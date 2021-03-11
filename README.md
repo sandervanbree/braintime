@@ -1,5 +1,4 @@
-### Current to do list (for devs)
-### Official documentation starts below
+### Current to do list (for devs) | Official documentation starts below
 - random gaussian field theory to perform multiple testing correction over power spectra and TGMs?
 - Implement cluster correction TGM (Marije ter Wal's code is coming up soon in the lab's Github)
 - Implement testing of the diagonal only
