@@ -34,8 +34,9 @@ Warp electrophysiological data from clock time (default) to brain time and analy
 | --- | --- |
 | Clock time (CT) | data ordered by sequences of seconds |
 | Brain time (BT) | data ordered by the phase of a carrier oscillation |
-| Carrier | an oscillation to which clock time data can be warped |
-| Warping | a procedure to nonlinearly rescale time series |
+| Warping source | a data structure that contains the to-be-selected warping signal |
+| Warping signal | the signal within your warping source that shows optimal time frequency characteristics |
+| Brain time warping | a procedure to nonlinearly rescale clock time data based on the phase dynamics of the warping signal |
 | Recurrence | rhythmic patterns of classification performance emerging from data trained on previous time points |
 | Temporal Generalization Matrix (TGM): | testing and training a classifier at all time points |
 
