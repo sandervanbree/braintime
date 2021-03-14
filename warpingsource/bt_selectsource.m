@@ -70,6 +70,10 @@ msg = ['The warping sources are ranked by ',ranktype,newline,...
 % Prepare figure
 src_oi = -2; %source of interest
 maxp=max(max(max(powtf(:,:,:)))); %establish maximum power. This will be used to limit axes and normalize power to
+% Sanity check
+if isnan(maxp)
+    error('The time frequency analysis of the warping source analysis has yielded only NaNs. Did you select the right time window?');
+end
 finish = 0;
 src_ind=1;
 f1 = figure;hold on;set(gcf, 'WindowState', 'maximized'); % create full screen figure
@@ -153,7 +157,8 @@ while finish==0
     mrk = plot(xvec(maxpowloc),yvec(maxpowloc)./maxp,'o','MarkerSize',15,'LineWidth',4,'Color','r');
     mx = plot([xvec(maxpowloc) xvec(maxpowloc)],[min(yvec),yvec(maxpowloc)/maxp],'LineWidth',3,'Color','r');
     text(xvec(maxpowloc)-(xvec(2)-xvec(1))/2,1.075,[num2str(maxfreq),' Hz'],'Color','red','FontSize',14);
-    rec2 = rectangle('Position',[minfoi,min(yvec),maxfoi-minfoi,1-min(yvec)],'FaceColor',[0, 0, 0, 0.15]);
+    xline(minfoi,'Color','k');
+    xline(maxfoi,'Color','k');
     set(gca,'FontSize',14);
     legend(mrk,'Warping signal',['Warping signal (',num2str(maxfreq),' Hz'])
     xlim([minfft maxfft]);
