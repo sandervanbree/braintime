@@ -56,7 +56,7 @@ function [bt_TGMquant] = bt_TGMquantify(config, TGM)
 
 %% Get basic info
 toi = config.bt_warpeddata.toi;                       % Start and end time of interest
-warpfreq = config.bt_warpeddata.freq;                 % Warped frequency (frequency of the carrier)
+warpfreq = config.bt_warpeddata.freq;                 % Warped requency (frequency of the carrier)
 duration = toi(2)-toi(1);                             % Duration of the time window of interest
 mapmethod = config.mapmethod;                         % Perform the analysis over TGM or its autocorrelation map?
 MVPAcfg = config.MVPAcfg;                             % MVPA Light configuration structured used to obtain TGM
@@ -229,15 +229,17 @@ elseif figopt == 1 && strcmp(mapmethod,'tgm') || strcmp(mapmethod,'ac')
     set(gca,'FontSize',16)
     
     % Plot AC map
+    mp2 = autocorr2d(TGM);
+    
     % Detect appropriate color range by zscoring
-    mn_ac=median(mp(:));
-    sd_ac=std(mp(:));
-    ac_z=(mp-mn_ac)/sd_ac;
+    mn_ac=median(mp2(:));
+    sd_ac=std(mp2(:));
+    ac_z=(mp2-mn_ac)/sd_ac;
     indx = (abs(ac_z)<5); %filter to include only z-scores under 5
-    clim = max(mp(indx)); %take the max number as clim for plotting
+    clim = max(mp2(indx)); %take the max number as clim for plotting
     
     subplot(2,2,2)
-    pcolor(timevec,timevec,mp(1:numel(timevec),1:numel(timevec)));shading interp;title(['Autocorrelation map'])
+    pcolor(timevec,timevec,mp2(1:numel(timevec),1:numel(timevec)));shading interp;title(['Autocorrelation map'])
     caxis([-clim +clim])
     xticks(linspace(timevec(1),timevec(end),6)); % Create 11 steps
     yticks(xticks);
