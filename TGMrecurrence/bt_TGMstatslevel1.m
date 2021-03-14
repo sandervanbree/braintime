@@ -51,7 +51,6 @@ powspecrange = recurrencefoi;
 %% statistically test TGM
 % FIRST LEVEL PERMUTATION
 % % Pre-allocate
-pspec_perm = zeros(1,numel(powspecrange));
 permTGM = zeros(numperms1,size(TGM,1),size(TGM,2));
 
 % First level permutations
@@ -82,6 +81,8 @@ for perm1 = 1:numperms1
             l = nearest(f,powspecrange(1)); %minimum frequency to be tested
             h = nearest(f,powspecrange(end)); %maximum frequency to be tested
             ps_range = l:h; % this is the range of frequencies desired
+            
+            pspec_perm = zeros(1,numel(ps_range));
         end
         
         % 1st dimension
