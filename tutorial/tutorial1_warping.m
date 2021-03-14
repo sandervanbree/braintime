@@ -13,6 +13,11 @@
 %%% ct = clock time, bt = brain time. See Github for a full glossary.
 
 % Load two classes of data (see tutorial folder)
+% Ensure that the data
+% (1) is longer than your time window of interest to facilitate time
+% frequency analysis
+% (2) has a trialinfo field that can be used to extract class labels of
+% your two conditions of interest
 load c1_data
 load c2_data
 
