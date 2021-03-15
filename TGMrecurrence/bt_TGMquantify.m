@@ -103,7 +103,7 @@ else
     error('Please specify cfg.refdimension with ''braintime'' or ''clocktime''. See help bt_TGMquantify or toolbox documentation for more details');
 end
 
-% Perform analysis over TGM or its autocorrelation map (AC)?
+% Perform analysis over TGM, its autocorrelation map (AC), or its diagonal?
 if strcmp(mapmethod,'tgm')
     mp = TGM;
 elseif strcmp(mapmethod,'ac')
@@ -116,57 +116,9 @@ else
     mp = diag(TGM)';
 end
 
-% For TGMs and Autocorrelation maps, analyze all rows and columns
-if strcmp(mapmethod,'tgm') || strcmp(mapmethod,'ac')
-    % Run FFT over all rows and columns of the TGM/AC map
-    nrows = numel(mp(:,1));
-    ncols = numel(mp(:,2));
+[PS,f] = fftTGM(mp,powspecrange,timevec);
+pspec_emp = PS;
     
-    for row = 1:nrows % Perform FFT over rows
-        
-        if row == 1 % For the first row, perform a test analysis
-            [~,f]=Powspek(mp(1,:),nrows/refdimension.val);
-            l = nearest(f,powspecrange(1)); %minimum frequency to be tested
-            h = nearest(f,powspecrange(end)); %maximum frequency to be tested
-            ps_range = l:h; % this is the range of frequencies desired
-        end
-        
-        % 1st dimension
-        [PS,f]=Powspek(mp(row,:),nrows/refdimension.val);
-        PS1(row,:) = PS(ps_range); % restrict do desired range
-    end
-    
-    for col = 1:ncols % Perform FFT over columns
-        
-        if col == 1 % For the first column, perform a test analysis
-            [~,f]=Powspek(mp(1,:),ncols/refdimension.val);
-            l = nearest(f,powspecrange(1)); %minimum frequency to be tested
-            h = nearest(f,powspecrange(end)); %maximum frequency to be tested
-            ps_range = l:h; % this is the range of frequencies desired
-        end
-        
-        % 2nd dimension
-        [PS,f]=Powspek(mp(:,col),ncols/refdimension.val);
-        PS2(col,:) = PS(ps_range); % restrict do desired range
-    end
-    
-    f=f(ps_range); %filter frequency vector based on range of interest
-    avg_PS = mean(PS1,1)+mean(PS2,1); %Mean power spectra
-    pspec_emp = avg_PS;
-    
-    % For TGM diagonals, analyze only one vector
-else
-    nbins = numel(mp);
-    
-    [PS,f]=Powspek(mp,nbins/refdimension.val);
-    l = nearest(f,powspecrange(1)); %minimum frequency to be tested
-    h = nearest(f,powspecrange(end)); %maximum frequency to be tested
-    ps_range = l:h; % this is the range of frequencies desired
-    PS1 = PS(ps_range);
-    f=f(ps_range); %filter frequency vector based on range of interest
-    pspec_emp = PS1;
-end
-
 if isfield(config,'figure')
     if strcmp(config.figure,'no')
         figopt = 0;
@@ -174,7 +126,6 @@ if isfield(config,'figure')
         figopt = 1; %Default yes
     end
 end
-
 
 % Plotting TGM diagonal (no time generalization)
 if figopt == 1 && strcmp(mapmethod,'diag')
@@ -208,8 +159,8 @@ elseif figopt == 1 && strcmp(mapmethod,'tgm') || strcmp(mapmethod,'ac')
     figure;
     subplot(2,2,1)
     cfg_plot= [];
-    cfg_plot.x   = linspace(timevec(1),timevec(end),nrows);
-    cfg_plot.y   = linspace(timevec(1),timevec(end),ncols);
+    cfg_plot.x   = linspace(timevec(1),timevec(end),size(mp,1));
+    cfg_plot.y   = linspace(timevec(1),timevec(end),size(mp,2));
     mv_plot_2D(cfg_plot, TGM);
     cb = colorbar;
     title(cb,'perf')
@@ -293,7 +244,7 @@ bt_TGMquant.toi = toi;                                  % Start and end time of 
 bt_TGMquant.warpfreq = warpfreq;                        % Warped frequency (frequency of the warping signal)
 bt_TGMquant.timevec = timevec;                          % Time vector (different for brain and clock time referencing)
 bt_TGMquant.refdimension = refdimension;                % Reference dimension used
-bt_TGMquant.recurrencefoi = powspecrange;               % Range of tested TGM recurrence frequencies
+bt_TGMquant.recurrencefoi = powspecrange;               % Range of tested recurrence frequencies
 bt_TGMquant.TGM = TGM;                                  % Save the TGM itself
-bt_TGMquant.mapmethod = mapmethod;                      % Save whether analysis is done over TGM or AC map
+bt_TGMquant.mapmethod = mapmethod;                      % Save whether analysis is done over TGM, AC map, or diag
 bt_TGMquant.pspec_emp = pspec_emp;                      % Recurrence power spectrum of empirical data

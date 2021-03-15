@@ -39,6 +39,7 @@ numperms1 = config.numperms1;                             % Number of first leve
 MVPAcfg = bt_TGMquant.MVPAcfg;                            % MVPA Light configuration structured used to obtain TGM
 warpfreq = bt_TGMquant.warpfreq;                          % Warped frequency (frequency of the carrier)
 TGM = bt_TGMquant.TGM;                                    % Time Generalization Matrix of the data
+timevec = bt_TGMquant.timevec;                            % Time vector (different for brain and clock time referencing)
 refdimension = bt_TGMquant.refdimension;                  % Reference dimension used
 recurrencefoi = bt_TGMquant.recurrencefoi;                % Range of tested TGM recurrence frequencies
 mapmethod = bt_TGMquant.mapmethod;                        % Check whether analysis is done over TGM or AC map
@@ -63,53 +64,19 @@ end
 % Analyze first level permutation
 for perm1 = 1:numperms1
     
-    % Perform analysis over TGM or its autocorrelation map (AC)?
     if strcmp(mapmethod,'tgm')
         mp = squeeze(permTGM(perm1,:,:));
-    else
+    elseif strcmp(mapmethod,'ac')
         mp = autocorr2d(squeeze(permTGM(perm1,:,:)));
+    elseif strcmp(mapmethod,'diag')
+        mp = diag(squeeze(permTGM(perm1,:,:)))';
     end
-    
-    % Run FFT over all rows and columns of the AC map
-    nrows = numel(mp(:,1));
-    ncols = numel(mp(:,2));
-        
-    for row = 1:nrows % Perform FFT over rows
-        
-        if row == 1 % For the first row, perform a test analysis
-            [~,f]=Powspek(mp(1,:),nrows/refdimension.val);
-            l = nearest(f,powspecrange(1)); %minimum frequency to be tested
-            h = nearest(f,powspecrange(end)); %maximum frequency to be tested
-            ps_range = l:h; % this is the range of frequencies desired
-            
-            pspec_perm = zeros(1,numel(ps_range));
-        end
-        
-        % 1st dimension
-        [PS,f]=Powspek(mp(row,:),nrows/refdimension.val);
-        PS1(row,:) = PS(ps_range); % restrict do desired range
-    end
-    
-    for col = 1:ncols % Perform FFT over columns
-        
-        if col == 1 % For the first column, perform a test analysis
-            [~,f]=Powspek(mp(1,:),ncols/refdimension.val);
-            l = nearest(f,powspecrange(1)); %minimum frequency to be tested
-            h = nearest(f,powspecrange(end)); %maximum frequency to be tested
-            ps_range = l:h; % this is the range of frequencies desired
-        end
-        
-        % 2nd dimension
-        [PS,f]=Powspek(mp(:,col),ncols/refdimension.val);
-        PS2(col,:) = PS(ps_range); % restrict do desired range
-    end
-    
-    avg_PS = mean(PS1,1)+mean(PS2,1); %Mean power spectra
-    pspec_perm(perm1,:) = avg_PS;
+
+[PS,f] = fftTGM(mp,powspecrange,timevec);
+pspec_perm(perm1,:) = PS;
+
 end
     
-f=f(ps_range); %filter frequency vector based on range of interest
-
 % Only calculate confidence interval and plot stats if desired
 if isfield(config,'figure')
     if strcmp(config.figure,'no')
