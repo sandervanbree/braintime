@@ -101,7 +101,10 @@ end
 f = nanmean(fvec,1);
 
 %% Get average recurrence power spectrum across participants
-% PS_emp = zeros(numsubj,numel(f));
+% Crop away empty participants
+stats1 = stats1(~cellfun('isempty',stats1));
+
+% Create full empirical power spectrum
 for subj = 1:numsubj
     PS_emp(subj,:) = stats1{subj}.empspec;
 end
