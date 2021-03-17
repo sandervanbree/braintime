@@ -113,12 +113,17 @@ bt_data=data;
 nsec=bt_data.time{1}(end)-bt_data.time{1}(1);           % number of seconds in the data
 Ncycles_pre=warpfreq*nsec;                              % number of cycles * seconds
 cycledur=round(phs_sr*nsec/Ncycles_pre);                % samples for cycle
+
+% Unsure which is better, grid cell data show latter
+tmp_sr=phs_sr;
 tmp_sr=Ncycles_pre*cycledur/nsec;
+
 tempphs=linspace(-pi,(2*pi*Ncycles_pre)-pi,tmp_sr*nsec);% set up phase bins for unwrapped phase (angular frequency)
 timephs=linspace(0,Ncycles_pre,phs_sr*nsec);            % time vector of the unwrapper phase
 
 for nt=1:size(phs,1)
-    tmpphstrl=unwrap(phs(nt,:));
+    tmpphstrl=unwrap((phs(nt,:)));
+%      tmpphstrl = rescale(tmpphstrl,-1,1);
     % Warp phase of single trial onto template phase
     [~,ix,iy] = dtw(tmpphstrl,tempphs);
     
