@@ -29,7 +29,7 @@ cfg = [];
 cfg.method      = 'mtmfft';
 cfg.output      = 'pow';
 cfg.taper       = 'hanning';
-cfg.foi         = [powspecrange];
+cfg.foi         = powspecrange;
 cfg.toi         = timevec;
 output  = ft_freqanalysis(cfg, ftdat);
 

@@ -91,6 +91,11 @@ if strcmp(refdimension.dim,'braintime') % Test if range is OK
     end
 end
 
+% Adjust powspecrange to be centered on warping frequency
+nrst = nearest(powspecrange,warpfreq);
+diffr = powspecrange(nrst)-warpfreq;
+powspecrange = powspecrange-diffr;
+
 if strcmp(refdimension.dim,'braintime')
     powspecrange = powspecrange/warpfreq; % adjust tested range to warped frequency
     
