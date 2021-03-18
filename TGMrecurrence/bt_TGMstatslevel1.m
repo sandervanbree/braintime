@@ -203,7 +203,7 @@ if figopt == 1
     p1 = plot(f,pspec_emp,'LineStyle','-','LineWidth',3,'Color','b'); %Mean across 1st level perms
     p2 = plot(f,mean(pspec_perm,1),'LineStyle','-','LineWidth',2,'Color',[0.3 0.3 0.3]); %Mean across 1st level perms
     xlabel('Recurrence frequency')
-    ylabel('Mean power across participants')
+    ylabel('Power')
     
     if strcmp(refdimension.dim,'braintime') %warp freq line is dependent on clock (warped freq) or brain time (1 hz)
         p3 = line([1 1], [0 max(pspec_emp)],'color',[1 0 1],'LineWidth',4); %Line at warped freq
