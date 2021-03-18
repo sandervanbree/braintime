@@ -42,6 +42,9 @@ function [stats2] = bt_TGMstatslevel2(config, stats1)
 %                    % The second row vector contains the tested
 %                    % frequencies.
 
+%% Crop away empty participant cells
+stats1 = stats1(~cellfun('isempty',stats1));
+
 %% Get information
 numsubj = numel(stats1);                             % Number of participants
 numperms1 = size(stats1{1}.permspec,1);             % Number of first level permutations
@@ -101,9 +104,6 @@ end
 f = nanmean(fvec,1);
 
 %% Get average recurrence power spectrum across participants
-% Crop away empty participants
-stats1 = stats1(~cellfun('isempty',stats1));
-
 % Create full empirical power spectrum
 for subj = 1:numsubj
     PS_emp(subj,:) = stats1{subj}.empspec;
