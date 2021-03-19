@@ -28,6 +28,9 @@ function [stats2] = bt_TGMstatslevel2(config, stats1)
 %                    % on the False Discovery Rate, and 'bonferroni' for
 %                    % Bonferroni correction.
 %                    %
+%   - clust_p        % The threshold for significant clusters in the
+%                    % TGM cluster correction (default = 0.05).
+%                    %
 % stats1             % Output structure obtained using bt_TGMstatslevel1.
 %                    % Each cell contains one participants' empirical TGM,
 %                    % permuted TGMs, recurrence power spectrum of the
@@ -35,19 +38,21 @@ function [stats2] = bt_TGMstatslevel2(config, stats1)
 %                    % frequency vector.
 %                    %
 % Output:            %
-% pval               % Three row vectors. The first row vector contains the
-%                    % pvalues of the statistical comparison between the
-%                    % empirical power spectrum (averaged across
-%                    % participants) and the numperm2 permuted datasets.
-%                    % The second row vector contains the tested
-%                    % frequencies.
+% UPDATE
 
 %% Crop away empty participant cells
 stats1 = stats1(~cellfun('isempty',stats1));
 
 %% Get information
 numsubj = numel(stats1);                             % Number of participants
-numperms1 = size(stats1{1}.permspec,1);             % Number of first level permutations
+numperms1 = size(stats1{1}.permspec,1);              % Number of first level permutations
+
+if isfield(config,'clust_p')                         % Cluster-correction p-value threshold
+    clust_p = config.clust_p;                         
+else
+    clust_p = 0.05;
+end
+
 if isfield(config,'numperms2')                       % Number of second level permutations
     numperms2 = config.numperms2;
 else
@@ -330,8 +335,8 @@ set(gca,'FontSize',16)
 
 %% Adapt output variable
 % Add freq and pval information to output
-stats2.pval_corr = pval_corr;
-stats2.frequency = f;
+stats2.recurrence.pval_corr = pval_corr;
+stats2.recurrence.frequency = f;
 
 % Print results for brain time
 disp('See the output structure for:')
@@ -339,76 +344,96 @@ disp('(1) the (corrected) p-values per frequency');
 disp('(2) the range of tested frequencies');
 disp('(3) for brain time, the (corrected) p-value of 0.5x, 1x, and 2x the warped frequency');
 
-% %% STEP 2: TEST SIGNIFICANCE OF TGM
-% % Pre-allocate
-% empset_TGM = zeros(numel(stats1),size(stats1{1}.empTGM,1),size(stats1{1}.empTGM,2));
-% permset_TGM = zeros(numel(stats1),size(stats1{1}.permTGM,1),size(stats1{1}.permTGM,2),size(stats1{1}.permTGM,3));
-% 
-% % Put each participant's empirical and permuted data into one matrix, whilst z-scoring based on permuted data
-% disp('To test for significant points in the TGM, the toolbox normalizes to');
-% disp('the mean and standard deviation of permuted TGMs');
-% for i = 1:numel(stats1)
-%     % Calculate mean and std of the permuted TGMs
-%     mn = mean(stats1{i}.permTGM(:));
-%     sd = std(stats1{i}.permTGM(:));
-%     
-%     % Subtract the mean and divide by std to normalize across participants
-%     empset_TGM(i,:,:) = (stats1{i}.empTGM-mn)./sd;
-%     permset_TGM(i,:,:,:) = (stats1{i}.permTGM-mn)./sd;
-% end
-% 
-% % Create average empirical TGM
-% avgemp = squeeze(mean(empset_TGM,1));
-% 
-% % Pre-allocate
-% tempperm = zeros(numsubj,size(permset_TGM,3),size(permset_TGM,4));
-% distX = zeros(numperms2,size(permset_TGM,3),size(permset_TGM,4));
-% 
-% % Loop through numperms2
-% for perm2 = 1:numperms2
-%     if ismember(perm2,progbar) % Print progress
-%         disp(strcat((num2str(round((perm2/numperms2)*100,2))),'% of second level permutations completed (for TGM significance testing)'));
-%     end
-%     for s = 1:numsubj      % For each participant
-%         idx = randperm(numperms1,1); % Grab a random first permutation
-%         tempperm(s,:,:) = squeeze(permset_TGM(s,idx,:,:));
-%     end
-%     distX(perm2,:,:) = squeeze(mean(tempperm,1));
-% end
-% 
-% nrow = size(distX(1,:,:),2);
-% ncol = size(distX(1,:,:),3);
-% 
-% % Get p-values of each TGM datapoint
-% pval=zeros(nrow,ncol);
-% for r=1:nrow
-%     for c=1:ncol
-%         pval(r,c)=numel(find(distX(:,r,c)>=avgemp(r,c)))/numperms2;
-%     end
-% end
-% 
-% % Multiple comparison correction
-% pval_vec=pval(:);
-% [~,~,~,pval_corr] = fdr_bh(pval_vec,0.05,'dep');
-% pval_corr = reshape(pval_corr,nrow,ncol);
-% 
-% % Logical mask based on significant points
-% sigmask=zeros(nrow,ncol);
-% for r=1:nrow
-%     for c=1:ncol
-%         if pval_corr(r,c)<=0.05 % Only let through significant points
-%             sigmask(r,c)=1;
-%         end
-%     end
-% end
-% 
-% sig_i = find(sigmask==1); % Find only significant points
-% maskedTGM = nan(nrow,ncol); % Prepare NaN TGM
-% maskedTGM(sig_i) = avgemp(sig_i); % Replace by values of average emp TGM
-% 
-% figure;
-% pcolor(1:nrow,1:ncol,maskedTGM);
-% shading interp;
-% xlabel('Data points (train)');
-% ylabel('Data points (test)');
-% title('TGM data points significantly higher than permuted (FDR-corrected)');
+%% STEP 2: TEST SIGNIFICANCE OF TGM
+% Pre-allocate
+empset_TGM = zeros(size(stats1{1}.empTGM,1),size(stats1{1}.empTGM,2),numel(stats1));
+permset_TGM = zeros(size(stats1{1}.permTGM,1),size(stats1{1}.permTGM,2),size(stats1{1}.permTGM,3),numel(stats1));
+
+% Put each participant's empirical and permuted data into one matrix, whilst z-scoring based on permuted data
+disp('To test for significant points in the TGM, the toolbox normalizes to');
+disp('the mean and standard deviation of permuted TGMs');
+for i = 1:numel(stats1)
+    % Calculate mean and std of the permuted TGMs
+    mn = mean(stats1{i}.permTGM(:));
+    sd = std(stats1{i}.permTGM(:));
+    
+    % Subtract the mean and divide by std to normalize across participants
+    empset_TGM(:,:,i) = (stats1{i}.empTGM-mn)./sd;
+    permset_TGM(:,:,:,i) = (stats1{i}.permTGM-mn)./sd;
+end
+
+% For every participant, average the permuted TGMs 
+permset_TGM = squeeze(mean(permset_TGM,1));  
+
+% Perform cluster correction (Maris & Oostenveld, 2007; J Neurosci Methods) 
+% where the empirical TGMs are compared against the average permuted TGMs
+[c_TGM,p_TGM,~,~] = permutest(empset_TGM,permset_TGM,true,clust_p,100000);
+ 
+% Find significant clusters
+sig_clus = find(p_TGM<=clust_p);
+nsig_clus = find(p_TGM>clust_p);
+
+sig_TGM = c_TGM(sig_clus); % Filter significant clusters
+nsig_TGM = c_TGM(nsig_clus); % Filter significant clusters
+
+% Check whether there are any clusters, and if those clusters are
+% significant.
+if isempty(sig_clus) && isempty(nsig_clus)~=1
+    disp('No significant clusters detected in the TGM');
+    clust_sig_ind = [];
+elseif isempty(sig_clus) && isempty(nsig_clus)
+    disp('No clusters detected in the TGM');
+    clust_sig_ind = [];
+    clust_nsig_ind = [];
+end
+
+% Vectorize significant clusters
+for i = 1:numel(sig_TGM) 
+    if i == 1
+clust_sig_ind = sig_TGM{i};
+    else
+        clust_sig_ind = [clust_sig_ind;sig_TGM{i}];
+    end
+end
+
+% Vectorize non-significant clusters
+for i = 1:numel(nsig_TGM) 
+    if i == 1
+clust_nsig_ind = nsig_TGM{i};
+    else
+        clust_nsig_ind = [clust_nsig_ind;nsig_TGM{i}];
+    end
+end
+
+% Create average empirical TGM
+TGMavg = squeeze(mean(empset_TGM,3));
+
+% Pre-allocate TGM mask and p-value dist
+TGM_sig_mask = zeros(size(TGMavg,1),size(TGMavg,2));
+TGM_nsig_mask = zeros(size(TGMavg,1),size(TGMavg,2));
+
+% Enter significant clusters into mask
+TGM_sig_mask(clust_sig_ind) = true;
+TGM_nsig_mask(clust_nsig_ind) = true;
+
+% Plot clusters in mean empirical TGM
+figure;hold on;
+    mv_plot_2D(TGMavg);hold on;
+    cb = colorbar;
+    title(cb,'perf')
+    title('Cluster correction average empirical TGM')
+    xlabel('Test data (bin)')
+    ylabel('Training data (bin)')
+    % Adapt font
+    set(gca,'FontName','Arial')
+    set(gca,'FontSize',16)
+    
+contour(1:size(TGMavg,1),1:size(TGMavg,2),TGM_sig_mask,1,'linewidth', 1, 'color', 'r');hold on;
+contour(1:size(TGMavg,1),1:size(TGMavg,2),TGM_nsig_mask,1,'linewidth', 1, 'color', 'k'); 
+legend('Significant clusters', 'Non-significant clusters');
+
+%% Adapt output variable
+% Add cluster correction information to output
+stats2.TGMclusters.clusters = c_TGM;
+stats2.TGMclusters.clusters_p = p_TGM;
+end
