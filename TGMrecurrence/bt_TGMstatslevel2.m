@@ -119,12 +119,12 @@ PS_emp_avg = mean(PS_emp,1);
 % Pre-allocate
 perm1PS = zeros(numsubj,mode(nfbins));
 perm2PS = zeros(numperms2,mode(nfbins));
-progbar = 0:1000:numperms2;
+progbar = round(linspace(0,numperms2,100));
 
 % Loop through numperms2
 for perm2=1:numperms2
     if ismember(perm2,progbar) % Print progress
-        disp(strcat((num2str(round((perm2/numperms2)*100,2))),'% of second level permutations completed (for second-level stats)'));
+        disp(strcat((num2str(round((perm2/numperms2)*100))),'% of second level permutations completed (for second-level stats)'));
     end
     
     for subj = 1:numsubj
@@ -367,9 +367,6 @@ end
 
 % For every participant, average the permuted TGMs 
 permset_TGM = squeeze(mean(permset_TGM,1));  
-
-empset_TGM = empset_TGM(1:100,1:100);
-permset_TGM = permset_TGM(1:100,1:100);
 
 % Determine number of cluster permutations based on TGM size (larger TGM =
 % fewer permutations).
