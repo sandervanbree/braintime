@@ -21,7 +21,7 @@ function [stats2] = bt_TGMstatslevel2(config, stats1)
 % Input Arguments:
 % config
 %   - numperms2      % Number of permutations on the second statistical
-%                    % level. Default: 1000000.
+%                    % level.
 %                    %
 %   - multiplecorr   % Correction method for multiple comparisons.
 %                    % 'none' (default), 'fdr' for adjusted p-values based
@@ -320,10 +320,13 @@ ylabel('-log10 p-value')
 % plot star at every significant frequency
 yyaxis left
 sigind = find(pval_corr<=0.05);
-p5 = plot(f(sigind),0,'r*','MarkerSize',10,'LineWidth',1.5);
-
-% legend
-l2 = legend([p1 p2 p3 p4 p5(1)],{'Average emp spectrum','Average perm spectrum', 'Conf. interv. perm spectrum', '-log10 p-value', 'p<=0.05'});
+if isempty(sigind) ~= 1
+    p5 = plot(f(sigind),0,'r*','MarkerSize',10,'LineWidth',1.5);
+    % legend
+    l2 = legend([p1 p2 p3 p4 p5(1)],{'Average emp spectrum','Average perm spectrum', 'Conf. interv. perm spectrum', '-log10 p-value', 'p<=0.05'});
+else
+    l2 = legend([p1 p2 p3 p4],{'Average emp spectrum','Average perm spectrum', 'Conf. interv. perm spectrum', '-log10 p-value'});
+end
 set(l2,'Location','best')
 
 % add title
@@ -365,9 +368,24 @@ end
 % For every participant, average the permuted TGMs 
 permset_TGM = squeeze(mean(permset_TGM,1));  
 
+empset_TGM = empset_TGM(1:100,1:100);
+permset_TGM = permset_TGM(1:100,1:100);
+
+% Determine number of cluster permutations based on TGM size (larger TGM =
+% fewer permutations).
+% There must be a better equation but I suck at math
+TGMsz = numel(stats1{1}.empTGM(:));
+cluster_nperm = 1./(TGMsz/(10^6));
+cluster_nperm = round(cluster_nperm.*10^4);
+if cluster_nperm < 10^4 % Minimum
+    cluster_nperm = 10^4;
+elseif cluster_nperm > 10^5 % Maximum
+    cluster_nperm = 10^5;
+end
+
 % Perform cluster correction (Maris & Oostenveld, 2007; J Neurosci Methods) 
 % where the empirical TGMs are compared against the average permuted TGMs
-[c_TGM,p_TGM,~,~] = permutest(empset_TGM,permset_TGM,true,cluster_p,100000);
+[c_TGM,p_TGM,~,~] = permutest(empset_TGM,permset_TGM,true,cluster_p,cluster_nperm);
  
 % Find significant clusters
 sig_clus = find(p_TGM<=cluster_p);
