@@ -28,7 +28,7 @@ function [stats2] = bt_TGMstatslevel2(config, stats1)
 %                    % on the False Discovery Rate, and 'bonferroni' for
 %                    % Bonferroni correction.
 %                    %
-%   - clust_p        % The threshold for significant clusters in the
+%   - cluster_p      % The threshold for significant clusters in the
 %                    % TGM cluster correction (default = 0.05).
 %                    %
 % stats1             % Output structure obtained using bt_TGMstatslevel1.
@@ -47,10 +47,10 @@ stats1 = stats1(~cellfun('isempty',stats1));
 numsubj = numel(stats1);                             % Number of participants
 numperms1 = size(stats1{1}.permspec,1);              % Number of first level permutations
 
-if isfield(config,'clust_p')                         % Cluster-correction p-value threshold
-    clust_p = config.clust_p;                         
+if isfield(config,'cluster_p')                         % Cluster-correction p-value threshold
+    cluster_p = config.cluster_p;                         
 else
-    clust_p = 0.05;
+    cluster_p = 0.05;
 end
 
 if isfield(config,'numperms2')                       % Number of second level permutations
@@ -367,11 +367,11 @@ permset_TGM = squeeze(mean(permset_TGM,1));
 
 % Perform cluster correction (Maris & Oostenveld, 2007; J Neurosci Methods) 
 % where the empirical TGMs are compared against the average permuted TGMs
-[c_TGM,p_TGM,~,~] = permutest(empset_TGM,permset_TGM,true,clust_p,100000);
+[c_TGM,p_TGM,~,~] = permutest(empset_TGM,permset_TGM,true,cluster_p,100000);
  
 % Find significant clusters
-sig_clus = find(p_TGM<=clust_p);
-nsig_clus = find(p_TGM>clust_p);
+sig_clus = find(p_TGM<=cluster_p);
+nsig_clus = find(p_TGM>cluster_p);
 
 sig_TGM = c_TGM(sig_clus); % Filter significant clusters
 nsig_TGM = c_TGM(nsig_clus); % Filter significant clusters
@@ -418,9 +418,11 @@ TGM_nsig_mask(clust_nsig_ind) = true;
 
 % Plot clusters in mean empirical TGM
 figure;hold on;
-    mv_plot_2D(TGMavg);hold on;
-    cb = colorbar;
-    title(cb,'perf')
+    cfg_plot = [];
+    cfg_plot.colorbar = 1;
+    cfg_plot.colorbar_location = 'EastOutside';
+    cfg_plot.colorbar_title = 'perf';
+    mv_plot_2D(cfg_plot,TGMavg);hold on;
     title('Cluster correction average empirical TGM')
     xlabel('Test data (bin)')
     ylabel('Training data (bin)')
