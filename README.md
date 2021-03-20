@@ -1,10 +1,9 @@
 ### Current to do list (for devs) | Official documentation starts below
-- spectral resolution (alignment warped freq and peak)
+- For diagonal testing, test significance of diagonal, not whole TGM
 - make clear you don't have to get components
 - random gaussian field theory to perform multiple testing correction over power spectra and TGMs?
 - Implement cluster correction TGM (Marije ter Wal's code is coming up soon in the lab's Github)
-- Implement testing of the diagonal only
-- Statistical masking requires too much memory
+
 
 
 LOW URGENCY:
@@ -13,6 +12,9 @@ LOW URGENCY:
 - In the paper, remind users to be very careful with high pass filtering; https://doi.org/10.1101/530220
 
 COMPLETED RECENTLY: 
+- Implement testing of the diagonal only
+- Statistical masking requires too much memory
+- spectral resolution (alignment warped freq and peak)
 - Make lingo consistent within toolbox, in line with SfN poster ("warping signal", "warping source", etc.)
 - Resize second level power spectra to the right number of frequency bins, discuss together what that is
 - Separately, decide for "shuffled" versus "permuted" and make consistent
