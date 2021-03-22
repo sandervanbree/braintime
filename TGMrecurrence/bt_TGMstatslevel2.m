@@ -371,14 +371,17 @@ permset_TGM = squeeze(mean(permset_TGM,1));
 % Determine number of cluster permutations based on TGM size (larger TGM =
 % fewer permutations).
 % There must be a better equation but I suck at math
-TGMsz = numel(stats1{1}.empTGM(:));
-cluster_nperm = 1./(TGMsz/(10^6));
-cluster_nperm = round(cluster_nperm.*10^4);
-if cluster_nperm < 10^4 % Minimum
-    cluster_nperm = 10^4;
-elseif cluster_nperm > 10^5 % Maximum
-    cluster_nperm = 10^5;
-end
+% TGMsz = numel(stats1{1}.empTGM(:));
+% cluster_nperm = 1./(TGMsz/(10^6));
+% cluster_nperm = round(cluster_nperm.*10^4);
+% if cluster_nperm < 10^4 % Minimum
+%     cluster_nperm = 10^4;
+% elseif cluster_nperm > 10^5 % Maximum
+%     cluster_nperm = 10^5;
+% end
+
+cluster_nperm = 10^4;
+disp('Testing for significant cluster. TO devs: This may take a long time, turn this block of code off to skip the step');
 
 % Perform cluster correction (Maris & Oostenveld, 2007; J Neurosci Methods) 
 % where the empirical TGMs are compared against the average permuted TGMs
@@ -436,7 +439,7 @@ figure;hold on;
     cfg_plot = [];
     cfg_plot.colorbar = 1;
     cfg_plot.colorbar_location = 'EastOutside';
-    cfg_plot.colorbar_title = 'perf';
+    cfg_plot.colorbar_title = 'z-value';
     mv_plot_2D(cfg_plot,TGMavg);hold on;
     title('Cluster correction average empirical TGM')
     xlabel('Test data (bin)')

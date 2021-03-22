@@ -35,7 +35,7 @@ function [bt_TGMquant] = bt_TGMquantify(config, TGM)
 %   - mapmethod      % 'diag' (default): perform recurrence analysis over
 %                    % the diagonal of the TGM. This ignores cross-temporal
 %                    % recurrence.
-%                    % 
+%                    %
 %                    % 'ac': perform recurrence analysis over the
 %                    % autocorrelation map of the TGM. This accentuates
 %                    % the primary recurrence frequency in the TGM, but may
@@ -91,12 +91,12 @@ if strcmp(refdimension.dim,'braintime') % Test if range is OK
     end
 end
 
-% Adjust powspecrange to be centered on warping frequency
-nrst = nearest(powspecrange,warpfreq);
-diffr = powspecrange(nrst)-warpfreq;
-powspecrange = powspecrange-diffr;
-
 if strcmp(refdimension.dim,'braintime')
+    % Adjust powspecrange to be centered on warping frequency
+    nrst = nearest(powspecrange,warpfreq);
+    diffr = powspecrange(nrst)-warpfreq;
+    powspecrange = powspecrange-diffr;
+    
     powspecrange = powspecrange/warpfreq; % adjust tested range to warped frequency
     
     refdimension.val = duration*warpfreq; % normalize by cycles in the data
@@ -113,6 +113,10 @@ if strcmp(mapmethod,'tgm')
     mp = TGM;
 elseif strcmp(mapmethod,'ac')
     mp = autocorr2d(TGM);
+%     mp2 = imrotate(mp,45);
+%     zi = find(mp2==0);
+%     mp2(zi)=nan;
+%     mp = mp2;
 elseif strcmp(mapmethod,'diag')
     mp = diag(TGM)';
 else
@@ -123,7 +127,7 @@ end
 
 [PS,f] = fftTGM(mp,powspecrange,timevec);
 pspec_emp = PS;
-    
+
 if isfield(config,'figure')
     if strcmp(config.figure,'no')
         figopt = 0;
@@ -195,7 +199,7 @@ elseif figopt == 1 && strcmp(mapmethod,'tgm') || strcmp(mapmethod,'ac')
     clim = max(mp2(indx)); %take the max number as clim for plotting
     
     subplot(2,2,2)
-    pcolor(timevec,timevec,mp2(1:numel(timevec),1:numel(timevec)));shading interp;title(['Autocorrelation map'])
+    pcolor(timevec,timevec,mp2(1:numel(timevec),1:numel(timevec)));shading interp;title('Autocorrelation map')
     caxis([-clim +clim])
     xticks(linspace(timevec(1),timevec(end),6)); % Create 11 steps
     yticks(xticks);
@@ -222,11 +226,11 @@ ylabel('Mean power')
 if strcmp(refdimension.dim,'braintime') %warp freq line is dependent on clock (warped freq) or brain time (1 hz)
     p3 = line([1 1], [0 max(pspec_emp)],'color',[1 0 1],'LineWidth',4); %Line at warped freq
     xlabel('Recurrence frequency (factor of warped freq)')
-else
-    p3 = line([warpfreq warpfreq], [0 max(pspec_emp)],'color',[1 0 1],'LineWidth',4); %Line at warped freq
-    xlabel('Recurrence frequency')
+    p3.Color(4) = 0.45;
+    
+    % Add legend
+    legend('Recurrence power','Warped frequency');
 end
-p3.Color(4) = 0.45;
 
 if strcmp(mapmethod,'diag')
     title('Recurrence power spectrum of TGM diagonal (classifier time series)');
@@ -235,9 +239,6 @@ elseif strcmp(mapmethod,'ac')
 elseif strcmp(mapmethod,'tgm')
     title('Recurrence power spectrum of TGM');
 end
-
-% Add legend
-legend('Recurrence power','Warped frequency');
 
 % Adapt font
 set(gca,'FontName','Arial')
