@@ -193,6 +193,7 @@ while finish==0
     end
 end
 
+src_oi = 1;
 
 %% Save basic info
 bt_source{1} = src_oi;                             % Warping source which contains the warping signal
