@@ -64,8 +64,8 @@ msg = ['The warping sources are ranked by ',ranktype,newline,...
     '(2) topography of interest (if applicable)',newline,...
     '(3) variance explained (for ICA components, lower source number means higher r^2)',newline,newline,...
      'INSTRUCTIONS:',newline,...
-     'Press \leftarrow or \rightarrow arrow to see the previous or next warping source',newline,...
-     'Click on a warping source to highlight it, then keep browsing or press ''Q'' to quit.'];
+     'Press \leftarrow or \rightarrow arrow to see the previous or next warping source. Click on a',newline,...
+     'warping source to highlight it, then keep browsing or press ''Q'', spacebar, or enter to quit.'];
 
 % Prepare figure
 src_oi = -2; %source of interest
@@ -185,7 +185,7 @@ while finish==0
         if src_ind > numel(srcrank) % make sure source cannot go out of bounds
             src_ind = 1;
         end
-    elseif strcmp(key,'q') %stop the loop if it is not necessesary to keep visualising
+    elseif sum(strcmp(key,'q'))>=1 || sum(strcmp(key,'space'))>=1 || sum(strcmp(key,'return'))>=1 %stop the loop if it is not necessesary to keep visualising
         fprintf('Warping signal will be the %0.2fHz phase in warping source %d.',maxfreq,currsrc)
         src_ind = (numel(srcrank))+1;
         close(f1)
