@@ -1,10 +1,5 @@
 ### Current to do list (for devs) | Official documentation starts below
-- For diagonal testing, test significance of diagonal, not whole TGM
-- make clear you don't have to get components
 - random gaussian field theory to perform multiple testing correction over power spectra and TGMs?
-- Implement cluster correction TGM (Marije ter Wal's code is coming up soon in the lab's Github)
-
-
 
 LOW URGENCY:
 - Add licenses! 
@@ -13,6 +8,8 @@ LOW URGENCY:
 - In the paper, remind users to be very careful with high pass filtering; https://doi.org/10.1101/530220
 
 COMPLETED RECENTLY: 
+- For diagonal testing, test significance of diagonal, not whole TGM
+- make clear you don't have to get components
 - Implement testing of the diagonal only
 - Statistical masking requires too much memory
 - spectral resolution (alignment warped freq and peak)
