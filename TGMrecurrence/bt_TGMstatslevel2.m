@@ -47,11 +47,18 @@ stats1 = stats1(~cellfun('isempty',stats1));
 numsubj = numel(stats1);                             % Number of participants
 numperms1 = size(stats1{1}.permspec,1);              % Number of first level permutations
 mapmethod = stats1{1}.mapmethod;                     % Save whether analysis is done over TGM, AC map, or diag
+MVPAcfg = stats1{1}.MVPAcfg;                         % MVPA Light configuration structured used to obtain TGM 
 
-if isfield(config,'cluster_p')                         % Cluster-correction p-value threshold
+if isfield(config,'cluster_p')                       % Cluster-correction p-value threshold
     cluster_p = config.cluster_p;                         
 else
     cluster_p = 0.05;
+end
+
+if isfield(config,'cluster_n')                       % Cluster-correction number of clusters
+    cluster_n = config.cluster_n;                         
+else
+    cluster_n = 10;
 end
 
 if isfield(config,'numperms2')                       % Number of second level permutations
@@ -301,13 +308,13 @@ end
 
 yyaxis left
 p1 = plot(f,PS_emp_avg,'LineStyle','-','LineWidth',3,'Color','b','Marker','none'); %Mean across 2nd level perms
-p2 = plot(f,perms2PS_avg,'LineStyle','-','LineWidth',2,'Color',[0.3 0.3 0.3],'Marker','none'); %Mean across 2nd level perms
+p2 = plot(f,perms2PS_avg,'LineStyle','-','LineWidth',2,'Color',[0 0 0],'Marker','none'); %Mean across 2nd level perms
 xlabel('Recurrence frequency')
 ylabel('Mean power across participants')
 
 % Plot confidence interval
-c2 = plot(f,low_CI,'LineStyle','-','LineWidth',0.5,'Color','k','Marker','none');
-c3 = plot(f,hi_CI,'LineStyle','-','LineWidth',0.5,'Color','k','Marker','none');
+c2 = plot(f,low_CI,'LineStyle','-','LineWidth',0.5,'Color',[0 0 0],'Marker','none');
+c3 = plot(f,hi_CI,'LineStyle','-','LineWidth',0.5,'Color',[0 0 0],'Marker','none');
 p3 = patch([f fliplr(f)],[low_CI' fliplr(hi_CI')], 1,'FaceColor', 'black', 'EdgeColor', 'none', 'FaceAlpha', 0.15);
 
 % p-value axis
@@ -350,8 +357,9 @@ disp('(3) for brain time, the (corrected) p-value of 0.5x, 1x, and 2x the warped
 
 %% STEP 2: TEST SIGNIFICANCE OF TGM OR DIAGONAL
 % Pre-allocate
-empset_TGM = zeros(size(stats1{1}.empTGM,1),size(stats1{1}.empTGM,2),numel(stats1));
-permset_TGM = zeros(size(stats1{1}.permTGM,1),size(stats1{1}.permTGM,2),size(stats1{1}.permTGM,3),numel(stats1));
+empset_TGM_Z = zeros(size(stats1{1}.empTGM,1),size(stats1{1}.empTGM,2),numel(stats1));
+permset_TGM_Z = zeros(size(stats1{1}.permTGM,1),size(stats1{1}.permTGM,2),size(stats1{1}.permTGM,3),numel(stats1));
+empset_TGM_ori = zeros(size(stats1{1}.empTGM,1),size(stats1{1}.empTGM,2),numel(stats1));
 
 % Put each participant's empirical and permuted data into one matrix, whilst z-scoring based on permuted data
 disp('To test for significant points in the TGM, the toolbox normalizes to');
@@ -361,13 +369,20 @@ for i = 1:numel(stats1)
     mn = mean(stats1{i}.permTGM(:));
     sd = std(stats1{i}.permTGM(:));
     
+    % Save original
+    empset_TGM_ori(:,:,i) = stats1{i}.empTGM;
+    
     % Subtract the mean and divide by std to normalize across participants
-    empset_TGM(:,:,i) = (stats1{i}.empTGM-mn)./sd;
-    permset_TGM(:,:,:,i) = (stats1{i}.permTGM-mn)./sd;
+    empset_TGM_Z(:,:,i) = (stats1{i}.empTGM-mn)./sd;
+    permset_TGM_Z(:,:,:,i) = (stats1{i}.permTGM-mn)./sd;
 end
 
 % For every participant, average the permuted TGMs 
-permset_TGM = squeeze(mean(permset_TGM,1));  
+permset_TGM_Z = squeeze(mean(permset_TGM_Z,1));  
+
+% Compute average TGM
+TGMavg = squeeze(mean(empset_TGM_ori,3));
+TGMavg_Z = squeeze(mean(empset_TGM_Z,3));
 
 % Determine number of cluster permutations based on TGM size (larger TGM =
 % fewer permutations).
@@ -386,18 +401,18 @@ disp('Testing for significant cluster. TO devs: This may take a long time, turn 
 
 % Filter diagonal if diagonal is analyzed
 if strcmp(mapmethod,'diag')
-    for i = 1:size(empset_TGM,3)
-    emp_clus(:,i) = diag(empset_TGM(:,:,i))';
-    perm_clus(:,i) = diag(permset_TGM(:,:,i))';
+    for i = 1:size(empset_TGM_Z,3)
+    emp_clus(:,i) = diag(empset_TGM_Z(:,:,i))';
+    perm_clus(:,i) = diag(permset_TGM_Z(:,:,i))';
     end
 else % Else just keep the whole TGM
-    emp_clus = empset_TGM;
-    perm_clus = permset_TGM;
+    emp_clus = empset_TGM_Z;
+    perm_clus = permset_TGM_Z;
 end
 
 % Perform cluster correction (Maris & Oostenveld, 2007; J Neurosci Methods) 
 % where the empirical TGMs are compared against the average permuted TGMs
-[c_TGM,p_TGM,~,~] = permutest(emp_clus,perm_clus,true,cluster_p,cluster_nperm,false);
+[c_TGM,p_TGM,~,~] = permutest(emp_clus,perm_clus,true,cluster_p,cluster_nperm,false,cluster_n);
 
 % Transpose for diagonal
 if strcmp(mapmethod,'diag')
@@ -450,41 +465,50 @@ end
 % Plot Diagonal option
 if strcmp(mapmethod,'diag')
     % Calculate average diagonal
-diagavg = squeeze(mean(emp_clus,2)); 
+diagavg = diag(TGMavg); 
+diagavg_Z = diag(TGMavg_Z);
 
-  figure; hold on;
-    plot(diagavg,'LineWidth',3,'Color',[0 0 0]);
+  figure;subplot(5,5,1:10); hold on;
+    plot(diagavg_Z,'LineWidth',3,'Color',[0 0 0]);
     yline(0,'LineWidth',1.5,'Color',[0.6 0.6 0.6]);
     
     xlabel('Test data (bin)')
-    ylabel('Performance (z)');
-    title('TGM Diagonal (classifier time course)');
+    ylabel('Z-value');
+    title('Z-scored TGM Diagonal (classifier time course)');
     
     % Adapt font
     set(gca,'FontName','Arial');
     set(gca,'FontSize',16);
     
-% Get plot's minimum Y limit
-ax = gca;
-lim = ax.YLim(1);
+% Plot points a little below lowest Z
+lim = min(diagavg_Z(:))*1.05;
 
 % Plot significant and non-significant datapoints
 if isempty(clust_sig_ind) && isempty(clust_nsig_ind)~=1
-    c1 = plot(clust_nsig_ind,lim,'o','linewidth', 0.1, 'color', 'k','MarkerFaceColor','k');hold on;
+    c1 = plot(clust_nsig_ind,lim,'o','linewidth', 0.1, 'color', [0 0 0],'MarkerFaceColor',[0 0 0]);hold on;
     legend(c1(1),'Non-significant clusters');
 elseif isempty(clust_sig_ind)~=1 && isempty(clust_nsig_ind)
-    c1 = plot(clust_sig_ind,lim,'o','linewidth', 0.1, 'color',[0.14,0.5,0.27],'MarkerFaceColor','r');hold on;
+    c1 = plot(clust_sig_ind,lim,'o','linewidth', 0.1, 'color',[0,0.8,0],'MarkerFaceColor',[0,0.8,0]);hold on;
     legend(c1(1),'Significant clusters');
 elseif isempty(clust_sig_ind)~=1 && isempty(clust_nsig_ind)~=1
-    c1 = plot(clust_nsig_ind,lim,'o','linewidth', 0.1, 'color', 'k','MarkerFaceColor','k');hold on;
-    c2 = plot(clust_sig_ind,lim,'o','linewidth', 0.1, 'color', [0.14,0.5,0.27],'MarkerFaceColor','r');hold on;
+    c1 = plot(clust_sig_ind,lim,'o','linewidth', 0.1, 'color', [0,0.8,0],'MarkerFaceColor',[0,0.8,0]);hold on;
+    c2 = plot(clust_nsig_ind,lim,'o','linewidth', 0.1, 'color', [0 0 0],'MarkerFaceColor',[0 0 0]);hold on;
     legend([c1(1),c2(1)],'Significant clusters', 'Non-significant clusters');
 end
 
-else % Plot TGM option
-% Create average empirical TGM
-TGMavg = squeeze(mean(emp_clus,3));
+% Plot regular average diagonal;
+subplot(5,5,20:25);hold on;
+plot(diagavg,'LineWidth',3,'Color',[0 0 0]);
+yline(0.5,'LineWidth',1.5,'Color',[0.6 0.6 0.6]);
 
+xlabel('Test data (bin)')
+ylabel(MVPAcfg.metric);
+title('TGM Diagonal (classifier time course)');
+% Adapt font
+set(gca,'FontName','Arial');
+set(gca,'FontSize',16);
+
+else % Plot TGM option
 % Pre-allocate TGM mask and p-value dist
 TGM_sig_mask = zeros(size(TGMavg,1),size(TGMavg,2));
 TGM_nsig_mask = zeros(size(TGMavg,1),size(TGMavg,2));
@@ -494,23 +518,34 @@ TGM_sig_mask(clust_sig_ind) = true;
 TGM_nsig_mask(clust_nsig_ind) = true;
 
 % Plot clusters in mean empirical TGM
-figure;hold on;
+figure;hold on;subplot(10,2,[3 5 7 9 11 13 15]);
     cfg_plot = [];
     cfg_plot.colorbar = 1;
     cfg_plot.colorbar_location = 'EastOutside';
-    cfg_plot.colorbar_title = 'z-value';
-    mv_plot_2D(cfg_plot,TGMavg);hold on;
+    cfg_plot.colorbar_title = 'Z-value';
+    mv_plot_2D(cfg_plot,TGMavg_Z);hold on;
     colormap(flipud(brewermap([],'RdBu')));
-    title('Cluster correction average empirical TGM')
+    title('Z-scored average empirical TGM (with clusters)')
     xlabel('Test data (bin)')
     ylabel('Training data (bin)')
     % Adapt font
     set(gca,'FontName','Arial')
     set(gca,'FontSize',16)
     
-contour(1:size(TGMavg,1),1:size(TGMavg,2),TGM_sig_mask,1,'linewidth', 1, 'color',[0.14,0.5,0.27]);hold on;
-contour(1:size(TGMavg,1),1:size(TGMavg,2),TGM_nsig_mask,1,'linewidth', 1, 'color', 'k'); 
+contour(1:size(TGMavg,1),1:size(TGMavg,2),TGM_sig_mask,1,'linewidth', 2, 'color',[0,0.8,0]);hold on;
+contour(1:size(TGMavg,1),1:size(TGMavg,2),TGM_nsig_mask,1,'linewidth', 2, 'color', [0 0 0]); 
 legend('Significant clusters', 'Non-significant clusters');
+
+subplot(10,2,[4 6 8 10 12 14 16]);
+cfg_plot.colorbar_title = MVPAcfg.metric;
+    mv_plot_2D(cfg_plot,TGMavg);hold on;
+    colormap(flipud(brewermap([],'RdBu')));
+    title('Average empirical TGM')
+    xlabel('Test data (bin)')
+    ylabel('Training data (bin)')
+    % Adapt font
+    set(gca,'FontName','Arial')
+    set(gca,'FontSize',16)
 end
 
 %% Adapt output variable

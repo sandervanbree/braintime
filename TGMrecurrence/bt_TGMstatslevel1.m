@@ -42,7 +42,7 @@ TGM = bt_TGMquant.TGM;                                    % Time Generalization 
 timevec = bt_TGMquant.timevec;                            % Time vector (different for brain and clock time referencing)
 refdimension = bt_TGMquant.refdimension;                  % Reference dimension used
 recurrencefoi = bt_TGMquant.recurrencefoi;                % Range of tested TGM recurrence frequencies
-mapmethod = bt_TGMquant.mapmethod;                        % Check whether analysis is done over TGM or AC map
+mapmethod = bt_TGMquant.mapmethod;                        % Check whether analysis is done over TGM, AC map, or diag
 pspec_emp = bt_TGMquant.pspec_emp;                        % Recurrence power spectrum of empirical data
 clabel = config.clabel;                                   % Classification labels
 
@@ -245,3 +245,6 @@ stats1.permTGM = permTGM;                             % Nperm1 permuted TGMs
 stats1.empspec = pspec_emp;                           % Power spectrum of average empirical data
 stats1.permspec = pspec_perm;                         % Power spectrum of average permutation data
 stats1.refdimension = refdimension;                   % Save reference dimension (clock or brain time)
+stats1.mapmethod = mapmethod;                         % Save whether analysis is done over TGM, AC map, or diag
+stats1.MVPAcfg = MVPAcfg;                             % MVPA Light configuration structured used to obtain TGM
+
