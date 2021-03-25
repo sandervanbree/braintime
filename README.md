@@ -7,6 +7,7 @@
 
 
 LOW URGENCY:
+- Add licenses! 
 - Implement Cohen/Luca's GED scripts
 - Update tutorial 4 to 6
 - In the paper, remind users to be very careful with high pass filtering; https://doi.org/10.1101/530220
