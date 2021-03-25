@@ -44,7 +44,9 @@ end
 % Apply second level statistics
 cfg.numperms2      = 100000;                    % Number of second level Monte Carlo permutations
 cfg.multiplecorr   = 'fdr';                     % Multiple correction option
-cfg.cluster_p      = 0.3;                      % Threshold for TGM cluster significance testing
+cfg.cluster_p      = 0.05;                      % Threshold for TGM cluster significance testing
+cfg.cluster_n      = 10;                        % Maximum number of clusters
+cfg.cluster_smooth = 1;                         % Width of smoothing window (Gaussian SD), used only for cluster testing
 [bt_stats2] = bt_TGMstatslevel2(cfg,bt_stats1); % Output matrix contains p-values and associated frequencies
 fprintf('Brain Time warped data results (SIGNIFICANT at simulated 8 Hz)')
 
