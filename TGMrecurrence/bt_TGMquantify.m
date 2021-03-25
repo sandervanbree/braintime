@@ -113,10 +113,6 @@ if strcmp(mapmethod,'tgm')
     mp = TGM;
 elseif strcmp(mapmethod,'ac')
     mp = autocorr2d(TGM);
-%     mp2 = imrotate(mp,45);
-%     zi = find(mp2==0);
-%     mp2(zi)=nan;
-%     mp = mp2;
 elseif strcmp(mapmethod,'diag')
     mp = diag(TGM)';
 else
@@ -172,6 +168,7 @@ elseif figopt == 1 && strcmp(mapmethod,'tgm') || strcmp(mapmethod,'ac')
     cfg_plot.y   = linspace(timevec(1),timevec(end),size(mp,2));
     mv_plot_2D(cfg_plot, TGM);
     cb = colorbar;
+    colormap(flipud(brewermap([],'RdBu')));
     title(cb,'perf')
     xlim([timevec(1) timevec(end)]);
     ylim([timevec(1) timevec(end)]);
@@ -199,7 +196,8 @@ elseif figopt == 1 && strcmp(mapmethod,'tgm') || strcmp(mapmethod,'ac')
     clim = max(mp2(indx)); %take the max number as clim for plotting
     
     subplot(2,2,2)
-    pcolor(timevec,timevec,mp2(1:numel(timevec),1:numel(timevec)));shading interp;title('Autocorrelation map')
+    pcolor(timevec,timevec,mp2(1:numel(timevec),1:numel(timevec)));shading interp;title('Autocorrelation map');
+    colormap(flipud(brewermap([],'RdBu')));
     caxis([-clim +clim])
     xticks(linspace(timevec(1),timevec(end),6)); % Create 11 steps
     yticks(xticks);

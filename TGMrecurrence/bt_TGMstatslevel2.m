@@ -46,6 +46,7 @@ stats1 = stats1(~cellfun('isempty',stats1));
 %% Get information
 numsubj = numel(stats1);                             % Number of participants
 numperms1 = size(stats1{1}.permspec,1);              % Number of first level permutations
+mapmethod = stats1{1}.mapmethod;                     % Save whether analysis is done over TGM, AC map, or diag
 
 if isfield(config,'cluster_p')                         % Cluster-correction p-value threshold
     cluster_p = config.cluster_p;                         
@@ -126,7 +127,6 @@ for perm2=1:numperms2
     if ismember(perm2,progbar) % Print progress
         disp(strcat((num2str(round((perm2/numperms2)*100))),'% of second level permutations completed (for second-level stats)'));
     end
-    
     for subj = 1:numsubj
         idx=randperm(numperms1,1); %randomly grab with replacement
         perm1PS(subj,:) = stats1{subj}.permspec(idx,:);
@@ -340,6 +340,7 @@ set(gca,'FontSize',16)
 % Add freq and pval information to output
 stats2.recurrence.pval_corr = pval_corr;
 stats2.recurrence.frequency = f;
+stats2.mapmethod = mapmethod;
 
 % Print results for brain time
 disp('See the output structure for:')
@@ -347,7 +348,7 @@ disp('(1) the (corrected) p-values per frequency');
 disp('(2) the range of tested frequencies');
 disp('(3) for brain time, the (corrected) p-value of 0.5x, 1x, and 2x the warped frequency');
 
-%% STEP 2: TEST SIGNIFICANCE OF TGM
+%% STEP 2: TEST SIGNIFICANCE OF TGM OR DIAGONAL
 % Pre-allocate
 empset_TGM = zeros(size(stats1{1}.empTGM,1),size(stats1{1}.empTGM,2),numel(stats1));
 permset_TGM = zeros(size(stats1{1}.permTGM,1),size(stats1{1}.permTGM,2),size(stats1{1}.permTGM,3),numel(stats1));
@@ -383,10 +384,30 @@ permset_TGM = squeeze(mean(permset_TGM,1));
 cluster_nperm = 10^4;
 disp('Testing for significant cluster. TO devs: This may take a long time, turn this block of code off to skip the step');
 
+% Filter diagonal if diagonal is analyzed
+if strcmp(mapmethod,'diag')
+    for i = 1:size(empset_TGM,3)
+    emp_clus(:,i) = diag(empset_TGM(:,:,i))';
+    perm_clus(:,i) = diag(permset_TGM(:,:,i))';
+    end
+else % Else just keep the whole TGM
+    emp_clus = empset_TGM;
+    perm_clus = permset_TGM;
+end
+
 % Perform cluster correction (Maris & Oostenveld, 2007; J Neurosci Methods) 
 % where the empirical TGMs are compared against the average permuted TGMs
-[c_TGM,p_TGM,~,~] = permutest(empset_TGM,permset_TGM,true,cluster_p,cluster_nperm);
- 
+[c_TGM,p_TGM,~,~] = permutest(emp_clus,perm_clus,true,cluster_p,cluster_nperm,false);
+
+% Transpose for diagonal
+if strcmp(mapmethod,'diag')
+    p_TGM = p_TGM';
+    c_TGM = c_TGM';
+   for i = 1:numel(c_TGM)
+       c_TGM{i} = c_TGM{i}';
+   end
+end
+
 % Find significant clusters
 sig_clus = find(p_TGM<=cluster_p);
 nsig_clus = find(p_TGM>cluster_p);
@@ -402,6 +423,8 @@ if isempty(sig_clus) && isempty(nsig_clus)~=1
 elseif isempty(sig_clus) && isempty(nsig_clus)
     disp('No clusters detected in the TGM');
     clust_sig_ind = [];
+    clust_nsig_ind = [];
+elseif isempty(sig_clus)~=1 && isempty(nsig_clus)==1
     clust_nsig_ind = [];
 end
 
@@ -423,8 +446,44 @@ clust_nsig_ind = nsig_TGM{i};
     end
 end
 
+%% PLOTTING
+% Plot Diagonal option
+if strcmp(mapmethod,'diag')
+    % Calculate average diagonal
+diagavg = squeeze(mean(emp_clus,2)); 
+
+  figure; hold on;
+    plot(diagavg,'LineWidth',3,'Color',[0 0 0]);
+    yline(0,'LineWidth',1.5,'Color',[0.6 0.6 0.6]);
+    
+    xlabel('Test data (bin)')
+    ylabel('Performance (z)');
+    title('TGM Diagonal (classifier time course)');
+    
+    % Adapt font
+    set(gca,'FontName','Arial');
+    set(gca,'FontSize',16);
+    
+% Get plot's minimum Y limit
+ax = gca;
+lim = ax.YLim(1);
+
+% Plot significant and non-significant datapoints
+if isempty(clust_sig_ind) && isempty(clust_nsig_ind)~=1
+    c1 = plot(clust_nsig_ind,lim,'o','linewidth', 0.1, 'color', 'k','MarkerFaceColor','k');hold on;
+    legend(c1(1),'Non-significant clusters');
+elseif isempty(clust_sig_ind)~=1 && isempty(clust_nsig_ind)
+    c1 = plot(clust_sig_ind,lim,'o','linewidth', 0.1, 'color',[0.14,0.5,0.27],'MarkerFaceColor','r');hold on;
+    legend(c1(1),'Significant clusters');
+elseif isempty(clust_sig_ind)~=1 && isempty(clust_nsig_ind)~=1
+    c1 = plot(clust_nsig_ind,lim,'o','linewidth', 0.1, 'color', 'k','MarkerFaceColor','k');hold on;
+    c2 = plot(clust_sig_ind,lim,'o','linewidth', 0.1, 'color', [0.14,0.5,0.27],'MarkerFaceColor','r');hold on;
+    legend([c1(1),c2(1)],'Significant clusters', 'Non-significant clusters');
+end
+
+else % Plot TGM option
 % Create average empirical TGM
-TGMavg = squeeze(mean(empset_TGM,3));
+TGMavg = squeeze(mean(emp_clus,3));
 
 % Pre-allocate TGM mask and p-value dist
 TGM_sig_mask = zeros(size(TGMavg,1),size(TGMavg,2));
@@ -441,6 +500,7 @@ figure;hold on;
     cfg_plot.colorbar_location = 'EastOutside';
     cfg_plot.colorbar_title = 'z-value';
     mv_plot_2D(cfg_plot,TGMavg);hold on;
+    colormap(flipud(brewermap([],'RdBu')));
     title('Cluster correction average empirical TGM')
     xlabel('Test data (bin)')
     ylabel('Training data (bin)')
@@ -448,9 +508,10 @@ figure;hold on;
     set(gca,'FontName','Arial')
     set(gca,'FontSize',16)
     
-contour(1:size(TGMavg,1),1:size(TGMavg,2),TGM_sig_mask,1,'linewidth', 1, 'color', 'r');hold on;
+contour(1:size(TGMavg,1),1:size(TGMavg,2),TGM_sig_mask,1,'linewidth', 1, 'color',[0.14,0.5,0.27]);hold on;
 contour(1:size(TGMavg,1),1:size(TGMavg,2),TGM_nsig_mask,1,'linewidth', 1, 'color', 'k'); 
 legend('Significant clusters', 'Non-significant clusters');
+end
 
 %% Adapt output variable
 % Add cluster correction information to output
