@@ -37,6 +37,10 @@ cfg.method       = 'runica';
 cfg.runica.pca   = 30;               % Let's get 30 to save time
 warpsources      = ft_componentanalysis(cfg ,ct_data);
 
+% It is recommended to save your warpsources (ICA output),
+% to replicate your results at a later stage.
+save warpsources
+
 %% Perform FFT over warping sources (components) to enable sorting by time frequency characteristics of interest
 
 % Toolbox configuration

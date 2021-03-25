@@ -43,13 +43,5 @@ cfg.refdimension    = 'braintime';                % Quantify recurrence as a fun
 bt_TGMquant         = bt_TGMquantify(cfg,bt_TGM); % Do once for brain time
 title('Brain time recurrence');
 
-%% Statistically test TGM recurrence on the single subject level (compare clock and brain time)
-clabel = bt_warpeddata.clabel;
-
-cfg.numperms1       = 5;               % Number of permutations on the first level
-cfg.clabel          = clabel;
-[ct_TGMstats1] = bt_TGMstatslevel1(cfg,ct_data,ct_TGMquant);  % Clock time results (not significant)
-[bt_TGMstats1] = bt_TGMstatslevel1(cfg,bt_data,bt_TGMquant);  % Brain time results (significant)
-
 %% Save results for tutorial 3
-save tutorial2_output ct_TGMquant bt_TGMquant ct_TGMstats1 bt_TGMstats1 ct_data bt_data clabel cfg_mv
+save tutorial2_output ct_TGMquant bt_TGMquant ct_data bt_data  cfg_mv
