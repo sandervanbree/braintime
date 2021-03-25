@@ -44,4 +44,4 @@ bt_TGMquant         = bt_TGMquantify(cfg,bt_TGM); % Do once for brain time
 title('Brain time recurrence');
 
 %% Save results for tutorial 3
-save tutorial2_output ct_TGMquant bt_TGMquant ct_data bt_data  cfg_mv
+save tutorial2_output ct_TGMquant bt_TGMquant ct_data bt_data cfg_mv clabel

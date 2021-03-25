@@ -26,16 +26,13 @@ TGM_subj4.bt_data = bt_data;
 TGM_subj4.ct_TGM  = ct_TGMquant;
 TGM_subj4.ct_data = ct_data;
 
-% Extract class labels
-clabel = bt_warpeddata.clabel;
-
 %% Brain Time warped data
 % First level statistics (single subject level)
 cfg.mvpacfg         = cfg_mv;          % Input previous MVPA Light config structure
 cfg.figure          = 'no'; 
 cfg.numperms1       = 5;               % Number of permutations on the first level (per participant)
 cfg.statsrange      = [1 20];          % Range of tested recurrence rates
-cfg.clabel          = clabel;
+cfg.clabel          = clabel;          % We've saved clabel from last tutorial
 
 % Loop through all participants
 for subj = 1:4 
