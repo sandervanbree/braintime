@@ -61,6 +61,12 @@ else
     cluster_n = 10;
 end
 
+if isfield(config,'cluster_smooth')                  % Smoothing for better Cluster-correction
+    cluster_smooth = config.cluster_smooth; 
+else
+    cluster_smooth = 0;
+end
+
 if isfield(config,'numperms2')                       % Number of second level permutations
     numperms2 = config.numperms2;
 else
@@ -382,7 +388,6 @@ permset_TGM_Z = squeeze(mean(permset_TGM_Z,1));
 
 % Compute average TGM
 TGMavg = squeeze(mean(empset_TGM_ori,3));
-TGMavg_Z = squeeze(mean(empset_TGM_Z,3));
 
 % Determine number of cluster permutations based on TGM size (larger TGM =
 % fewer permutations).
@@ -408,6 +413,12 @@ if strcmp(mapmethod,'diag')
 else % Else just keep the whole TGM
     emp_clus = empset_TGM_Z;
     perm_clus = permset_TGM_Z;
+end
+
+% Smoothing
+if cluster_smooth~=0
+    emp_clus = imgaussfilt(emp_clus,cluster_smooth);
+    perm_clus = imgaussfilt(perm_clus,cluster_smooth);
 end
 
 % Perform cluster correction (Maris & Oostenveld, 2007; J Neurosci Methods) 
@@ -464,9 +475,9 @@ end
 %% PLOTTING
 % Plot Diagonal option
 if strcmp(mapmethod,'diag')
-    % Calculate average diagonal
+% Calculate average diagonal
 diagavg = diag(TGMavg); 
-diagavg_Z = diag(TGMavg_Z);
+diagavg_Z = squeeze(mean(emp_clus,2));
 
   figure;subplot(5,5,1:10); hold on;
     plot(diagavg_Z,'LineWidth',3,'Color',[0 0 0]);
@@ -474,8 +485,12 @@ diagavg_Z = diag(TGMavg_Z);
     
     xlabel('Test data (bin)')
     ylabel('Z-value');
-    title('Z-scored TGM Diagonal (classifier time course)');
-    
+   
+    if cluster_smooth == 0
+    title('Z-scored average empirical TGM Diagonal (classifier time course)');
+    else
+    title('Smoothed Z-scored average empirical TGM Diagonal (classifier time course)');
+    end
     % Adapt font
     set(gca,'FontName','Arial');
     set(gca,'FontSize',16);
@@ -503,12 +518,16 @@ yline(0.5,'LineWidth',1.5,'Color',[0.6 0.6 0.6]);
 
 xlabel('Test data (bin)')
 ylabel(MVPAcfg.metric);
-title('TGM Diagonal (classifier time course)');
+title('average empirical TGM Diagonal (classifier time course)');
 % Adapt font
 set(gca,'FontName','Arial');
 set(gca,'FontSize',16);
 
-else % Plot TGM option
+% Plot TGM option
+else 
+% Get average z-scored TGM
+TGMavg_Z = squeeze(mean(emp_clus,3));
+    
 % Pre-allocate TGM mask and p-value dist
 TGM_sig_mask = zeros(size(TGMavg,1),size(TGMavg,2));
 TGM_nsig_mask = zeros(size(TGMavg,1),size(TGMavg,2));
@@ -523,9 +542,14 @@ figure;hold on;subplot(10,2,[3 5 7 9 11 13 15]);
     cfg_plot.colorbar = 1;
     cfg_plot.colorbar_location = 'EastOutside';
     cfg_plot.colorbar_title = 'Z-value';
+    cfg_plot.climzero = 0;
     mv_plot_2D(cfg_plot,TGMavg_Z);hold on;
     colormap(flipud(brewermap([],'RdBu')));
-    title('Z-scored average empirical TGM (with clusters)')
+    if cluster_smooth == 0
+    title('Z-scored average empirical TGM (clusters)')
+    else
+    title('Smoothed Z-scored average empirical TGM (clusters)')
+    end
     xlabel('Test data (bin)')
     ylabel('Training data (bin)')
     % Adapt font
@@ -537,7 +561,8 @@ contour(1:size(TGMavg,1),1:size(TGMavg,2),TGM_nsig_mask,1,'linewidth', 2, 'color
 legend('Significant clusters', 'Non-significant clusters');
 
 subplot(10,2,[4 6 8 10 12 14 16]);
-cfg_plot.colorbar_title = MVPAcfg.metric;
+    cfg_plot.colorbar_title = MVPAcfg.metric;
+    cfg_plot.climzero = 0.5;
     mv_plot_2D(cfg_plot,TGMavg);hold on;
     colormap(flipud(brewermap([],'RdBu')));
     title('Average empirical TGM')
