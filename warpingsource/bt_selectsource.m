@@ -167,8 +167,8 @@ while finish==0
     xline(minfoi,'Color','k'); 
     xline(maxfoi,'Color','k');
     catch
-    hline(minfoi,'Color','k'); 
-    hline(minfoi,'Color','k'); 
+    hline(minfoi); 
+    hline(maxfoi); 
     end
     
     set(gca,'FontSize',14);
