@@ -139,7 +139,13 @@ if figopt == 1 && strcmp(mapmethod,'diag')
     subplot(2,1,1)
     xvec = linspace(timevec(1),timevec(end),numel(mp));
     plot(xvec,mp,'LineWidth',3,'Color',[0 0 0]);
+    
+    try % For old Matlab versions
     yline(0.5,'LineWidth',1.5,'Color',[0.6 0.6 0.6]);
+    catch
+    vline(0.5,'Color','k'); 
+    vline(0.5,'Color','k'); 
+    end
     
     % xlabel is dependent on refdimension
     if strcmp(refdimension.dim,'braintime')

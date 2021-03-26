@@ -487,7 +487,13 @@ diagavg_Z = squeeze(mean(emp_clus,2));
 
   figure;subplot(5,5,1:10); hold on;
     plot(diagavg_Z,'LineWidth',3,'Color',[0 0 0]);
+    
+    try % For old Matlab versions
     yline(0,'LineWidth',1.5,'Color',[0.6 0.6 0.6]);
+    catch
+    vline(0,'LineWidth',1.5,'Color','k');
+    end
+    
     xlim([0,numel(diagavg_Z)]);
     xlabel('Test data (bin)')
     ylabel('Z-value');
@@ -520,7 +526,13 @@ end
 % Plot regular average diagonal;
 subplot(5,5,20:25);hold on;
 plot(diagavg,'LineWidth',3,'Color',[0 0 0]);
-yline(0.5,'LineWidth',1.5,'Color',[0.6 0.6 0.6]);
+
+try % For old Matlab versions
+    yline(0.5,'LineWidth',1.5,'Color',[0.6 0.6 0.6]);
+catch
+    vline(0.5,'LineWidth',1.5,'Color','k');
+end
+
 xlim([0,numel(diagavg_Z)]);
 xlabel('Test data (bin)')
 ylabel(MVPAcfg.metric);
