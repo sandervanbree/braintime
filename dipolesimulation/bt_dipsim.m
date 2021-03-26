@@ -74,7 +74,14 @@ for trl = 1:settings.numtrials % Loop through trials
 end
 
 % Plot drift for 6 example trials;
-f1 = figure; set(gcf, 'WindowState', 'maximized');
+f1 = figure;
+
+% create full screen figure
+try set(gcf, 'WindowState', 'maximized');
+catch
+    figure('units','normalized','outerposition',[0 0 1 1]);
+end
+
 subplot(5,5,[1 7]); hold on;
 plot(t,drift_sig(1:6,:),'LineWidth',2);
 title('Frequency drift over time (example trial 1 to 6)');
