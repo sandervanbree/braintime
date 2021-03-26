@@ -33,5 +33,5 @@ end
 
 
 % If we reach here, all checks have passed
-disp('Brain Time Toolbox setup successful - time to warp! The tutorials are a good place to start.');
+disp('Brain Time Toolbox setup successful - happy warping! The tutorials are a good place to start.');
 end
