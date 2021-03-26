@@ -11,11 +11,11 @@ figure;imshow('bt_dipsim.png');
 
 % establish parameters
 settings.saveopt    = 1;          % Save the results?
-settings.dur        = 5;          % Duration of simulated trials
+settings.dur        = 3;          % Duration of simulated trials
 settings.sr         = 200;        % Sampling rate of simulated data
-settings.numtrials  = 100;        % Number of trial per condition
+settings.numtrials  = 60;         % Number of trial per condition
 settings.mainfreq   = 10;         % Simulated frequency of interest
-settings.freqdrift  = 0.005;      % Frequency walk per timepoint (random value between -n to +n)
+settings.freqdrift  = 0.05;       % Frequency walk per timepoint (random value between -n to +n)
 settings.pinkns_amp = 0.5;        % Amplitude of 1/f pink noise
 settings.savedir    = '\\its-rds.bham.ac.uk\rdsprojects\w\wimberm-ieeg-compute\Sander\TGM\BrainTimeToolbox-github\dipolesimulation';
 
@@ -305,12 +305,11 @@ ct_left=ft_timelockanalysis(cfg,ct_left);
 ct_left.trialinfo = ones(size(ct_left.trial,1),1);
 ct_right.trialinfo = 2*(ones(size(ct_right.trial,1),1));
 
-% Complete the simulation by appending the two conditions
-cfg = [];
-ct_dipolesim = ft_appenddata(cfg,ct_left,ct_right);
+% Save settings to trace back parameters
+dipolesim_params = settings;
 
 %% Save results
 if settings.saveopt == 1
-    save([settings.savedir,'\dipolesim'],'ct_dipolesim','-v7.3');
+    save([settings.savedir,'\dipolesim'],'ct_left','ct_right','dipolesim_params','-v7.3');
     saveas(f1,[settings.savedir,'\dipolesim_positions.jpg'],'jpeg')
 end
