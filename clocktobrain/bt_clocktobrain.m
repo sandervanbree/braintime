@@ -4,14 +4,15 @@ function [bt_warpeddata] = bt_clocktobrain(config, data, bt_source)
 % oscillation. This warping path is used to resample the clock time data,
 % stretching at specific moments where the warping signal falls out of tune
 % with the stationary oscillation. Finally, the data is resized to its
-% original length.
+% original length. This procedure attempts to account for variation in each
+% trial's starting phase as well as frequency drift within trials.
 %
 % Use:
 % [bt_struc] = bt_clocktobrain(cfg,data,bt_source)
 %
 % Input Arguments:
 % config
-%   - btsrate        % Sampling rate of the brain time data.
+%   - bt_srate       % Sampling rate of the brain time data.
 %                    %
 %   - removecomp     % 'yes' (default): if the warping source is an ICA
 %                    % component, remove it from the brain time data. When
@@ -22,8 +23,8 @@ function [bt_warpeddata] = bt_clocktobrain(config, data, bt_source)
 %                    %
 %                    % 'no': keeps component in the brain time data.
 %                    %
-% data               % Preprocessed clock time data structure consisting of
-%                    % both classes.
+% data               % Clock time data structure consisting of both
+%                    % classes.
 %                    %
 % bt_source          % Data structure obtained from bt_selectsource.
 %                    % Includes: Warping signal's time frequency
@@ -31,9 +32,9 @@ function [bt_warpeddata] = bt_clocktobrain(config, data, bt_source)
 %                    % retrieval.
 %                    %
 % Output:            %
-% bt_warpeddata      % Data structure with: brain time data, its 
-%                    % time frequency information, and config details
-%                    % saved for later retrieval.
+% bt_warpeddata      % Data structure with: the warping signal's frequency,
+%                    % brain time data, its time frequency information, and
+%                    % config details saved for later retrieval.
 
 %% Get basic info
 src_oi = bt_source{1};                               % Warping source which contains the warping signal
@@ -59,8 +60,8 @@ mintime_ind = nearest(bt_source{5}.time,mintime);    % Index of start time of in
 maxtime_ind = nearest(bt_source{5}.time,maxtime);    % Index of end time of interest
 
 % Set up sampling rate
-if isfield(config,'btsrate')
-    phs_sr = config.btsrate;
+if isfield(config,'bt_srate')
+    phs_sr = config.bt_srate;
 else
     phs_sr = 512; %Default sampling rate
 end
@@ -110,16 +111,12 @@ end
 
 %% Warp the phase of the warping signal to the phase of a stationary oscillation
 bt_data=data;
-nsec=bt_data.time{1}(end)-bt_data.time{1}(1);           % number of seconds in the data
-Ncycles_pre=warpfreq*nsec;                              % number of cycles * seconds
-cycledur=round(phs_sr*nsec/Ncycles_pre);                % samples for cycle
-
-% Unsure which is better, grid cell data show latter
-tmp_sr=phs_sr;
+nsec=bt_data.time{1}(end)-bt_data.time{1}(1);            % number of seconds in the data
+Ncycles_pre=warpfreq*nsec;                               % number of cycles * seconds
+cycledur=round(phs_sr*nsec/Ncycles_pre);                 % samples for cycle
 tmp_sr=Ncycles_pre*cycledur/nsec;
-
-tempphs=linspace(-pi,(2*pi*Ncycles_pre)-pi,tmp_sr*nsec);% set up phase bins for unwrapped phase (angular frequency)
-timephs=linspace(0,Ncycles_pre,phs_sr*nsec);            % time vector of the unwrapper phase
+tempphs=linspace(-pi,(2*pi*Ncycles_pre)-pi,tmp_sr*nsec); % set up phase bins for unwrapped phase (angular frequency)
+timephs=linspace(0,Ncycles_pre,phs_sr*nsec);             % time vector of the unwrapper phase
 
 for nt=1:size(phs,1)
     tmpphstrl=unwrap((phs(nt,:)));
@@ -182,6 +179,6 @@ end
 
 %% Reformat data structure and include basic info
 bt_warpeddata.data = bt_data;                                     % Brain time warped data
-bt_warpeddata.toi = [min_t max_t];                            % Start and end time of interest
+bt_warpeddata.toi = [min_t max_t];                                % Start and end time of interest
 bt_warpeddata.freq = warpfreq;                                    % Warped frequency (frequency of the warping signal)
 bt_warpeddata.clabel = bt_data.trialinfo;                         % Classification labels
