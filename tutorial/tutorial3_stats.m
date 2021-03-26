@@ -33,10 +33,10 @@ TGM_subj4.ct_data = ct_data;
 
 % First level statistics (single subjects)
 cfg.mvpacfg         = cfg_mv;          % Input previous MVPA Light config structure
-cfg.figure          = 'no'; 
+cfg.figure          = 'yes';           % Plot first level stats of each participant
 cfg.numperms1       = 5;               % Number of permutations on the first level (per participant).
                                        % For real analyses, this should be higher.
-cfg.statsrange      = [1 20];          % Range of tested recurrence rates
+cfg.statsrange      = [1 22];          % Range of tested recurrence rates
 cfg.clabel          = clabel;          % We've saved clabel from last tutorial
 
 for subj = 1:4 % This takes a minute or two for this data
@@ -45,12 +45,19 @@ TGM = eval(strcat('TGM_subj',num2str(subj),'.ct_TGM'));
 [ct_stats1{subj}] = bt_TGMstatslevel1(cfg,data,TGM); %bt_TGMstatslevel2 requires one cell for each participant
 end
 
-% Apply second level statistics
+% The first level results will be very similar for all participants, as we
+% just copy pasted datasets. Moreover, since our cfg.numperm1 is so low,
+% significant testing is disabled on the first level. Let's just close 
+% the plots and turn off 1st level plotting for now.
+close all;
+cfg.figure = 'no';
+
+% Apply second level statistics (group-level)
 cfg.numperms2      = 100000;                    % Number of second level Monte Carlo permutations
 cfg.multiplecorr   = 'fdr';                     % Multiple correction option
 cfg.cluster_p      = 0.05;                      % Threshold for TGM cluster significance testing
 cfg.cluster_n      = 10;                        % Maximum number of clusters
-cfg.cluster_smooth = 1;                         % Width of smoothing window (Gaussian SD), used only for cluster testing
+cfg.cluster_smooth = 2;                         % Width of smoothing window (Gaussian SD), used only for cluster testing
 [ct_stats2] = bt_TGMstatslevel2(cfg,ct_stats1); % Output matrix contains p-values and associated frequencies
 disp('Clock Time results (LOW recurrence)')
 
