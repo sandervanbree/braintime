@@ -162,8 +162,15 @@ while finish==0
     mrk = plot(xvec(maxpowloc),yvec(maxpowloc)./maxp,'o','MarkerSize',15,'LineWidth',4,'Color','r');
     mx = plot([xvec(maxpowloc) xvec(maxpowloc)],[min(yvec),yvec(maxpowloc)/maxp],'LineWidth',3,'Color','r');
     text(xvec(maxpowloc)-(xvec(2)-xvec(1))/2,1.075,[num2str(maxfreq),' Hz'],'Color','red','FontSize',14);
-    xline(minfoi,'Color','k');
+
+    try % I got you, old Matlabs
+    xline(minfoi,'Color','k'); 
     xline(maxfoi,'Color','k');
+    catch
+    hline(minfoi,'Color','k'); 
+    hline(minfoi,'Color','k'); 
+    end
+    
     set(gca,'FontSize',14);
     legend(mrk,'Warping signal',['Warping signal (',num2str(maxfreq),' Hz'])
     xlim([minfft maxfft]);
