@@ -34,7 +34,9 @@ function [fft_sources] = bt_analyzesources(config,configFT,warpsources)
 %                    % removed. The downside is variance across trials
 %                    % in the brain time data's start and end time, as well
 %                    % as the duration being slightly off to the window
-%                    % of interest.
+%                    % of interest. This method is not recommended for
+%                    % TGM diagonal analyses, as the first cycle artefact
+%                    % is minimal there.
 %                             
 %   - rankmethod     % 'maxpow': rank warping sources according to their
 %                    % average power between minfoi and maxfoi.
