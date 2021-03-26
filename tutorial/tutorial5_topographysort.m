@@ -1,14 +1,14 @@
 %%% In tutorial 5 we will make a template topography that can be 
-%%% used to bias the choice of independent components as warping sources.
-%%% In addition, we will take this chance to look at possibilities for
-%%% other parameters in the brain time toolbox pipeline.
+%%% used to bias the ranking of warping sources.
+%%% In addition, we will take this chance to look at another way of
+%%% analyzing TGMs: 'cutartefact'.
 
+%% Generate a template topography
 % Create a template topography, which will be saved in the toolbox
 % topography folder. Please draw two boxes with your cursor, one over each
 % parietal cortex. This is where we've simulated and therefore predict the
 % optimal warping signal to reside.
 
-%% Generate a template topography
 load layout_tutorial
 cfg.layout = layout;
 bt_templatetopo(cfg);
