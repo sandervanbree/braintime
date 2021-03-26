@@ -1,11 +1,33 @@
-%%% In tutorial 3 we will statistically analyze recurrence in the TGMs
-%%% by performing a two-level statistical analysis with four dummy
-%%% participants. Recurrence is compared against recurrence in
-%%% data with permuted classification labels (serving as the null
-%%% distribution).
+%%% In tutorial 4 we will show that besides testing recurrence in TGMs, you
+%%% can also test for rhythmicity on the diagonal of TGMs. That is,
+%%% analyzing classification when training and testing on the same
+%%% timepoint, ignoring how training on one timepoint generalizes to other
+%%% timepoints. Tutorial 4 differs minimally from tutorial 2 and 3 -- the
+%%% only difference is the analysis is done over a 1D vector (the diagonal
+%%% of the TGM), rather than a 2D matrix (the TGM). Theoretically, this
+%%% analysis is optimal when the neural signature underlying your classes
+%%% evolves within your time window of interest.
 
-% Load previously created brain time TGM structures
-load tutorial2_output
+% Since everything was saved, we can jump right into bt_TGMquantify
+load tutorial2_output 
+
+%% Quantify TGM recurrence (compare clock and brain time)
+cfg = [];
+cfg.bt_warpeddata   = bt_warpeddata;              % The warped data structure is required input
+cfg.MVPAcfg         = cfg_mv;                     % Input the MVPA Light config structure
+cfg.figure          = 'yes';
+cfg.mapmethod       = 'diag';                     % Let's see what the output looks like
+                                                  % when analyzing only the diagonal of TGMs.
+                                                                                                    
+cfg.recurrencefoi   = [1 22];                     % Range of tested recurrence rates
+
+cfg.refdimension    = 'clocktime';                % Quantify recurrence as a function of seconds in the data
+ct_TGMquant         = bt_TGMquantify(cfg,ct_TGM); % Clock time
+title('Clock time recurrence');
+
+cfg.refdimension    = 'braintime';                % Quantify recurrence as a function of passed cycles in the data
+bt_TGMquant         = bt_TGMquantify(cfg,bt_TGM); % Brain time
+title('Brain time recurrence');
 
 %% Create four dummy participants with identical data
 TGM_subj1.bt_TGM  = bt_TGMquant; % brain time quantified TGMs
@@ -36,7 +58,7 @@ cfg.mvpacfg         = cfg_mv;          % Input previous MVPA Light config struct
 cfg.figure          = 'no'; 
 cfg.numperms1       = 5;               % Number of permutations on the first level (per participant).
                                        % For real analyses, this should be higher.
-cfg.statsrange      = [1 20];          % Range of tested recurrence rates
+cfg.statsrange      = [1 22];          % Range of tested recurrence rates
 cfg.clabel          = clabel;          % We've saved clabel from last tutorial
 
 for subj = 1:4 % This takes a minute or two for this data
@@ -52,15 +74,9 @@ cfg.cluster_p      = 0.05;                      % Threshold for TGM cluster sign
 cfg.cluster_n      = 10;                        % Maximum number of clusters
 cfg.cluster_smooth = 1;                         % Width of smoothing window (Gaussian SD), used only for cluster testing
 [ct_stats2] = bt_TGMstatslevel2(cfg,ct_stats1); % Output matrix contains p-values and associated frequencies
-disp('Clock Time results (LOW recurrence)')
+disp('Clock Time results (LOW recurrence at 10 Hz)')
 
 %% Brain time statistics
-% If the right warping source was selected, brain time unveils simulated 
-% recurrence. In addition, the time axis transforms from seconds to cycles,
-% and the frequency space normalizes to participants' warping frequency
-% (1 Hz = each participant's warping frequency). In addition, the toolbox
-% displays significant clusters in the TGM.
-
 for subj = 1:4 
 data = eval(strcat('TGM_subj',num2str(subj),'.bt_data'));
 TGM = eval(strcat('TGM_subj',num2str(subj),'.bt_TGM'));
@@ -68,21 +84,10 @@ TGM = eval(strcat('TGM_subj',num2str(subj),'.bt_TGM'));
 end
 
 [bt_stats2] = bt_TGMstatslevel2(cfg,bt_stats1); 
-disp('Brain Time results (HIGH recurrence)')
+disp('Brain Time results (HIGH recurrence at 2 Hz)')
 
-%% Results extraction
-disp(bt_stats2.warpedfreqs);   % Displays the warping frequency and its harmonics.
-                               % Results are predicted at one of these frequencies.
-                               
-disp(bt_stats2.mapmethod);     % Over what dimension was the analysis performed?
+% Depending on the data structure, the TGM and diagonal may show recurrence
+% not at 1 Hz, but at half (0.5 Hz) or double (2 Hz) the warping frequency.
 
-disp(bt_stats2.recurrence);    % A vector of the second level recurrence spectra;
-                               % their frequency and corrected p-values.
-                               % Specifically the bt_stats2.warpedfreqs are
-                               % exempted from multiple testing correction,
-                               % because recurrence is predicted at those
-                               % rates.
-                               
-disp(bt_stats2.TGMclusters);   % These are the clusters in the tested dimension,
-                               % and their associated p-values.
-
+% In this simulation, spurious significant frequencies may arise as one
+% small dataset is copied four times over.
