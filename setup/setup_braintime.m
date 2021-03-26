@@ -17,7 +17,6 @@ end
 % Add all folders and subfolders to path
 braintime_path = fileparts(fileparts(mfilename('fullpath')));
 try
-    addpath(genpath(braintime_path));       
     addpath(genpath(fullfile(braintime_path,'setup')));
     addpath(genpath(fullfile(braintime_path,'clocktobrain')));
     addpath(genpath(fullfile(braintime_path,'tutorial')));
@@ -26,6 +25,7 @@ try
     addpath(genpath(fullfile(braintime_path,'warpingsource')));
     addpath(genpath(fullfile(braintime_path,'dependencies')));
     addpath(genpath(fullfile(braintime_path,'topography')));
+    addpath(genpath(fullfile(braintime_path,'dipolesimulation')));
 catch
     error('Unable to add folders and subfolders to path. Please add all folders and subfolders to get started.');
 end
