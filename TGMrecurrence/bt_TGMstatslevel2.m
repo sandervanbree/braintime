@@ -491,7 +491,7 @@ diagavg_Z = squeeze(mean(emp_clus,2));
     try % For old Matlab versions
     yline(0,'LineWidth',1.5,'Color',[0.6 0.6 0.6]);
     catch
-    vline(0,'LineWidth',1.5,'Color','k');
+    vline(0);
     end
     
     xlim([0,numel(diagavg_Z)]);
@@ -530,7 +530,7 @@ plot(diagavg,'LineWidth',3,'Color',[0 0 0]);
 try % For old Matlab versions
     yline(0.5,'LineWidth',1.5,'Color',[0.6 0.6 0.6]);
 catch
-    vline(0.5,'LineWidth',1.5,'Color','k');
+    vline(0.5);
 end
 
 xlim([0,numel(diagavg_Z)]);

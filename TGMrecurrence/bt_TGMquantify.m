@@ -143,8 +143,8 @@ if figopt == 1 && strcmp(mapmethod,'diag')
     try % For old Matlab versions
     yline(0.5,'LineWidth',1.5,'Color',[0.6 0.6 0.6]);
     catch
-    vline(0.5,'Color','k'); 
-    vline(0.5,'Color','k'); 
+    vline(0.5); 
+    vline(0.5); 
     end
     
     % xlabel is dependent on refdimension
