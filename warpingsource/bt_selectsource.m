@@ -1,21 +1,20 @@
 function [bt_source] = bt_selectsource(config, fft_sources, warpsources)
 % Display the warping sources analyzed and ranked by bt_analyzesources.
-% The user may browse through all warping sources, and selects the warping
-% source. Each warping source contains a potential warping signal which
-% will be used to brain time warp the data. Please select the optimal
-% warping source based on the time-frequency characteristics of the warping
-% signal, the topography of the warping source (for EEG/MEG), and several
-% other criteria described in the function's graphical interface.
+% This allows the user to visually inspect warping sources. Each warping
+% source contains a potential warping signal which can be used to brain
+% time warp the data. Please select the optimal warping source based on the
+% time-frequency characteristics of the warping signal, the topography of
+% the warping source (if relevant), and several other criteria described
+% in the function's graphical interface.
 %
 % Use:
 % [bt_source] = bt_selectsource(cfg,fft_sources,warpsources)
 %
 % Input Arguments:
 % config
-%   - layout         % A FieldTrip layout file to plot warping source data
-%                    % at the sensor level. See ft_prepare_layout for
-%                    % details. This field is not applicable for
-%                    % intracranial data.
+%   - layout         % (Optional) A FieldTrip layout file to plot warping
+%                    % source data at the sensor level. See
+%                    % ft_prepare_layout for details.
 %                    %
 % fft_sources        % Data structure with time frequency information of
 %                    % all warping sources as obtained by
@@ -72,7 +71,7 @@ src_oi = -2; %source of interest
 maxp=max(max(max(powtf(:,:,:)))); %establish maximum power. This will be used to limit axes and normalize power to
 % Sanity check
 if isnan(maxp)
-    error('The time frequency analysis of the warping source analysis has yielded only NaNs. Did you select the right time window?');
+    error('The time frequency analysis of the warping source analysis has yielded only NaNs. Did you select the right time window?, and does your data contain additional time before and after your time window?');
 end
 finish = 0;
 src_ind=1;

@@ -4,7 +4,8 @@ function [fft_sources] = bt_analyzesources(config,configFT,warpsources)
 % will be ranked according to power at frequencies of interest, and
 % may optionally be biased by their topography (see config.rankmethod).
 % Each warping source contains a candidate warping signal (the oscillation
-% with the most power in a range of interest).
+% with the most power in a range of interest), the dynamics of which will 
+% be used to warp clock time data.
 %
 % Use:
 % [fft_sources] = analyzesources(cfg,cfg.FT,warpsources)
@@ -17,18 +18,18 @@ function [fft_sources] = bt_analyzesources(config,configFT,warpsources)
 %                    % be designated warping signal
 %   - correct1f      % (Optional). 'yes' to apply 1/F correction to
 %                    % visualized power spectrum (default: 'yes').
-%   - nwarpsources   % Number of best warping sources to be extracted from
+%   - nwarpsources   % Number of warping sources to be extracted from
 %                    % the total amount of available warping sources.
 %                    %
-%   - cutmethod      % 'consistenttime': warp from start to end of window
-%                    % of interest and no more. The upside of this method
+%   - cutmethod      % 'consistenttime': warp strictly from start to end of
+%                    % window of interest. The upside of this method
 %                    % is that the final brain time data is of the exact
 %                    % intended duration. The downside is an artefact in
 %                    % the first cycle caused by the dynamic time warping
 %                    % algorithm.
 %                    % 
 %                    % 'cutartefact': warp half a second before and after
-%                    % your time window of interest that is later cut. 
+%                    % your time window of interest, which is later cut. 
 %                    % The upside is that the first cycle artefact is 
 %                    % removed. The downside is variance across trials
 %                    % in the brain time data's start and end time, as well
@@ -137,7 +138,7 @@ for src = 1:numsrc
     pspec(:,src)=squeeze(nanmean(powtf(:,:,src),2)); % get power spectrum of warping sources
     [maxpow, maxpowind]= max(pspec(minfoi_ind:maxfoi_ind,src)); % what's the highest power in the freq range of interest and its index?
     oscmaxfreq(src) = (fspec.freq(foivec_ind(maxpowind))); % what's the warping signal?
-    [~, freqidx]=find(abs(oscmaxfreq(src)-fspec.freq)==min(abs(oscmaxfreq(src)-fspec.freq))); % what is the index of the highest power oscillation?
+    [~, freqidx]= find(abs(oscmaxfreq(src)-fspec.freq)==min(abs(oscmaxfreq(src)-fspec.freq))); % what is the index of the highest power oscillation?
     foi_ind(src) = freqidx;
     oscmax(src,:) = [src,oscmaxfreq(src), foi_ind(src),maxpow]; % matrix with warping source number, freq, its index, and its power
     phs{src}=squeeze(angle(fspec_old.fourierspctrm(:,src,foi_ind(src),:))); % fetch phase of warping signal
@@ -163,7 +164,7 @@ if strcmp(config.rankmethod,'templatetopo')
     try
         topo_ind = contains(warpsources.topolabel,temptopo); % Find the indices of the chosen sensors in the channels' labels
     catch
-        error('Channel labels in your template topography mismatch carrier labels')
+        error('Channel labels in your template topography do not match with warping source labels')
     end
     topo = double(topo_ind)*5; % Put high value (5) only for chosen channels
     
@@ -215,5 +216,5 @@ fft_sources{5} = powtf(:,:,srcrank(:,1));                  % Power spectrum of w
 fft_sources{6} = pspec(:,srcrank(:,1));                    % Power spectrum averaged across trials
 fft_sources{7} = phs(srcrank(:,1));                        % Phase of all warping sources for all trials
 fft_sources{8} = config.cutmethod;                         % Applied cutting method
-fft_sources{9} = config.rankmethod;                       % Applied ranking method
+fft_sources{9} = config.rankmethod;                        % Applied ranking method
 end
