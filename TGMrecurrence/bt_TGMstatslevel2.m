@@ -230,7 +230,13 @@ end
 
 %% Plot results
 % Relationship empirical and empirical power at all freqs
-figure;hold on;set(gcf, 'WindowState', 'maximized'); % create full screen figure
+figure;hold on;
+
+% Maximize window
+try set(gcf, 'WindowState', 'maximized');
+catch
+    figure('units','normalized','outerposition',[0 0 1 1]);
+end
 
 if strcmp(refdimension.dim,'braintime') % Only for brain time, separate warped frequency
     subplot(1,10,1:3)
