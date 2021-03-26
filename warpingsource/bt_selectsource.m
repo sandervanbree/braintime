@@ -75,7 +75,13 @@ if isnan(maxp)
 end
 finish = 0;
 src_ind=1;
-f1 = figure;hold on;set(gcf, 'WindowState', 'maximized'); % create full screen figure
+f1 = figure;hold on;
+
+% create full screen figure
+try set(gcf, 'WindowState', 'maximized');
+catch
+    figure('units','normalized','outerposition',[0 0 1 1]);
+end
 
 % Create loop to browse through warping sources 
 while finish==0
