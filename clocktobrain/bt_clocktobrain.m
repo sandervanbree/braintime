@@ -45,7 +45,6 @@ mintime_fft = bt_source{5}.time(1);                  % Start time of interest
 maxtime_fft = bt_source{5}.time(end);                % End time of interest
 sr = bt_source{5}.time(2)-bt_source{5}.time(1);      % Sampling rate
 cutmethod = bt_source{6};                            % Applied cutting method 
-analyzemethod = bt_source{7};                        % Save warping source selection method 
 warpfreq = srcrank(2);                               % Warped frequency (frequency of the warping signal)
 
 if strcmp(cutmethod,'cutartefact')                   % Depending on cutmethod, specify original time window of interest
@@ -71,18 +70,12 @@ cfg           = [];
 cfg.component = src_oi;
 if isfield(config,'removecomp')
     if strcmp(config.removecomp,'yes')
-        if strcmp(analyzemethod,'bt_choosecarrier')
         data = ft_rejectcomponent (cfg, warpsources, data);
-        else
-        error('For component analysis using bt_GEDanalyzechoose, you can remove the component by specifying cfg.removecomp to ''yes'' in bt_GEDanalyzechoose.')
-        end
     end
 else
     % if the removal option is not specified, remove by default
-    if isfield(warpsources.cfg,'method')&&strcmp(analyzemethod,'bt_selectsource') %only makes sense if warping source data are ICA components and if method was bt_selectsource
-        if strcmp(warpsources.cfg.method,'runica')
-    data = ft_rejectcomponent (cfg, warpsources, data);
-        end
+    if strcmp(warpsources.cfg.method,'runica')
+        data = ft_rejectcomponent (cfg, warpsources, data);
     end
 end
 
@@ -114,13 +107,12 @@ bt_data=data;
 nsec=bt_data.time{1}(end)-bt_data.time{1}(1);            % number of seconds in the data
 Ncycles_pre=warpfreq*nsec;                               % number of cycles * seconds
 cycledur=round(phs_sr*nsec/Ncycles_pre);                 % samples for cycle
-tmp_sr=Ncycles_pre*cycledur/nsec;
-tempphs=linspace(-pi,(2*pi*Ncycles_pre)-pi,tmp_sr*nsec); % set up phase bins for unwrapped phase (angular frequency)
+tempsr=Ncycles_pre*cycledur/nsec;
+tempphs=linspace(-pi,(2*pi*Ncycles_pre)-pi,tempsr*nsec); % set up phase bins for unwrapped phase (angular frequency)
 timephs=linspace(0,Ncycles_pre,phs_sr*nsec);             % time vector of the unwrapper phase
 
 for nt=1:size(phs,1)
     tmpphstrl=unwrap((phs(nt,:)));
-%      tmpphstrl = rescale(tmpphstrl,-1,1);
     % Warp phase of single trial onto template phase
     [~,ix,iy] = dtw(tmpphstrl,tempphs);
     
