@@ -16,7 +16,7 @@ function bt_templatetopo(config)
 f = figure;
 cfg.layout  = config.layout;
 layout = ft_prepare_layout(cfg);
-ft_plot_lay(layout)
+ft_plot_layout(layout)
 
 % add the required guidata
 info       = guidata(gcf);
