@@ -1,14 +1,16 @@
-function [bt_TGMquant] = bt_TGMquantify(config, TGM)
-% Quantify the degree of recurrence in the time generalization matrix
-% (TGM). "Recurrence" refers to fluctuating patterns of classification
-% performance, which reflect fluctuations of the studied cognitive process.
-% bt_TGMquantify displays the TGM, its autocorrelation map, and peforms
-% a fast Fourier transform (FFT) over all rows and columns of the TGM.
-% This quantifies recurrence in the TGM, and is necessary for first level
+function [bt_quant] = bt_quantify(config, TGM)
+% Quantify the degree of periodicity in the time generalization matrix
+% (TGM). Here, "periodicity" refers to fluctuating patterns of
+% classification, which reflect fluctuations of the studied cognitive
+% process. This function displays the TGM, its autocorrelation map, and
+% peforms a fast Fourier transform (FFT) over all rows and columns of the
+% TGM, its autocorrelation map, or only the diagonal of the TGM (no
+% generalization). Periodicity quantification is necessary for first level
 % statistics (bt_TGMstatslevel1).
 %
-% Use:
-% [bt_TGMquant] = bt_TGMquantify(cfg, TGM)
+% Use as:
+% [bt_quant] = bt_quantify(cfg, TGM)
+% [ct_quant] = bt_quantify(cfg, TGM) (tip: use name to label output)
 %
 % Input Arguments:
 % config
@@ -21,36 +23,36 @@ function [bt_TGMquant] = bt_TGMquantify(config, TGM)
 %                    % later functions create permuted TGMs using the same
 %                    % classification parameters.
 %                    %
-%   - refdimension   % 'clocktime': find TGM recurrence as a function of
+%   - refdimension   % 'clocktime': find periodicity as a function of
 %                    % clock time seconds in the brain time data.
 %                    %
-%                    % 'braintime': find TGM recurrence as a function of
+%                    % 'braintime': find periodicity as a function of
 %                    % cycles of the warped frequency in the brain time
 %                    & data.
 %                    %
-%   - recurrencefoi  % '[min max]': Range of TGM recurrence frequencies to
+%   - periodicityfoi  % '[min max]': Range of periodicity frequencies to
 %                    % be quantified and statistically tested.
 %                    %
 %                    %
-%   - mapmethod      % 'diag' (default): perform recurrence analysis over
+%   - mapmethod      % 'diag' (default): perform periodicity analysis over
 %                    % the diagonal of the TGM. This ignores cross-temporal
-%                    % recurrence.
+%                    % periodicity.
 %                    %
-%                    % 'ac': perform recurrence analysis over the
+%                    % 'ac': perform periodicity analysis over the
 %                    % autocorrelation map of the TGM. This accentuates
-%                    % the primary recurrence frequency in the TGM, but may
+%                    % the primary periodicity frequency in the TGM, but may
 %                    % drown out other frequencies.
 %                    %
-%                    % 'tgm': perform recurrence analysis over the TGM
+%                    % 'tgm': perform periodicity analysis over the TGM
 %                    % itself. This method is more sensitive to TGMs with
-%                    % multiple recurrence frequencies.
+%                    % multiple periodicity frequencies.
 %                    %
 %   - figure         % 'yes' (default) or 'no': display TGM and its AC map.
 %                    %
 % TGM                % TGM obtained by MVPA Light's mv_classify_timextime
 %                    %
 % Output:            %
-% bt_quantTGM        % Data structure with: TGM or AC map, recurrence
+% bt_quant           % Data structure with: TGM or AC map, periodicity
 %                    % power spectrum, and config details saved for later
 %                    % retrieval.
 
@@ -62,31 +64,31 @@ mapmethod = config.mapmethod;                         % Perform the analysis ove
 MVPAcfg = config.MVPAcfg;                             % MVPA Light configuration structured used to obtain TGM
 refdimension.dim = config.refdimension;               % Extract reference dimension (clock or brain time)
 
-% Set up recurrence range over which stats will be applied
-if isfield(config,'recurrencefoi')
-    powspecrange = config.recurrencefoi(1):config.recurrencefoi(end);
+% Set up periodicity range over which stats will be applied
+if isfield(config,'periodicityfoi')
+    powspecrange = config.periodicityfoi(1):config.periodicityfoi(end);
 else
-    warning('No recurrence frequency range of interest entered under config.recurrencefoi; testing 1 to 30 Hz')
+    warning('No periodicity frequency range of interest entered under config.periodicityfoi; testing 1 to 30 Hz')
     powspecrange = 1:30;
 end
 
 if strcmp(refdimension.dim,'braintime') % Test if range is OK
     if powspecrange(1)/warpfreq > 0.5
-        answer = questdlg('The lowest frequency of the specified recurrence range is too high to test recurrence at half the warped frequency, which is an important harmonic. Please consider increasing it before continuing.', ...
+        answer = questdlg('The lowest frequency of the specified periodicity range is too high to test periodicity at half the warped frequency, which is an important harmonic. Please consider increasing it before continuing.', ...
             'Warning', ...
             'Continue','Cancel','Continue');
         
         if strcmp(answer,'Cancel')
-            error('Please change cfg.recurrencefoi')
+            error('Please change cfg.periodicityfoi')
         end
     elseif powspecrange(end)/warpfreq < 2
         
-        answer = questdlg('The lowest frequency of the specified recurrence range is too low to test recurrence at double the warped frequency, which is an important harmonic. Please consider increasing it before continuing.', ...
+        answer = questdlg('The lowest frequency of the specified recurrence range is too low to test periodicity at double the warped frequency, which is an important harmonic. Please consider increasing it before continuing.', ...
             'Warning', ...
             'Continue','Cancel','Continue');
         
         if strcmp(answer,'Cancel')
-            error('Please change cfg.recurrencefoi')
+            error('Please change cfg.periodicityfoi')
         end
     end
 end
@@ -105,7 +107,7 @@ elseif strcmp(refdimension.dim,'clocktime')
     refdimension.val = duration; %normalize by seconds in the data
     timevec = linspace(toi(1),toi(2),size(TGM,1));
 else
-    error('Please specify cfg.refdimension with ''braintime'' or ''clocktime''. See help bt_TGMquantify or toolbox documentation for more details');
+    error('Please specify cfg.refdimension with ''braintime'' or ''clocktime''. See help bt_quantify or toolbox documentation for more details');
 end
 
 % Perform analysis over TGM, its autocorrelation map (AC), or its diagonal?
@@ -121,7 +123,7 @@ else
     mp = diag(TGM)';
 end
 
-[PS,f] = fftTGM(mp,powspecrange,timevec);
+[PS,f] = bt_fft(mp,powspecrange,timevec);
 pspec_emp = PS;
 
 if isfield(config,'figure')
@@ -135,10 +137,14 @@ end
 % Plotting TGM diagonal (no time generalization)
 if figopt == 1 && strcmp(mapmethod,'diag')
     % Plot Diagonal
-    figure;
+    figure; bt_figure(0);
     subplot(2,1,1)
     xvec = linspace(timevec(1),timevec(end),numel(mp));
-    plot(xvec,mp,'LineWidth',3,'Color',[0 0 0]);
+    plot(xvec,mp,'LineWidth',3,'Color',bt_colorscheme('diagonal'));
+    
+    if isempty(bt_plotparams('diag_ylim'))~=1 % Change y-lim
+    ylim(bt_plotparams('diag_ylim'));
+    end
     
     try % For old Matlab versions
     yline(0.5,'LineWidth',1.5,'Color',[0.6 0.6 0.6]);
@@ -157,8 +163,8 @@ if figopt == 1 && strcmp(mapmethod,'diag')
     title('TGM Diagonal (classifier time course)');
     
     % Adapt font
-    set(gca,'FontName','Arial');
-    set(gca,'FontSize',16);
+    set(gca,'FontName',bt_plotparams('FontName'));
+    set(gca,'FontSize',bt_plotparams('FontSize'));
     
     % Prepare second subplot
     hold on
@@ -167,15 +173,16 @@ if figopt == 1 && strcmp(mapmethod,'diag')
     % Plotting TGMs and AC maps
 elseif figopt == 1 && strcmp(mapmethod,'tgm') || strcmp(mapmethod,'ac')
     % Plot TGM
-    figure;
-    subplot(2,2,1)
+    figure; bt_figure(0);
+    subplot(2,2,1);
     cfg_plot= [];
+    cfg_plot.clim = bt_plotparams('TGM_clim');
     cfg_plot.x   = linspace(timevec(1),timevec(end),size(mp,1));
     cfg_plot.y   = linspace(timevec(1),timevec(end),size(mp,2));
     mv_plot_2D(cfg_plot, TGM);
     cb = colorbar;
-    colormap(flipud(brewermap([],'RdBu')));
-    title(cb,'perf')
+    colormap(bt_colorscheme('TGM'));freezeColors;
+    title(cb,MVPAcfg.metric)
     xlim([timevec(1) timevec(end)]);
     ylim([timevec(1) timevec(end)]);
     xticks(yticks) % make ticks the same on the two axes
@@ -188,23 +195,28 @@ elseif figopt == 1 && strcmp(mapmethod,'tgm') || strcmp(mapmethod,'ac')
         ylabel('Training data (seconds)')
     end
     % Adapt font
-    set(gca,'FontName','Arial')
-    set(gca,'FontSize',16)
+    set(gca,'FontName',bt_plotparams('FontName'));
+    set(gca,'FontSize',bt_plotparams('FontSize'));
     
     % Plot AC map
     mp2 = autocorr2d(TGM);
     
+    % Has user specified a color limit?
+    if isempty(bt_plotparams('AC_clim'))~=1
+    clim = bt_plotparams('AC_clim');
+    else 
     % Detect appropriate color range by zscoring
     mn_ac=median(mp2(:));
     sd_ac=std(mp2(:));
     ac_z=(mp2-mn_ac)/sd_ac;
     indx = (abs(ac_z)<5); %filter to include only z-scores under 5
-    clim = max(mp2(indx)); %take the max number as clim for plotting
+    clim = [-max(mp2(indx)),+max(mp2(indx))]; %take the max number as clim for plotting
+    end
     
-    subplot(2,2,2)
+    subplot(2,2,2);
     pcolor(timevec,timevec,mp2(1:numel(timevec),1:numel(timevec)));shading interp;title('Autocorrelation map');
-    colormap(flipud(brewermap([],'RdBu')));
-    caxis([-clim +clim])
+    colormap(bt_colorscheme('AC'));
+    caxis(clim);freezeColors;
     xticks(linspace(timevec(1),timevec(end),6)); % Create 11 steps
     yticks(xticks);
     xticklabels(linspace(-50,50,6)); % Indicate % shifted
@@ -214,8 +226,8 @@ elseif figopt == 1 && strcmp(mapmethod,'tgm') || strcmp(mapmethod,'ac')
     xlabel('Map shifted by x%')
     ylabel('Map shifted by y%')
     % Adapt font
-    set(gca,'FontName','Arial')
-    set(gca,'FontSize',16)
+    set(gca,'FontName',bt_plotparams('FontName'));
+    set(gca,'FontSize',bt_plotparams('FontSize'));
     
     % Prepare second subplot
     hold on
@@ -223,38 +235,40 @@ elseif figopt == 1 && strcmp(mapmethod,'tgm') || strcmp(mapmethod,'ac')
 end
 
 % Now plot the power spectrum; which is done identically for all mapmethods (only the subplot index is different)
-p1 = plot(f,pspec_emp,'LineStyle','-','LineWidth',3,'Color','b'); %Mean across 1st level perms
-xlabel('Recurrence frequency (Hz)')
-ylabel('Mean power')
+p1 = plot(f,pspec_emp,'LineStyle','-','LineWidth',4,'Color',bt_colorscheme('per_ps_emp')); %Mean across 1st level perms
+xlabel('Periodicity frequency (Hz)')
+ylabel('Periodicity power')
+xlim([f(1) f(end)]);
 
 if strcmp(refdimension.dim,'braintime') %warp freq line is dependent on clock (warped freq) or brain time (1 hz)
-    p3 = line([1 1], [0 max(pspec_emp)],'color',[1 0 1],'LineWidth',4); %Line at warped freq
-    xlabel('Recurrence frequency (factor of warped freq)')
-    p3.Color(4) = 0.45;
+    wfreq_i = nearest(f,1);
+    p3 = line([f(wfreq_i) f(wfreq_i)], [0 max(pspec_emp)],'color',bt_colorscheme('warpingsignal'),'LineWidth',4); %Line at warped freq
+    xlabel('Periodicity frequency (factor of warped freq)')
+    p3.Color(4) = 0.85;
     
     % Add legend
-    legend('Recurrence power','Warped frequency');
+    legend('Periodicity power','Warped frequency');
 end
 
 if strcmp(mapmethod,'diag')
-    title('Recurrence power spectrum of TGM diagonal (classifier time series)');
+    title('Periodicity power spectrum of TGM diagonal (classifier time series)');
 elseif strcmp(mapmethod,'ac')
-    title('Recurrence power spectrum of TGM''s autocorrelation map');
+    title('Periodicity power spectrum of TGM''s autocorrelation map');
 elseif strcmp(mapmethod,'tgm')
-    title('Recurrence power spectrum of TGM');
+    title('Periodicity power spectrum of TGM');
 end
 
 % Adapt font
-set(gca,'FontName','Arial')
-set(gca,'FontSize',16)
+set(gca,'FontName',bt_plotparams('FontName'));
+set(gca,'FontSize',bt_plotparams('FontSize'));
 
 %% Save basic info
-bt_TGMquant.MVPAcfg = MVPAcfg;                          % MVPA Light configuration structured used to obtain TGM
-bt_TGMquant.toi = toi;                                  % Start and end time of interest
-bt_TGMquant.warpfreq = warpfreq;                        % Warped frequency (frequency of the warping signal)
-bt_TGMquant.timevec = timevec;                          % Time vector (different for brain and clock time referencing)
-bt_TGMquant.refdimension = refdimension;                % Reference dimension used
-bt_TGMquant.recurrencefoi = powspecrange;               % Range of tested recurrence frequencies
-bt_TGMquant.TGM = TGM;                                  % Save the TGM itself
-bt_TGMquant.mapmethod = mapmethod;                      % Save whether analysis is done over TGM, AC map, or diag
-bt_TGMquant.pspec_emp = pspec_emp;                      % Recurrence power spectrum of empirical data
+bt_quant.MVPAcfg = MVPAcfg;                          % MVPA Light configuration structured used to obtain TGM
+bt_quant.toi = toi;                                  % Start and end time of interest
+bt_quant.warpfreq = warpfreq;                        % Warped frequency (frequency of the warping signal)
+bt_quant.timevec = timevec;                          % Time vector (different for brain and clock time referencing)
+bt_quant.refdimension = refdimension;                % Reference dimension used
+bt_quant.periodicityfoi = powspecrange;              % Range of tested periodicity frequencies
+bt_quant.TGM = TGM;                                  % Save the TGM itself
+bt_quant.mapmethod = mapmethod;                      % Save whether analysis is done over TGM, AC map, or diag
+bt_quant.pspec_emp = pspec_emp;                      % Periodicity power spectrum of empirical data
