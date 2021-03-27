@@ -1,4 +1,5 @@
 function setup_braintime
+% Check for FieldTrip and MVPA Light, and add brain time folders to path.
 
 % Check for FieldTrip
 if exist('ft_freqanalysis') ~= 2
@@ -18,12 +19,13 @@ end
 braintime_path = fileparts(fileparts(mfilename('fullpath')));
 try
     addpath(genpath(fullfile(braintime_path,'setup')));
+    addpath(genpath(fullfile(braintime_path,'utilities')));
     addpath(genpath(fullfile(braintime_path,'clocktobrain')));
     addpath(genpath(fullfile(braintime_path,'tutorial')));
-    addpath(genpath(fullfile(braintime_path,'TGMrecurrence')));
+    addpath(genpath(fullfile(braintime_path,'periodicity')));
     addpath(genpath(fullfile(braintime_path,'datacheck')));
     addpath(genpath(fullfile(braintime_path,'warpingsource')));
-    addpath(genpath(fullfile(braintime_path,'dependencies')));
+    addpath(genpath(fullfile(braintime_path,'external')));
     addpath(genpath(fullfile(braintime_path,'topography')));
     addpath(genpath(fullfile(braintime_path,'dipolesimulation')));
 catch
