@@ -11,7 +11,7 @@
 % Since everything was saved, we can jump right into bt_TGMquantify
 load tutorial2_output 
 
-%% Quantify TGM recurrence (compare clock and brain time)
+%% Quantify TGM periodicity (compare clock and brain time)
 cfg = [];
 cfg.bt_warpeddata   = bt_warpeddata;              % The warped data structure is required input
 cfg.MVPAcfg         = cfg_mv;                     % Input the MVPA Light config structure
@@ -19,72 +19,72 @@ cfg.figure          = 'yes';
 cfg.mapmethod       = 'diag';                     % Let's see what the output looks like
                                                   % when analyzing only the diagonal of TGMs.
                                                                                                     
-cfg.recurrencefoi   = [1 22];                     % Range of tested recurrence rates
+cfg.periodicityfoi   = [1 22];                     % Range of tested periodicity rates
 
-cfg.refdimension    = 'clocktime';                % Quantify recurrence as a function of seconds in the data
-ct_TGMquant         = bt_TGMquantify(cfg,ct_TGM); % Clock time
-title('Clock time recurrence');
+cfg.refdimension    = 'clocktime';                % Quantify periodicity as a function of seconds in the data
+ct_quant            = bt_quantify(cfg,ct_TGM);    % Clock time
+title('Clock time periodicity');
 
-cfg.refdimension    = 'braintime';                % Quantify recurrence as a function of passed cycles in the data
-bt_TGMquant         = bt_TGMquantify(cfg,bt_TGM); % Brain time
-title('Brain time recurrence');
+cfg.refdimension    = 'braintime';                % Quantify periodicity as a function of passed cycles in the data
+bt_quant            = bt_quantify(cfg,bt_TGM);    % Brain time
+title('Brain time periodicity');
 
 %% Create four dummy participants with identical data
-TGM_subj1.bt_TGM  = bt_TGMquant; % brain time quantified TGMs
-TGM_subj1.bt_data = bt_data;     % brain time electrophysiological data
-TGM_subj1.ct_TGM  = ct_TGMquant; % clock time quantified TGMs
-TGM_subj1.ct_data = ct_data;     % clock time electrophysiological data
+subj1.bt_quant  = bt_quant; % brain time quantified TGMs
+subj1.bt_data   = bt_data;  % brain time electrophysiological data
+subj1.ct_quant  = ct_quant; % clock time quantified TGMs
+subj1.ct_data   = ct_data;  % clock time electrophysiological data
 
-TGM_subj2.bt_TGM  = bt_TGMquant;
-TGM_subj2.bt_data = bt_data;
-TGM_subj2.ct_TGM  = ct_TGMquant;
-TGM_subj2.ct_data = ct_data;
+subj2.bt_quant  = bt_quant;
+subj2.bt_data   = bt_data;
+subj2.ct_quant  = ct_quant;
+subj2.ct_data   = ct_data;
 
-TGM_subj3.bt_TGM  = bt_TGMquant;
-TGM_subj3.bt_data = bt_data;
-TGM_subj3.ct_TGM  = ct_TGMquant;
-TGM_subj3.ct_data = ct_data;
+subj3.bt_quant  = bt_quant;
+subj3.bt_data   = bt_data;
+subj3.ct_quant  = ct_quant;
+subj3.ct_data   = ct_data;
 
-TGM_subj4.bt_TGM  = bt_TGMquant;
-TGM_subj4.bt_data = bt_data;
-TGM_subj4.ct_TGM  = ct_TGMquant;
-TGM_subj4.ct_data = ct_data;
+subj4.bt_quant  = bt_quant;
+subj4.bt_data   = bt_data;
+subj4.ct_quant  = ct_quant;
+subj4.ct_data   = ct_data;
 
 %% Clock time statistics
-% Let's first show that the original data shows little to no recurrence
+% Let's first show that the original data shows little to no periodicity
 
 % First level statistics (single subjects)
 cfg.mvpacfg         = cfg_mv;          % Input previous MVPA Light config structure
 cfg.figure          = 'no'; 
 cfg.numperms1       = 5;               % Number of permutations on the first level (per participant).
                                        % For real analyses, this should be higher.
-cfg.statsrange      = [1 22];          % Range of tested recurrence rates
+cfg.statsrange      = [1 22];          % Range of tested periodicity rates
 cfg.clabel          = clabel;          % We've saved clabel from last tutorial
 
 for subj = 1:4 % This takes a minute or two for this data
-data = eval(strcat('TGM_subj',num2str(subj),'.ct_data'));
-TGM = eval(strcat('TGM_subj',num2str(subj),'.ct_TGM'));
-[ct_stats1{subj}] = bt_TGMstatslevel1(cfg,data,TGM); %bt_TGMstatslevel2 requires one cell for each participant
+data = eval(strcat('subj',num2str(subj),'.ct_data'));
+quant = eval(strcat('subj',num2str(subj),'.ct_quant'));
+[ct_stats1{subj}] = bt_statslevel1(cfg,data,quant); %bt_statslevel2 requires one cell for each participant
 end
 
 % Apply second level statistics
 cfg.numperms2      = 100000;                    % Number of second level Monte Carlo permutations
 cfg.multiplecorr   = 'fdr';                     % Multiple correction option
-cfg.cluster_p      = 0.05;                      % Threshold for TGM cluster significance testing
+cfg.cluster_p      = 0.55;                      % Threshold for TGM cluster significance testing
 cfg.cluster_n      = 10;                        % Maximum number of clusters
-cfg.cluster_smooth = 1;                         % Width of smoothing window (Gaussian SD), used only for cluster testing
-[ct_stats2] = bt_TGMstatslevel2(cfg,ct_stats1); % Output matrix contains p-values and associated frequencies
-disp('Clock Time results (LOW recurrence at 10 Hz)')
+cfg.cluster_smooth = 2;                         % Width of smoothing window (Gaussian SD), used only for cluster testing
+[ct_stats2] = bt_statslevel2(cfg,ct_stats1);    % Output matrix contains p-values and associated frequencies
+disp('Clock Time results (LOW periodicity)')
 
 %% Brain time statistics
 for subj = 1:4 
-data = eval(strcat('TGM_subj',num2str(subj),'.bt_data'));
-TGM = eval(strcat('TGM_subj',num2str(subj),'.bt_TGM'));
-[bt_stats1{subj}] = bt_TGMstatslevel1(cfg,data,TGM);
+data = eval(strcat('subj',num2str(subj),'.bt_data'));
+quant = eval(strcat('subj',num2str(subj),'.bt_quant'));
+[bt_stats1{subj}] = bt_statslevel1(cfg,data,quant);
 end
 
-[bt_stats2] = bt_TGMstatslevel2(cfg,bt_stats1); 
-disp('Brain Time results (HIGH recurrence at 2 Hz)')
+[bt_stats2] = bt_statslevel2(cfg,bt_stats1); 
+disp('Brain Time results (HIGH periodicity)')
 
 % Depending on the data structure, the TGM and diagonal may show recurrence
 % not at 1 Hz, but at half (0.5 Hz) or double (2 Hz) the warping frequency.
