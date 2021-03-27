@@ -1,12 +1,12 @@
 %%% In tutorial 1 we will transform data from clock time (input) to
 %%% brain time (output). The tutorial loads two classes of simulated data,
 %%% generated using dipole simulation. We will brain time warp the middle
-%%% segment of the dataset -- 1 to 2s.
+%%% segment of the dataset: 1 to 2s.
 %%% 
 %%% The simulation comprises a simple rhythmic attentional model, where
 %%% attention is oriented to the left (class 1) or right (class 2)
-%%% hemifield. We simulated a recurring pattern at 10 Hz, and introduced
-%%% different phases at the start of each trial, and frequency drift within
+%%% hemifield. The dipoles of interest oscillate at 10 Hz, but start
+%%% with a different phase between trials, and show frequency drift within
 %%% trials. For details on this simulation, please refer to:
 %%% (.../dipolesimulation/bt_dipsim.m).
 %%%
@@ -26,12 +26,13 @@ ct_data.trialinfo = clabel;
 
 % It is important that the data is not or minimally high pass
 % filtered, as this can introduce strong artifacts in later steps in the
-% toolbox (see van Driel et al., 2021; https://doi.org/10.1016/j.jneumeth.2021.109080)
+% toolbox. See van Driel et al., 2021; https://doi.org/10.1016/j.jneumeth.2021.109080
+% for details and recommendations.
 
 %% Step 2: Extract warping sources, which contain warping signals
-% "Warping source": The data that contains your warping singal. These can
+% "Warping source": The data that contains your warping signal. These can
 % be ICA components, source localized data, LFP from macrowires, etc.
-% "Warping signal": A frequency of interest within warping sources. The
+% "Warping signal": A signal of interest within warping sources. The
 % clock time data will be warped according to this signal's dynamics.
 cfg              = [];
 cfg.method       = 'runica';
@@ -49,8 +50,10 @@ cfg.time         = [1 2];            % time window of interest (1 to 2s)
 cfg.warpfreqs    = [10 10];          % frequency range of interest for brain time (10 to 10 Hz; usually a band)
 cfg.correct1f    = 'yes';            % apply 1/f correction after FFT, for plotting purposes only
 cfg.nwarpsources  = 10;              % consider only the 10 best warping sources
-cfg.rankmethod   = 'maxpow';         % sort warping sources by power in frequency range of interest. Alternative: 'templatetopo' (see tutorial 4)
-cfg.cutmethod    = 'consistenttime'; % 'cutartefact' or 'consistenttime' See "help bt_analyzecarriers" or our paper for details
+cfg.rankmethod   = 'maxpow';         % sort warping sources by power in frequency range of interest.
+                                     %  Alternative: 'templatetopo' (see tutorial 4)
+cfg.cutmethod    = 'consistenttime'; % 'cutartefact' or 'consistenttime' See "help bt_analyzecarriers"
+                                     % or our paper for details
 
 % Fieldtrip configuration
 cfgFT            = [];               % FieldTrip configuration structure, input to ft_freqanalysis
@@ -71,7 +74,8 @@ cfg.layout       = layout;           % load template for topography plotting (no
 %% Step 5: Warp clock time to brain time
 cfg              = [];
 cfg.bt_srate     = 200;              % specify the sampling rate of bt_data
-cfg.removecomp   = 'no';             % remove component when using brain time warped data outside the toolbox to avoid circularity
+cfg.removecomp   = 'no';             % remove component when using brain time warped data outside
+                                     % the toolbox to avoid circularity
 [bt_warpeddata]  = bt_clocktobrain(cfg,ct_data,bt_source);
 
 % cut ct_data to the same time window
@@ -81,3 +85,10 @@ ct_data    = ft_redefinetrial(cfg, ct_data);
 
 % Save results for tutorial 2
 save tutorial1_output bt_warpeddata ct_data
+
+% Your data is now in brain time. This means the original data is rescaled
+% based on the phase dynamics of your warping signal. You can now use your
+% transformed data in your own analyses (though ensure cfg.removecomp was
+% on 'yes' to avoid circularity). You may also test whether brain time
+% warping has unveiled periodic patterns in your data by applying
+% classification. To see how this is done, check out the next tutorials.
