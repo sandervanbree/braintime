@@ -1,8 +1,8 @@
 %%% In tutorial 2 we will take the transformed brain time data and
 %%% analyze it by applying a classifier, and cross-time generalization.
 %%% We will analyze the periodicity in classifier performance to visually
-%%% demonstrate that brain time warping has unveiled the hidden periodic
-%%% pattern.
+%%% demonstrate that brain time warping has accentuated the simulated
+%%% periodic pattern.
 
 load tutorial1_output
 
@@ -31,7 +31,7 @@ cfg = [];
 cfg.bt_warpeddata   = bt_warpeddata;              % The warped data structure is required input
 cfg.MVPAcfg         = cfg_mv;                     % Input the MVPA Light config structure
 cfg.figure          = 'yes';
-cfg.mapmethod       = 'tgm';                      % perform analysis over TGM ('tgm'), 
+cfg.mapmethod       = 'ac';                       % perform analysis over TGM ('tgm'), 
                                                   % autocorrelation map of the TGM ('ac')
                                                   % or the diagonal of the TGM ('diag').
                                                   % Analyzing on the TGM is better when patterns
@@ -51,6 +51,10 @@ title('Clock time periodicity');
 cfg.refdimension    = 'braintime';                % Quantify periodicity as a function of passed cycles in the data
 bt_quant         = bt_quantify(cfg,bt_TGM);       % Brain time
 title('Brain time periodicity');
+
+% If you chose the right independent component, you should be able to see
+% improvements in the autocorrelation map and periodicity spectrum after
+% brain time warping.
 
 % Save results for tutorial 3
 save tutorial2_output
