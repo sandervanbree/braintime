@@ -22,7 +22,7 @@ function [bt_source] = bt_selectsource(config, fft_sources, warpsources)
 %                    %
 % warpsources        % FieldTrip data structure that contains warping
 %                    % sources (ICA components, virtual channels,
-%                    % or LFP time). Each warping source contains a 
+%                    % or LFP time). Each warping source contains a
 %                    % warping signal, one of which will be selected here.
 %                    %
 % Output:            %
@@ -37,12 +37,12 @@ minfoi = fft_sources{3}(1);                            % Lowest possible warping
 maxfoi = fft_sources{3}(2);                            % Highest possible warping frequency
 fspecinfo = fft_sources{4};                            % FFT time and frequency vector
 minfft = fspecinfo.freq(1);                            % Lowest analyzed freq in FFT
-maxfft = fspecinfo.freq(end);                            % Highest analyzed freq in FFT
+maxfft = fspecinfo.freq(end);                          % Highest analyzed freq in FFT
 powtf = fft_sources{5};                                % Power spectrum of warping sources
 pspec = fft_sources{6};                                % Power spectrum averaged across trials
 phs = fft_sources{7};                                  % Phase of all warping sources for all trials
 cutmethod = fft_sources{8};                            % Applied cutting method
-rankmethod = fft_sources{9};                          % Applied ranking method
+rankmethod = fft_sources{9};                           % Applied ranking method
 
 mintime_ind = nearest(fspecinfo.time,mintime);             % Index of start time of interest (differs for cutartefact)
 maxtime_ind = nearest(fspecinfo.time,maxtime);             % Index of end time of interest
@@ -62,9 +62,9 @@ msg = ['The warping sources are ranked by ',ranktype,newline,...
     '(1) time frequency characteristics',newline,...
     '(2) topography of interest (if applicable)',newline,...
     '(3) variance explained (for ICA components, lower source number means higher r^2)',newline,newline,...
-     'INSTRUCTIONS:',newline,...
-     'Press \leftarrow or \rightarrow arrow to see the previous or next warping source. Click on a',newline,...
-     'warping source to highlight it, then keep browsing or press ''Q'', spacebar, or enter to quit.'];
+    'INSTRUCTIONS:',newline,...
+    'Press \leftarrow or \rightarrow arrow to see the previous or next warping source. Click on a',newline,...
+    'warping source to highlight it, then keep browsing or press ''Q'', spacebar, or enter to quit.'];
 
 % Prepare figure
 src_oi = -2; %source of interest
@@ -77,13 +77,10 @@ finish = 0;
 src_ind=1;
 f1 = figure;hold on;
 
-% create full screen figure
-try set(gcf, 'WindowState', 'maximized');
-catch
-    figure('units','normalized','outerposition',[0 0 1 1]);
-end
+% Adapt figure
+bt_figure;
 
-% Create loop to browse through warping sources 
+% Create loop to browse through warping sources
 while finish==0
     if src_ind < 1 % make sure source number cannot go out of bounds
         src_ind = 1;
@@ -94,15 +91,16 @@ while finish==0
     % Establish current warping source and its maximum frequency
     currsrc = srcrank(src_ind);
     maxfreq = srcrank(src_ind,2);
-     
-    subplot(8,2,[1 3]);
-    text(0,0.5,msg,'FontName','Arial','FontSize',11.5); axis off
     
-    subplot(8,2,[7 9 11 13 15]);
+    subplot(8,2,[1 3]);
+    inst = text(0,0.5,msg,'FontName','Arial','FontSize',11.5); axis off
+    
+    sp1 = subplot(8,2,[7 9 11 13 15]);
     % Only plot topography if layout is specified
     if isfield(config,'layout')
         % warping source topography
         cfg           = [];
+        cfg.figure    = sp1;
         cfg.component = currsrc; % specify the source(s) that should be plotted
         cfg.layout    = config.layout; % specify the layout file that should be used for plotting
         cfg.comment   = 'no';
@@ -121,8 +119,10 @@ while finish==0
         colorbar;
         lim=max(abs(warpsources.topo(:,currsrc)));
         lim=lim+(lim/100*10);
-        caxis([-lim lim])
-    else % Notify user layout is preferred where available
+        caxis([-lim lim]); colorbar('off');
+        colormap(bt_colorscheme('topography'));freezeColors;
+        
+    else % Notify user layout is preferred, if relevant
         msg2 = ['Warning: As no layout was specified in cfg.layout,',newline,...
             'the sources'' topography will not be plotted.',newline,...
             'For MEG and EEG it is recommended to specify',newline,...
@@ -136,60 +136,65 @@ while finish==0
     
     title({['Warping source ', num2str(currsrc),' (',num2str(src_ind) '/' num2str(size(srcrank,1)),')']},'FontName','Arial','FontSize',14)
     
-    % Time-frequency plot   
+    % Time-frequency plot
     subplot(8,2,[2 4 6 8]);
     pcolor(fspecinfo.time(mintime_ind:maxtime_ind),fspecinfo.freq,powtf(:,:,src_ind));
     shading interp
     ylim([minfft maxfft]);
-    caxis([0 maxp])
     xlabel('Time (s)')
     ylabel('Frequency (Hz)')
-    yl = line([mintime,maxtime],[maxfreq, maxfreq],'Color','r','LineWidth',4);
-    text((maxtime+mintime)/2,maxfreq+1,[num2str(maxfreq),'Hz'],'FontSize',14,'Color','r')
-    rec1 = rectangle('Position',[mintime,minfoi,maxtime-mintime,maxfoi-minfoi],'EdgeColor','k');
-    legend(yl','Warping signal')
+    warps_line = line([mintime,maxtime],[maxfreq, maxfreq],'Color',bt_colorscheme('warpingsignal'),'LineWidth',4);
+    minfoi_l = line([mintime,maxtime],[minfoi, minfoi],'Color',bt_colorscheme('foi_borders'),'LineWidth',1);
+    maxfoi_l = line([mintime,maxtime],[maxfoi, maxfoi],'Color',bt_colorscheme('foi_borders'),'LineWidth',1);
+    text((maxtime+mintime)/2,maxfreq+1,[num2str(maxfreq),' Hz'],'FontSize',14,'fontweight', 'bold','Color','k')
+    legend(warps_line','Warping signal')
     set(gca,'FontSize',14);
-    title(sprintf('Warping source %d | Warping signal: %0.3f power at %0.2fHz',currsrc,(srcrank(src_ind,4))/maxp,maxfreq),'FontSize',14) 
-
+    title(sprintf('Warping source %d | Warping signal: %0.3f power at %0.2fHz',currsrc,(srcrank(src_ind,4))/maxp,maxfreq),'FontSize',14)
+    colormap(bt_colorscheme('ephys_tfr'));freezeColors;
+    
     % Dominant oscillation plot
     subplot(8,2,[12 14 16]);
     
     % Mark max pow and frequency of interest window
     xvec = fspecinfo.freq;
     yvec = squeeze(pspec(:,src_ind,1));
-    maxpowloc = nearest(xvec,maxfreq); %Identify the warping signal location (max power) 
-    plot(xvec,yvec./maxp,'LineWidth',5);hold on
-    mrk = plot(xvec(maxpowloc),yvec(maxpowloc)./maxp,'o','MarkerSize',15,'LineWidth',4,'Color','r');
-    mx = plot([xvec(maxpowloc) xvec(maxpowloc)],[min(yvec),yvec(maxpowloc)/maxp],'LineWidth',3,'Color','r');
-    text(xvec(maxpowloc)-(xvec(2)-xvec(1))/2,1.075,[num2str(maxfreq),' Hz'],'Color','red','FontSize',14);
-
-    try % I got you, old Matlabs
-    xline(minfoi,'Color','k'); 
-    xline(maxfoi,'Color','k');
+    maxpowloc = nearest(xvec,maxfreq); %Identify the warping signal location (max power)
+    plot(xvec,yvec./maxp,'LineWidth',5,'Color',bt_colorscheme('foi_borders'));hold on
+    w_mrk = plot(xvec(maxpowloc),yvec(maxpowloc)./maxp,'o','MarkerSize',15,'LineWidth',4,'Color',bt_colorscheme('warpingsignal'));
+    w_ln = plot([xvec(maxpowloc) xvec(maxpowloc)],[-0.03,yvec(maxpowloc)/maxp],'LineWidth',3,'Color',bt_colorscheme('warpingsignal'));
+    text(xvec(maxpowloc)-(xvec(2)-xvec(1))/2,1.075,[num2str(maxfreq),' Hz'],'Color','k','fontweight', 'bold','FontSize',14);
+    
+    try % I got you, old Matlab version users
+        xline(minfoi,'Color',bt_colorscheme('foi_borders'),'LineWidth',1.5);
+        xline(maxfoi,'Color',bt_colorscheme('foi_borders'),'LineWidth',1.5);
     catch
-    hline(minfoi); 
-    hline(maxfoi); 
+        hline(minfoi);
+        hline(maxfoi);
     end
     
     set(gca,'FontSize',14);
-    legend(mrk,'Warping signal',['Warping signal (',num2str(maxfreq),' Hz'])
+    legend(w_mrk,'Warping signal',['Warping signal (',num2str(maxfreq),' Hz'])
     xlim([minfft maxfft]);
-    ylim([0 1])
+    ylim([-0.03 1.03])
     xlabel('Frequency (Hz)')
     ylabel('Power (a.u.)'); hold off
-    
+       
     % Adapt figure based on keypress
     keydown = waitforbuttonpress;
     value = double(get(gcf,'CurrentCharacter'));
     [~,~,keyCode] = KbCheck;
     key = KbName(find(keyCode));
-
+    
+    if exist('inst','var')
+        delete(inst)
+    end
+    
     if (keydown == 0) %grab the source if click
         src_oi=src_ind;
         if exist('ann','var')
             delete(ann)
         end
-        ann = annotation('textbox',[0.18 0.19 .5 .5],'String',['Warping source ', num2str(currsrc) ,' is highlighted'],'FitBoxToText','on','Color','red','FontSize',20);axis off
+        ann = annotation('textbox',[0.18 0.19 .5 .5],'String',[' Warping source ', num2str(currsrc) ,' is highlighted'],'FitBoxToText','on','Color',bt_colorscheme('warpingsignal'),'FontSize',20,'fontweight','bold','LineWidth',1.5,'EdgeColor',[0.1 0.1 0.1]);axis off
     elseif value == 28 %go back previous source if press back arrow
         src_ind = src_ind-1;
     elseif value == 29 %go back previous source if press back arrow
@@ -201,7 +206,7 @@ while finish==0
         fprintf('Warping signal will be the %0.2fHz phase in warping source %d.',maxfreq,currsrc)
         src_ind = (numel(srcrank))+1;
         close(f1)
-        finish = 1;   
+        finish = 1;
     end
 end
 
@@ -214,5 +219,3 @@ bt_source{3} = warpsources;                        % Warping sources data
 bt_source{4} = srcrank(src_oi,:);                  % Time freq data of chosen warping source
 bt_source{5} = fspecinfo;                          % FFT time and frequency vector
 bt_source{6} = cutmethod;                          % Applied cutting method
-bt_source{7} = [mintime_ind, maxtime_ind];         % Index of start and end time of interest (differs for cutartefact) 
-bt_source{8} = 'bt_selectsource';                  % Save source selection method
