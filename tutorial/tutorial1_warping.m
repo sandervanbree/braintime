@@ -84,7 +84,7 @@ cfg.toilim = [bt_warpeddata.toi(1) bt_warpeddata.toi(2)];
 ct_data    = ft_redefinetrial(cfg, ct_data);
 
 % Save results for tutorial 2
-save tutorial1_output bt_warpeddata ct_data
+save tutorial1_output bt_warpeddata ct_data warpsources
 
 % Your data is now in brain time. This means the original data is rescaled
 % based on the phase dynamics of your warping signal. You can now use your

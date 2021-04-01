@@ -1,15 +1,12 @@
-%%% In tutorial 5 we will brain time warp intracranial data, based on
-%%% recordings with a Behnke Fried electrode. In this tutorial, the clock
-%%% time data and carrier oscillation come from different recording
-%%% sources. Clock time data are spike trains convolved with a smoothing
-%%% kernel. The channel data with electable carrier oscillations are LFP
-%%% recordings. This differs from tutorial 1, where clock time data
-%%% and carrier channel data came from the same data structure.
+%%% In tutorial 6 we will brain time warp intracranial data. The data
+%%% consists of spike series and LFP obtained from the rat hippocampus.
+%%% ASK SIMON FOR SHORT METHODOLOGICAL DETAILS
 %%%
-%%% TO DEVS: I have found intracranial data that is more suited (i.e. it
-%%% shows recurrence only in brain time), but it is too large for Github.
-%%% As soon as I found a way to properly downsample, I will replace
-%%% c1_data_tut5 and c2_data_tut5.
+%%% There are no limitations to the type of electrophysiological data that 
+%%% can be used in the toolbox. All that is required is a FieldTrip
+%%% formatted datastructure with the to-be-warped data (clock time data),
+%%% and a FieldTrip structure with warping sources. Thus, EEG, MEG, and
+%%% intracranial data all work.
 
 % Load two classes of data and carrier LFP (see tutorial folder)
 load c1_data_tut5 % contains spike and LFP data for c1
