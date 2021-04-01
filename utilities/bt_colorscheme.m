@@ -64,11 +64,8 @@ TGM = flipud(brewermap([],'RdBu'));
 % Color map for Autocorrelation Maps
 AC = flipud(brewermap([],'RdBu'));
 
-
-
-
-
-
+% Colors used for different frequencies in bt_checksymmetry
+symmetry = brewermap([],'Set1');
 
 
 %% Output requested map or color values
