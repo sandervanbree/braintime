@@ -58,7 +58,7 @@ cutmethod = bt_source{6};                              % Applied cutting method
 warpfreq = srcrank(2);                                 % Warped frequency (frequency of the warping signal)
 wavshape = bt_source{7};                               % Average waveshape of the data
 
-method = bt_defaultval(config,'method','stationary');  % Set method for warping (default: stationary)
+warpmethod = bt_defaultval(config,'warpmethod','stationary');  % Set method for warping (default: stationary)
 
 if strcmp(cutmethod,'cutartefact')                     % Depending on cutmethod, specify original time window of interest
     mintime = mintime_fft+0.5;
@@ -122,15 +122,15 @@ Ncycles_pre=warpfreq*nsec;                                    % number of cycles
 cycledur=round(phs_sr*nsec/Ncycles_pre);                      % samples for cycle
 tempsr=Ncycles_pre*cycledur/nsec;
 
-if strcmp(method,'stationary')                                % warp using stationary sinusoid
+if strcmp(warpmethod,'stationary')                            % warp using stationary sinusoid
     tempphs=linspace(-pi,(2*pi*Ncycles_pre)-pi,tempsr*nsec);  % set up phase bins for unwrapped phase (angular frequency)
     
-elseif strcmp(method,'waveshape')                             % warp using average waveshape
+elseif strcmp(warpmethod,'waveshape')                         % warp using average waveshape
     waveshape = smoothdata(wavshape,'gaussian',100);          % smooth substantially
     [~,trgh] = findpeaks(-waveshape);                         % find troughs
     
-    if numel(trgh)~=2                                         % if there are not 2 troughs, this likely means the data is too noisy
-        error(['The waveshape of the warping signal is',...
+    if numel(trgh)~=2                                         % if there are not 2 troughs, this likely
+        error(['The waveshape of the warping signal is',...   % means the data is too noisy
             ' too noisy. Please select cfg.method =',...
             ' ''stationary'' and try again.']);
     end
@@ -214,4 +214,4 @@ bt_warpeddata.data = bt_data;                                     % Brain time w
 bt_warpeddata.toi = [min_t max_t];                                % Start and end time of interest
 bt_warpeddata.freq = warpfreq;                                    % Warped frequency (frequency of the warping signal)
 bt_warpeddata.clabel = bt_data.trialinfo;                         % Classification labels
-bt_warpeddata.method = method;                                    % Warping method
+bt_warpeddata.method = warpmethod;                                    % Warping method
