@@ -23,6 +23,16 @@ function [bt_warpeddata] = bt_clocktobrain(config, data, bt_source)
 %                    %
 %                    % 'no': keeps component in the brain time data.
 %                    %
+%   - method         % warping method: the desired template oscillation
+%                    % for warping.
+%                    %
+%                    % 'stationary': warp to a stationary sinusoid at the
+%                    % warping frequency (default).
+%                    %
+%                    % 'waveshape': warp to the average waveshape of the
+%                    % warping signal. Recommended for asymmetric warping
+%                    % signals.
+%                    %
 % data               % Clock time data structure consisting of both
 %                    % classes.
 %                    %
@@ -37,17 +47,20 @@ function [bt_warpeddata] = bt_clocktobrain(config, data, bt_source)
 %                    % config details saved for later retrieval.
 
 %% Get basic info
-src_oi = bt_source{1};                               % Warping source which contains the warping signal
-phs = cell2mat(bt_source{2});                        % Phase of all frequencies in this warping source
-warpsources = bt_source{3};                          % Warping source data 
-srcrank = bt_source{4};                              % Time freq data of selected warping signal
-mintime_fft = bt_source{5}.time(1);                  % Start time of interest
-maxtime_fft = bt_source{5}.time(end);                % End time of interest
-sr = bt_source{5}.time(2)-bt_source{5}.time(1);      % Sampling rate
-cutmethod = bt_source{6};                            % Applied cutting method 
-warpfreq = srcrank(2);                               % Warped frequency (frequency of the warping signal)
+src_oi = bt_source{1};                                 % Warping source which contains the warping signal
+phs = cell2mat(bt_source{2});                          % Phase of all frequencies in this warping source
+warpsources = bt_source{3};                            % Warping source data
+srcrank = bt_source{4};                                % Time freq data of selected warping signal
+mintime_fft = bt_source{5}.time(1);                    % Start time of interest
+maxtime_fft = bt_source{5}.time(end);                  % End time of interest
+sr = bt_source{5}.time(2)-bt_source{5}.time(1);        % Sampling rate
+cutmethod = bt_source{6};                              % Applied cutting method
+warpfreq = srcrank(2);                                 % Warped frequency (frequency of the warping signal)
+wavshape = bt_source{7};                               % Average waveshape of the data
 
-if strcmp(cutmethod,'cutartefact')                   % Depending on cutmethod, specify original time window of interest
+method = bt_defaultval(config,'method','stationary');  % Set method for warping (default: stationary)
+
+if strcmp(cutmethod,'cutartefact')                     % Depending on cutmethod, specify original time window of interest
     mintime = mintime_fft+0.5;
     maxtime = maxtime_fft-0.5;
 else
@@ -91,9 +104,9 @@ end
 data       = ft_redefinetrial(cfg, data);
 
 % Check whether phase and data are of the same length
-    if abs(length(data.time{1})-size(phs,2))>1
-        warning('phase vector and data differ in length by more than 1 sample. This may mean the wrong parameters were used during bt_analyzesources');
-    end   
+if abs(length(data.time{1})-size(phs,2))>1
+    warning('phase vector and data differ in length by more than 1 sample. This may mean the wrong parameters were used during bt_analyzesources');
+end
 if size(phs,2) > length(data.time{1})
     phs=phs(:,1:length(data.time{1}));
 elseif length(data.time{1}) > size(phs,2)
@@ -104,12 +117,39 @@ end
 
 %% Warp the phase of the warping signal to the phase of a stationary oscillation
 bt_data=data;
-nsec=bt_data.time{1}(end)-bt_data.time{1}(1);            % number of seconds in the data
-Ncycles_pre=warpfreq*nsec;                               % number of cycles * seconds
-cycledur=round(phs_sr*nsec/Ncycles_pre);                 % samples for cycle
+nsec=bt_data.time{1}(end)-bt_data.time{1}(1);                 % number of seconds in the data
+Ncycles_pre=warpfreq*nsec;                                    % number of cycles * seconds
+cycledur=round(phs_sr*nsec/Ncycles_pre);                      % samples for cycle
 tempsr=Ncycles_pre*cycledur/nsec;
-tempphs=linspace(-pi,(2*pi*Ncycles_pre)-pi,tempsr*nsec); % set up phase bins for unwrapped phase (angular frequency)
-timephs=linspace(0,Ncycles_pre,phs_sr*nsec);             % time vector of the unwrapper phase
+
+if strcmp(method,'stationary')                                % warp using stationary sinusoid
+    tempphs=linspace(-pi,(2*pi*Ncycles_pre)-pi,tempsr*nsec);  % set up phase bins for unwrapped phase (angular frequency)
+    
+elseif strcmp(method,'waveshape')                             % warp using average waveshape
+    waveshape = smoothdata(wavshape,'gaussian',100);          % smooth substantially
+    [~,trgh] = findpeaks(-waveshape);                         % find troughs
+    
+    if numel(trgh)~=2                                         % if there are not 2 troughs, this likely means the data is too noisy
+        error(['The waveshape of the warping signal is',...
+            ' too noisy. Please select cfg.method =',...
+            ' ''stationary'' and try again.']);
+    end
+    
+    waveshape_cut = waveshape(trgh(1)+1:trgh(2));             % cut waveshape to one cycle (-cos)
+    tempsig = repmat(waveshape_cut,[1 floor(Ncycles_pre)]);   % repeat wave Ncycles_pre times (round down)
+    misscycs = Ncycles_pre-floor(Ncycles_pre);                % check if rounding down lost us anything
+    extrasamps = round(numel(waveshape_cut)*misscycs);        % how many samples of the cut cycle were lost
+    
+    if misscycs~=0                                            % append those to the template signal
+    tempsig = [tempsig, waveshape_cut(1:extrasamps)];
+    end
+    
+    tempphs = angle(hilbert(tempsig));                        % get the phase using Hilbert transform
+    tempphs = unwrap(tempphs);                                % unwrap the phase
+    tempphs = imresize(tempphs,[1 tempsr*nsec]);              % resize to the desired length
+end
+
+timephs=linspace(0,Ncycles_pre,phs_sr*nsec);                  % time vector of the unwrapper phase
 
 for nt=1:size(phs,1)
     tmpphstrl=unwrap((phs(nt,:)));
@@ -174,3 +214,4 @@ bt_warpeddata.data = bt_data;                                     % Brain time w
 bt_warpeddata.toi = [min_t max_t];                                % Start and end time of interest
 bt_warpeddata.freq = warpfreq;                                    % Warped frequency (frequency of the warping signal)
 bt_warpeddata.clabel = bt_data.trialinfo;                         % Classification labels
+bt_warpeddata.method = method;                                    % Warping method
