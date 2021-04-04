@@ -49,7 +49,7 @@ Warp electrophysiological data from clock time to brain time and analyze the per
 | General term | description |
 | --- | --- |
 | Temporal Generalization Matrix (TGM) | training a classifier on one timepoint, and testing it on all other timepoints in the data |
-| Generalized eigendecomposition (GED) | mathematical approach to combine signals in different warping sources into a single timeseries |
+| Generalized eigendecomposition (GED) | a mathematical approach to combine signals in different warping sources into a single timeseries |
 
 ## Table of contents
 [Installation](#installation)
