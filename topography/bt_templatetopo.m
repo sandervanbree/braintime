@@ -30,9 +30,9 @@ guidata(gcf, info)
     'The resulting template topography will be saved in the toolbox''s topography subfolder for retrieval when you enter cfg.sortmethod = ''templatetopo'' in bt_analyzecomps.'});
 
     % call to select_channel_ibm (slightly modified for the Brain Time Toolbox)
-    set(gcf, 'WindowButtonDownFcn',   {@select_channel_ibm, 'multiple', true, 'callback', @disp, 'event', 'WindowButtonDownFcn'})
-    set(gcf, 'WindowButtonUpFcn',     {@select_channel_ibm, 'multiple', true, 'callback', @disp, 'event', 'WindowButtonDownFcn'})
-    set(gcf, 'WindowButtonMotionFcn', {@select_channel_ibm, 'multiple', true, 'callback', @disp, 'event', 'WindowButtonDownFcn'})
+    set(gcf, 'WindowButtonDownFcn',   {@ft_select_channel_btt, 'multiple', true, 'callback', @disp, 'event', 'WindowButtonDownFcn'})
+    set(gcf, 'WindowButtonUpFcn',     {@ft_select_channel_btt, 'multiple', true, 'callback', @disp, 'event', 'WindowButtonDownFcn'})
+    set(gcf, 'WindowButtonMotionFcn', {@ft_select_channel_btt, 'multiple', true, 'callback', @disp, 'event', 'WindowButtonDownFcn'})
     
     uiwait(f);
 end
