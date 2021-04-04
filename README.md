@@ -33,7 +33,7 @@ Warp electrophysiological data from clock time (default) to brain time and analy
 - [FieldTrip](http://www.fieldtriptoolbox.org/download/)
 - [MVPA Light](https://github.com/treder/MVPA-Light)
 - [Psychtoolbox](http://psychtoolbox.org/download.html)
-- MATLAB Signal Processing Toolbox
+- [MATLAB Signal Processing Toolbox](https://uk.mathworks.com/help/signal/getting-started-with-signal-processing-toolbox.html)
 - [Several functions](external) included in the toolbox
 
 ### Glossary
