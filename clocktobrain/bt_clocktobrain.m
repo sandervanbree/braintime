@@ -48,7 +48,8 @@ function [bt_warpeddata] = bt_clocktobrain(config, data, bt_source)
 
 %% Get basic info
 src_oi = bt_source{1};                                 % Warping source which contains the warping signal
-phs = cell2mat(bt_source{2});                          % Phase of all frequencies in this warping source
+FFT_phs = cell2mat(bt_source{2});                      % Phase of all frequencies in this warping source
+GED_phs = bt_source{9};                                % Phase of warping signal as estimated using GED
 warpsources = bt_source{3};                            % Warping source data
 srcrank = bt_source{4};                                % Time freq data of selected warping signal
 mintime_fft = bt_source{5}.time(1);                    % Start time of interest
@@ -56,9 +57,11 @@ maxtime_fft = bt_source{5}.time(end);                  % End time of interest
 sr = bt_source{5}.time(2)-bt_source{5}.time(1);        % Sampling rate
 cutmethod = bt_source{6};                              % Applied cutting method
 warpfreq = srcrank(2);                                 % Warped frequency (frequency of the warping signal)
-wavshape = bt_source{7};                               % Average waveshape of the data
+wvshape = bt_source{7};                                % Average waveshape of the data
 
 warpmethod = bt_defaultval(config,'warpmethod','stationary');  % Set method for warping (default: stationary)
+phasemethod = bt_defaultval(config,'phasemethod','FFT');       % Set phase estimation method used for warping (default: FFT)
+visualcheck = bt_defaultval(config,'visualcheck','off');           % Show warping path and phases for three example trials
 
 if strcmp(cutmethod,'cutartefact')                     % Depending on cutmethod, specify original time window of interest
     mintime = mintime_fft+0.5;
@@ -92,21 +95,44 @@ else
     end
 end
 
-%% Cut out the time window of fft (from which the phase was extracted)
+%% Cut out the time window of phase estimation used during bt_analyzesources
 cfg        = [];
 if strcmp(cutmethod,'cutartefact')
     cyclesample = round((1/warpfreq)*1/sr); % Calculate how many samples one cycle consists of
     cfg.toilim = [mintime_fft+0.5-(1/warpfreq) maxtime_fft-0.5+(1/warpfreq)]; % Cut to the time window of interest, plus one cycle
-    phs = phs(:,mintime_ind-cyclesample:maxtime_ind+cyclesample); % Cut to the time window of interest, plus one cycle
+    FFT_phs = FFT_phs(:,mintime_ind-cyclesample:maxtime_ind+cyclesample); % Cut to the time window of interest, plus one cycle
+    GED_phs = GED_phs(:,mintime_ind-cyclesample:maxtime_ind+cyclesample); % Do the same for GED phase
 elseif strcmp(cutmethod,'consistenttime')
     cfg.toilim = [mintime_fft maxtime_fft];
 end
 data       = ft_redefinetrial(cfg, data);
 
+
+%% Opt for FFT or GED phase and adapt data
+if strcmp(phasemethod,'FFT')
+    phs = FFT_phs;
+elseif strcmp(phasemethod,'GED')
+    
+    % Sanity check whether the two phase vectors are within 5% of each other's length
+    if abs(size(FFT_phs,2)-size(GED_phs,2)) > 0.05*max(size(FFT_phs,2),size(GED_phs,2))
+        error(['The length of the GED estimated phase substantially differs from '...
+            'the length of the FFT estimated phase. Please change to config.phasemethod '...
+            '= ''FFT'' or change the time window tested during bt_analyzechannels.'])
+    else
+        phs = GED_phs;
+    end
+end
+
 % Check whether phase and data are of the same length
 if abs(length(data.time{1})-size(phs,2))>1
-    warning('phase vector and data differ in length by more than 1 sample. This may mean the wrong parameters were used during bt_analyzesources');
+    warning(['The phase and data length in length by more than 1 samples. This'...
+        'may mean the wrong parameters were used during bt_analyzesources.']);
+elseif abs(length(data.time{1})-size(phs,2))>10
+    error(['The phase and data length in length by more than 10 samples. This'...
+        'may mean the wrong parameters were used during bt_analyzesources.']);
 end
+
+% Do some additional slicing to fix slight differences
 if size(phs,2) > length(data.time{1})
     phs=phs(:,1:length(data.time{1}));
 elseif length(data.time{1}) > size(phs,2)
@@ -121,13 +147,14 @@ nsec=bt_data.time{1}(end)-bt_data.time{1}(1);                 % number of second
 Ncycles_pre=warpfreq*nsec;                                    % number of cycles * seconds
 cycledur=round(phs_sr*nsec/Ncycles_pre);                      % samples for cycle
 tempsr=Ncycles_pre*cycledur/nsec;
+timephs=linspace(0,Ncycles_pre,phs_sr*nsec);                  % time vector of the unwrapper phase
 
 if strcmp(warpmethod,'stationary')                            % warp using stationary sinusoid
     tempphs=linspace(-pi,(2*pi*Ncycles_pre)-pi,tempsr*nsec);  % set up phase bins for unwrapped phase (angular frequency)
     
 elseif strcmp(warpmethod,'waveshape')                         % warp using average waveshape
-    waveshape = smoothdata(wavshape,'gaussian',100);          % smooth substantially
-    [~,trgh] = findpeaks(-waveshape);                         % find troughs
+    wvshape_sm = smoothdata(wvshape,'gaussian',25);           % smooth substantially - 25 bins seems the sweetspot for 201 bins
+    [~,trgh] = findpeaks(-wvshape_sm);                        % find troughs
     
     if numel(trgh)~=2                                         % if there are not 2 troughs, this likely
         error(['The waveshape of the warping signal is',...   % means the data is too noisy
@@ -135,26 +162,68 @@ elseif strcmp(warpmethod,'waveshape')                         % warp using avera
             ' ''stationary'' and try again.']);
     end
     
-    waveshape_cut = waveshape(trgh(1)+1:trgh(2));             % cut waveshape to one cycle (-cos)
+    waveshape_cut = wvshape_sm(trgh(1)+1:trgh(2));             % cut waveshape to one cycle (-cos)
     tempsig = repmat(waveshape_cut,[1 floor(Ncycles_pre)]);   % repeat wave Ncycles_pre times (round down)
     misscycs = Ncycles_pre-floor(Ncycles_pre);                % check if rounding down lost us anything
     extrasamps = round(numel(waveshape_cut)*misscycs);        % how many samples of the cut cycle were lost
     
     if misscycs~=0                                            % append those to the template signal
-    tempsig = [tempsig, waveshape_cut(1:extrasamps)];
+        tempsig = [tempsig, waveshape_cut(1:extrasamps)];
     end
     
-    tempphs = angle(hilbert(tempsig));                        % get the phase using Hilbert transform
-    tempphs = unwrap(tempphs);                                % unwrap the phase
+    tempsig_hb = angle(hilbert(tempsig));                     % get the phase using Hilbert transform
+    tempphs = unwrap(tempsig_hb);                             % unwrap the phase
     tempphs = imresize(tempphs,[1 tempsr*nsec]);              % resize to the desired length
+    
+    if strcmp(visualcheck,'on')                               % perform visual check
+        figure; hold on; bt_figure('half');
+        
+        subplot(3,1,1);
+        tempsig_check = imresize(tempsig,[1 numel(timephs)]);                % Resize to timephs for plotting
+        plot(timephs,tempsig_check,'LineWidth',3,'Color',[0.8 0.1 0.1]);     % Smoothed repeated waveshape
+        title('Smoothed repeated waveshape');
+        ylabel('Amplitude');
+        
+        subplot(3,1,2);
+        tempsig_hb_check = imresize(tempsig_hb,[1 numel(timephs)]);
+        plot(timephs,tempsig_hb_check,'LineWidth',3,'Color',[0.8 0.1 0.1]);  % Phase (Hilbert transform)
+        title('Phase (Hilbert transform)');
+        ylabel('Phase (-2*pi to 2*pi)');
+        
+        subplot(3,1,3);
+        tempphs_check = imresize(tempphs,[1 numel(timephs)]); 
+        plot(timephs,tempphs_check,'LineWidth',3,'Color',[0.8 0.1 0.1]);     % Unwrapped phase
+        title('Unwrapped phase');
+        xlabel('Time (cycles or seconds)');
+        ylabel('Unwrapped phase (Template [warped-to] signal)');
+        
+        % Adapt font
+        set(findobj(gcf,'type','axes'),'FontName',bt_plotparams('FontName'),'FontSize',bt_plotparams('FontSize'));
+    end
 end
 
-timephs=linspace(0,Ncycles_pre,phs_sr*nsec);                  % time vector of the unwrapper phase
+
 
 for nt=1:size(phs,1)
     tmpphstrl=unwrap((phs(nt,:)));
     % Warp phase of single trial onto template phase
     [~,ix,iy] = dtw(tmpphstrl,tempphs);
+    
+    % Perform visual check on warping path and phase (first three trials)
+    if strcmp(visualcheck,'on') && nt <= 3
+        figure; hold on; bt_figure('half');
+        
+        dtw(tmpphstrl,tempphs);     % warping path plot
+        
+        title(['Alignment after warping (trial ',num2str(nt), ')']);
+        legend('Clock time phase',['Template [warped-to] phase (method: ',warpmethod,')'],'Location','northwest');
+        xlabel('Data sample');
+        ylabel('Unwrapped phase');
+        
+        % Adapt font
+        set(findobj(gcf,'type','axes'),'FontName',bt_plotparams('FontName'),'FontSize',bt_plotparams('FontSize'));
+        set(findobj(gcf,'type','line'),'LineWidth',1.5);
+    end
     
     % How long is each cycle?
     cycles=zeros(1,length(iy));
@@ -214,4 +283,5 @@ bt_warpeddata.data = bt_data;                                     % Brain time w
 bt_warpeddata.toi = [min_t max_t];                                % Start and end time of interest
 bt_warpeddata.freq = warpfreq;                                    % Warped frequency (frequency of the warping signal)
 bt_warpeddata.clabel = bt_data.trialinfo;                         % Classification labels
-bt_warpeddata.method = warpmethod;                                    % Warping method
+bt_warpeddata.warpmethod = warpmethod;                            % Warping method (waveshape or stationary sinusoid)
+bt_warpeddata.phasemethod = phasemethod;                          % Phase estimation method (FFT or GED)
