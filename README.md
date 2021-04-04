@@ -41,7 +41,7 @@ Warp electrophysiological data from clock time (default) to brain time and analy
 | --- | --- |
 | Clock time (CT) | data ordered by sequences of seconds |
 | Brain time (BT) | data transformed according to the dynamics of a warping signal |
-| Warping signal | An oscillatory signal that is assumed to clock the cognitive process of interest |
+| Warping signal | an oscillatory signal that is assumed to clock the cognitive process of interest |
 | Warping source | a data structure that contains potential warping signals (e.g., local field potentials, independent component analysis components, virtual channels) |
 | Brain time warping | a transformation of clock time data that employs the phase dynamics of the warping signal |
 | Periodicty | rhythmic patterns of classification performance |
