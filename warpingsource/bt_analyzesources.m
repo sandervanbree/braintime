@@ -132,18 +132,18 @@ powtf = zeros(size(fspec.powspctrm,3),maxtime_ind+1-mintime_ind,numsrc);
 pspec = zeros(size(fspec.powspctrm,3),numsrc);
 oscmaxfreq = zeros(numsrc,1);
 foi_ind = zeros(numsrc,1);
-phs = cell(numsrc,1);
+FFT_phs = cell(numsrc,1);
 
 % For each source, obtain time frequency information
 for src = 1:numsrc
     powtf(:,:,src)=squeeze(nanmean(fspec.powspctrm(:,src,:,mintime_ind:maxtime_ind),1));
-    pspec(:,src)=squeeze(nanmean(powtf(:,:,src),2)); % get power spectrum of warping sources
-    [maxpow, maxpowind]= max(pspec(minfoi_ind:maxfoi_ind,src)); % what's the highest power in the freq range of interest and its index?
-    oscmaxfreq(src) = (fspec.freq(foivec_ind(maxpowind))); % what's the warping signal?
-    [~, freqidx]= find(abs(oscmaxfreq(src)-fspec.freq)==min(abs(oscmaxfreq(src)-fspec.freq))); % what is the index of the highest power oscillation?
+    pspec(:,src)=squeeze(nanmean(powtf(:,:,src),2));                                            % get power spectrum of warping sources
+    [maxpow, maxpowind]= max(pspec(minfoi_ind:maxfoi_ind,src));                                 % what's the highest power in the freq range of interest and its index?
+    oscmaxfreq(src) = (fspec.freq(foivec_ind(maxpowind)));                                      % what's the warping signal?
+    [~, freqidx]= find(abs(oscmaxfreq(src)-fspec.freq)==min(abs(oscmaxfreq(src)-fspec.freq)));  % what is the index of the highest power oscillation?
     foi_ind(src) = freqidx;
-    oscmax(src,:) = [src,oscmaxfreq(src), foi_ind(src),maxpow]; % matrix with warping source number, freq, its index, and its power
-    phs{src}=squeeze(angle(fspec_old.fourierspctrm(:,src,foi_ind(src),:))); % fetch phase of warping signal
+    oscmax(src,:) = [src,oscmaxfreq(src), foi_ind(src),maxpow];                                 % matrix with warping source number, freq, its index, and its power
+    FFT_phs{src}=squeeze(angle(fspec_old.fourierspctrm(:,src,foi_ind(src),:)));                 % fetch phase of warping signal
 end
 
 %% rank warping sources by one of two methods
@@ -205,18 +205,27 @@ else
 end
 srcrank = srcrank(1:nwarpsources,:); % take the best sources
 
+%% Calculate asymmetry indices and waveshape for each warping source
+ncycles = 2; % Number of cycles to extract
+[asymmidx,asymmidx_t,wavshap] = bt_calcwaveshape(warpsources,ncycles,srcrank);
+
+
 %% Save information
 % Filter relevant frequency spectrum information
-fspecinfo.freq = fspec.freq;
-fspecinfo.time = fspec.time;
+fspecinfo.freq     = fspec.freq;
+fspecinfo.time     = fspec.time;
 
-fft_sources{1} = srcrank;                                  % Time freq data of extracted warping sources
-fft_sources{2} = [mintime maxtime];                        % Start and end time of interest
-fft_sources{3} = [minfoi maxfoi];                          % Lowest and highest possible warping frequency
-fft_sources{4} = fspecinfo;                                % FFT time and frequency vector
-fft_sources{5} = powtf(:,:,srcrank(:,1));                  % Power spectrum of warping sources
-fft_sources{6} = pspec(:,srcrank(:,1));                    % Power spectrum averaged across trials
-fft_sources{7} = phs(srcrank(:,1));                        % Phase of all warping sources for all trials
-fft_sources{8} = config.cutmethod;                         % Applied cutting method
-fft_sources{9} = config.rankmethod;                        % Applied ranking method
+fft_sources{1}  = srcrank;                                  % Time freq data of extracted warping sources
+fft_sources{2}  = [mintime maxtime];                        % Start and end time of interest
+fft_sources{3}  = [minfoi maxfoi];                          % Lowest and highest possible warping frequency
+fft_sources{4}  = fspecinfo;                                % FFT time and frequency vector
+fft_sources{5}  = powtf(:,:,srcrank(:,1));                  % Power spectrum of warping sources
+fft_sources{6}  = pspec(:,srcrank(:,1));                    % Power spectrum averaged across trials
+fft_sources{7}  = FFT_phs(srcrank(:,1));                    % Phase of all warping sources for all trials
+fft_sources{8}  = config.cutmethod;                         % Applied cutting method
+fft_sources{9}  = config.rankmethod;                        % Applied ranking method
+fft_sources{10} = asymmidx;                                 % Asymmetry index per warping source
+fft_sources{11} = asymmidx_t;                               % Asymmetry index t-stat per warping source
+fft_sources{12} = wavshap;                                  % Waveshape per warping source
+
 end
