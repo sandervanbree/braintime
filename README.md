@@ -10,17 +10,6 @@ LOW URGENCY:
 - Update tutorial 4 to 6
 - In the paper, remind users to be very careful with high pass filtering; https://doi.org/10.1101/530220
 
-COMPLETED RECENTLY: 
-- Implement Cohen/Luca's GED scripts
-- For diagonal testing, test significance of diagonal, not whole TGM
-- make clear you don't have to get components
-- Implement testing of the diagonal only
-- Statistical masking requires too much memory
-- spectral resolution (alignment warped freq and peak)
-- Make lingo consistent within toolbox, in line with SfN poster ("warping signal", "warping source", etc.)
-- Resize second level power spectra to the right number of frequency bins, discuss together what that is
-- Separately, decide for "shuffled" versus "permuted" and make consistent
-
 ### Start documentation:
 
 
