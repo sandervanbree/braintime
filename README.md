@@ -27,7 +27,7 @@ COMPLETED RECENTLY:
 # Brain Time Toolbox
 <img src="https://i.imgur.com/OAEVqgM.png" width="200">
 
-Warp electrophysiological data from clock time (default) to brain time and analyze the recurrence of mental representations. By *Sander van Bree, María Melcón, Maria Wimber & Simon Hanslmayr*.
+Warp electrophysiological data from clock time to brain time and analyze the periodicity of cognitive processes.. By *Sander van Bree, María Melcón, Maria Wimber & Simon Hanslmayr*.
 
 ### Dependencies
 - [FieldTrip](http://www.fieldtriptoolbox.org/download/)
