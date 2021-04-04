@@ -1,4 +1,4 @@
-This is the GNU License for the Brain Time Toolbox
+This is the GNU License for the Brain Time Toolbox.
 Copyright (C) 2021 Sander van Bree
 
                     GNU GENERAL PUBLIC LICENSE
