@@ -16,7 +16,7 @@ LOW URGENCY:
 # Brain Time Toolbox
 <img src="https://i.imgur.com/OAEVqgM.png" width="200">
 
-Warp electrophysiological data from clock time to brain time and analyze the periodicity of cognitive processes.. By *Sander van Bree, María Melcón, Maria Wimber & Simon Hanslmayr*.
+Warp electrophysiological data from clock time to brain time and analyze the periodicity of cognitive processes. By *Sander van Bree, María Melcón, Maria Wimber & Simon Hanslmayr*.
 
 ### Dependencies
 - [MATLAB Signal Processing Toolbox](https://uk.mathworks.com/help/signal/getting-started-with-signal-processing-toolbox.html)
