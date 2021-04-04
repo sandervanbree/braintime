@@ -1,4 +1,4 @@
-function bt_wavplot(dat,ncycles,foi)
+function bt_wavplot(dat,ncycles)
 
 
 % Input:
@@ -21,27 +21,26 @@ if ncycles~=2
     warning('X-axis will only be plotted in pi fractions for 2 cycles');
 end
 
-ncond=size(dat,1);
-col = bt_colorscheme('symmetry');
+col = bt_colorscheme('asymm_wavshap');
 
-x = linspace(foi(1)-0.6,foi(end)+0.6);
+x = linspace(0-0.6,0+0.6);
 y = linspace(0,0);
 plot(y,x,'linewidth',1,'color',[0.5 0.5 0.5],'linestyle', '--');
 ylabel('Hz');
 hold on
 
-for k=1:numel(foi)
-    tmp=dat(k,:);
+    tmp=dat;
     
-    tmp_resc = rescale(tmp,foi(k)-0.4,foi(k)+0.4);
-    plot(tvec,tmp_resc,'Color',col(k,:),'LineWidth',3);
+    tmp_resc = rescale(tmp,0-0.4,0+0.4);
+    plot(tvec,tmp_resc,'Color',col,'LineWidth',3);
     hold on
-end
 
-ylim([foi(1)-0.6 max(x)]);
+
+ylim([0-0.6 max(x)]);
 
 ax=gca;
-ax.YTick = foi;
+ax.YTick = 1;
+ax.YAxis.Color = [1 1 1];
 ax.Box = 'off';
 ax.XAxis.Exponent = 0;
 

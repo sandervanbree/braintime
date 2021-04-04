@@ -23,6 +23,9 @@ per_ps_emp = [0.05 0.45 0.9];
 % Permuted periodicity spectra
 per_ps_perm = [0.4 0.4 0.4];
 
+% Asymmetry and wave shape
+asymm_wavshap = [0.18 0 0.21];
+
 % Diagonal classification timecourse
 diagonal = [0.04 0.23 0.03];
 
@@ -64,9 +67,8 @@ TGM = flipud(brewermap([],'RdBu'));
 % Color map for Autocorrelation Maps
 AC = flipud(brewermap([],'RdBu'));
 
-% Colors used for different frequencies in bt_checksymmetry
-symmetry = brewermap([],'Set1');
-
+% (LEGACY FUNCTION) bt_checksymmetry
+checksymmetry = brewermap([],'Set1');
 
 %% Output requested map or color values
 color = eval(object);
