@@ -1,6 +1,6 @@
 function A=autocorr2d(I)
 
-% By Tristan Ursell. Modified by Sander van Bree
+% By Tristan Ursell. Modified by Sander van Bree.
 %
 % Compute the 2D spatial autocorrelation of a matrix or image I using the 
 % Wiener - Khintchine Theorem. The output is the normalized correlation

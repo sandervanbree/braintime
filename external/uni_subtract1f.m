@@ -3,6 +3,8 @@ function freq = uni_subtract1f(freq)
 % This function estimates and subtracts the fractal property of a power 
 % spectrum. The [freq] input must match a Fieldtrip formatted
 % time-frequency data structure.
+%
+% By Benjamin Griffiths and Simon Hanslmayr
 
 % extract parameters
 f   = freq.freq;
