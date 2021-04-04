@@ -137,7 +137,7 @@ end
 % Plotting TGM diagonal (no time generalization)
 if figopt == 1 && strcmp(mapmethod,'diag')
     % Plot Diagonal
-    figure; bt_figure(0);
+    figure; bt_figure('default');
     subplot(2,1,1)
     xvec = linspace(timevec(1),timevec(end),numel(mp));
     plot(xvec,mp,'LineWidth',3,'Color',bt_colorscheme('diagonal'));
