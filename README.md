@@ -2,12 +2,13 @@
 - random gaussian field theory to perform multiple testing correction over power spectra and TGMs?
 
 LOW URGENCY:
+- Fix dots in the asymmetry plot in bt_selectsource
 - Add licenses! 
-- Implement Cohen/Luca's GED scripts
 - Update tutorial 4 to 6
 - In the paper, remind users to be very careful with high pass filtering; https://doi.org/10.1101/530220
 
 COMPLETED RECENTLY: 
+- Implement Cohen/Luca's GED scripts
 - For diagonal testing, test significance of diagonal, not whole TGM
 - make clear you don't have to get components
 - Implement testing of the diagonal only
