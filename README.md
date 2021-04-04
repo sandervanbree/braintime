@@ -37,7 +37,7 @@ Warp electrophysiological data from clock time to brain time and analyze the per
 - [Several functions](external) included in the toolbox
 
 ### Glossary
-| Term | Description |
+| Brain Time Toolbox term | description |
 | --- | --- |
 | Clock time (CT) | data ordered by sequences of seconds |
 | Brain time (BT) | data transformed according to the dynamics of a warping signal |
@@ -45,7 +45,9 @@ Warp electrophysiological data from clock time to brain time and analyze the per
 | Warping source | a data structure that contains potential warping signals (e.g., local field potentials, independent component analysis components, virtual channels) |
 | Brain time warping | a transformation of clock time data that employs the phase dynamics of the warping signal |
 | Periodicity | rhythmic patterns of classification performance |
-| Temporal Generalization Matrix (TGM): | training a classifier on one timepoint, and testing it on all other timepoints in the data |
+| --- | --- |
+| Temporal Generalization Matrix (TGM) | training a classifier on one timepoint, and testing it on all other timepoints in the data |
+| Generalized eigendecomposition (GED) | mathematical approach to combine signals in different warping sources into a single timeseries |
 
 ## Table of contents
 [Installation](#installation)
