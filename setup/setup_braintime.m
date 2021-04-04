@@ -1,6 +1,13 @@
 function setup_braintime
 % Check for FieldTrip and MVPA Light, and add brain time folders to path.
 
+% Check for Signal Processing Toolbox
+if exist('dtw') ~= 2
+error('Unable to locate MATLAB Signal Processing Toolbox. Please install it by going to Add-Ons -> Get Add-Ons -> use Add-On Explorer to find the Signal Processing Toolbox');   
+else
+disp('MATLAB Signal Processing Toolbox is running...');    
+end
+
 % Check for FieldTrip
 if exist('ft_freqanalysis') ~= 2
 error('Unable to locate FieldTrip. Please add it to path (using ft_defaults) or download it here: https://www.fieldtriptoolbox.org/download/');
@@ -13,6 +20,13 @@ if exist('mv_classify_timextime') ~= 2
 error('Unable to locate MVPA Light. Please set it up (using startup.m) or download it here: https://github.com/treder/MVPA-Light');   
 else
 disp('MVPA Light is up and running...');    
+end
+
+% Check for Psychtoolbox
+if exist('KbCheck') ~= 2
+error('Unable to locate Psychtoolbox. Please download and install it here: http://psychtoolbox.org/download.html');   
+else
+disp('Psychtoolbox is running...');    
 end
 
 % Add all folders and subfolders to path
