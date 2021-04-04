@@ -1,6 +1,6 @@
 function [warpsigGED] = ged_foiComp(data,warpfreq)
 % This function extracts a single timeseries at around the warping
-% frequency based on all the warping sources using General
+% frequency based on all the warping sources using Generalized
 % Eigendecomposition (GED). This yields one timeseries per trial that is
 % a holistic estimation of the warping signal, as its estimation involves
 % all warping sources.
@@ -16,7 +16,7 @@ function [warpsigGED] = ged_foiComp(data,warpfreq)
 % wfreq              % The selected warping frequency
 %                    %
 % Output:            %
-% warpsigGED        % 2D matrix of GED data (trial x time)
+% warpsigGED         % 2D matrix of GED data (trial x time)
 %
 % These functions were written by Mike X Cohen (see Cohen 2017, eLife;
 % doi: 10.7554/eLife.21792), and modified by Luca Kolibius and
@@ -26,10 +26,17 @@ function [warpsigGED] = ged_foiComp(data,warpfreq)
 settings.trials  = 1:size(data.trial,1);                     % number of trials
 settings.foi     = warpfreq;                                 % warping frequency
 settings.fs      = round(1/(data.time(2)-data.time(1)));     % sampling rate
-settings.fwhm    = 2;                                        % full width half maximum around the foi -> higher fwhm will include a broader range
-settings.visopt  = 0;                                        % visualize results? Warning: only 3 example trials will be plotted
+settings.visopt  = 1;                                        % visualize results? Warning: only 3 example trials will be plotted
 
-GEDinput = data.trial;                                       % rename
+% Full width at half maximum around the warping frequency (higher fwhm will include a more frequencies)
+% Use exponential function to determine FWHM
+k = 0.15;                                % Exponent
+Tc = 0.5;                                % Horizontal asymptote
+T0 = 3.5;                                % Vertical asymptote
+fwhm = Tc+(T0-Tc).*exp(-k.*warpfreq);    % Scale FWHM with frequency
+settings.fwhm   = fwhm;                                        
+
+GEDinput = data.trial;                                       % Rename
 trlLen   = size(GEDinput,3);                                 % trial length (number of samples)
 
 warpsigGED = zeros(size(data.trial,1),trlLen);               % pre-allocate data
