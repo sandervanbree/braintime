@@ -1,4 +1,7 @@
 ### Current to do list (for devs) | Official documentation starts below
+
+TO DO:
+- Update tutorials and maybe include one that just shows different parameters
 - random gaussian field theory to perform multiple testing correction over power spectra and TGMs?
 
 LOW URGENCY:
