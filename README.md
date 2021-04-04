@@ -48,10 +48,9 @@ Warp electrophysiological data from clock time to brain time and analyze the per
 
 | General term | description |
 | --- | --- |
-| Temporal
-Generalization
-Matrix (TGM) | training a classifier on one timepoint, and testing it on all other timepoints in the data |
+| Temporal generalization matrix (TGM) | training a classifier on one timepoint, and testing it on all other timepoints in the data |
 | Generalized eigendecomposition (GED) | a mathematical approach to combine signals in different warping sources into a single timeseries |
+| Independent component analysis (ICA) | a mathematical approach to separating electrophysiological data into additive subcomponents |
 
 ## Table of contents
 [Installation](#installation)
