@@ -348,236 +348,237 @@ disp('See the output structure for:')
 disp('(1) the (corrected) p-values per frequency');
 disp('(2) the range of tested frequencies');
 disp('(3) for brain time, the (corrected) p-value of 0.5x, 1x, and 2x the warped frequency');
-% 
-% %% STEP 2: TEST SIGNIFICANCE OF TGM OR DIAGONAL
-% % Pre-allocate
-% empset_TGM_Z = zeros(size(stats1{1}.empTGM,1),size(stats1{1}.empTGM,2),numel(stats1));
-% permset_TGM_Z = zeros(size(stats1{1}.permTGM,1),size(stats1{1}.permTGM,2),size(stats1{1}.permTGM,3),numel(stats1));
-% empset_TGM_ori = zeros(size(stats1{1}.empTGM,1),size(stats1{1}.empTGM,2),numel(stats1));
-% 
-% % Put each participant's empirical and permuted data into one matrix, whilst z-scoring based on permuted data
-% disp('To test for significant points in the TGM, the toolbox normalizes to');
-% disp('the mean and standard deviation of permuted TGMs');
-% for i = 1:numel(stats1)
-%     % Calculate mean and std of the permuted TGMs
-%     mn = mean(stats1{i}.permTGM(:));
-%     sd = std(stats1{i}.permTGM(:));
-%     
-%     % Save original
-%     empset_TGM_ori(:,:,i) = stats1{i}.empTGM;
-%     
-%     % Subtract the mean and divide by std to normalize across participants
-%     empset_TGM_Z(:,:,i) = (stats1{i}.empTGM-mn)./sd;
-%     permset_TGM_Z(:,:,:,i) = (stats1{i}.permTGM-mn)./sd;
+
+%% STEP 2: TEST SIGNIFICANCE OF TGM OR DIAGONAL
+% Pre-allocate
+empset_TGM_Z = zeros(size(stats1{1}.empTGM,1),size(stats1{1}.empTGM,2),numel(stats1));
+permset_TGM_Z = zeros(size(stats1{1}.permTGM,1),size(stats1{1}.permTGM,2),size(stats1{1}.permTGM,3),numel(stats1));
+empset_TGM_ori = zeros(size(stats1{1}.empTGM,1),size(stats1{1}.empTGM,2),numel(stats1));
+
+% Put each participant's empirical and permuted data into one matrix, whilst z-scoring based on permuted data
+disp('To test for significant points in the TGM, the toolbox normalizes to');
+disp('the mean and standard deviation of permuted TGMs');
+for i = 1:numel(stats1)
+    % Calculate mean and std of the permuted TGMs
+    mn = mean(stats1{i}.permTGM(:));
+    sd = std(stats1{i}.permTGM(:));
+    
+    % Save original
+    empset_TGM_ori(:,:,i) = stats1{i}.empTGM;
+    
+    % Subtract the mean and divide by std to normalize across participants
+    empset_TGM_Z(:,:,i) = (stats1{i}.empTGM-mn)./sd;
+    permset_TGM_Z(:,:,:,i) = (stats1{i}.permTGM-mn)./sd;
+end
+
+% For every participant, average the permuted TGMs
+permset_TGM_Z = squeeze(mean(permset_TGM_Z,1));
+
+% Compute average TGM
+TGMavg = squeeze(mean(empset_TGM_ori,3));
+
+% Determine number of cluster permutations based on TGM size (larger TGM =
+% fewer permutations).
+% TGMsz = numel(stats1{1}.empTGM(:));
+% cluster_nperm = 1./(TGMsz/(10^6));
+% cluster_nperm = round(cluster_nperm.*10^4);
+% if cluster_nperm < 10^4 % Minimum
+%     cluster_nperm = 10^4;
+% elseif cluster_nperm > 10^5 % Maximum
+%     cluster_nperm = 10^5;
 % end
-% 
-% % For every participant, average the permuted TGMs
-% permset_TGM_Z = squeeze(mean(permset_TGM_Z,1));
-% 
-% % Compute average TGM
-% TGMavg = squeeze(mean(empset_TGM_ori,3));
-% 
-% % Determine number of cluster permutations based on TGM size (larger TGM =
-% % fewer permutations).
-% % There must be a better equation but I suck at math
-% % TGMsz = numel(stats1{1}.empTGM(:));
-% % cluster_nperm = 1./(TGMsz/(10^6));
-% % cluster_nperm = round(cluster_nperm.*10^4);
-% % if cluster_nperm < 10^4 % Minimum
-% %     cluster_nperm = 10^4;
-% % elseif cluster_nperm > 10^5 % Maximum
-% %     cluster_nperm = 10^5;
-% % end
-% 
-% cluster_nperm = 10^4;
-% disp('Testing for significant cluster. TO devs: This may take a long time, turn this block of code off to skip the step');
-% 
-% % Filter diagonal if diagonal is analyzed
-% if strcmp(mapmethod,'diag')
-%     for i = 1:size(empset_TGM_Z,3)
-%         emp_clus(:,i) = diag(empset_TGM_Z(:,:,i))';
-%         perm_clus(:,i) = diag(permset_TGM_Z(:,:,i))';
-%     end
-% else % Else just keep the whole TGM
-%     emp_clus = empset_TGM_Z;
-%     perm_clus = permset_TGM_Z;
-% end
-% 
-% % Smoothing
-% if cluster_smooth~=0
-%     emp_clus = imgaussfilt(emp_clus,cluster_smooth);
-%     perm_clus = imgaussfilt(perm_clus,cluster_smooth);
-% end
-% 
-% % Perform cluster correction (Maris & Oostenveld, 2007; J Neurosci Methods)
-% % where the empirical TGMs are compared against the average permuted TGMs
-% [c_TGM,p_TGM,~,~] = permutest(emp_clus,perm_clus,true,cluster_p,cluster_nperm,false,cluster_n);
-% 
-% % Transpose for diagonal
-% if strcmp(mapmethod,'diag')
-%     p_TGM = p_TGM';
-%     c_TGM = c_TGM';
-%     for i = 1:numel(c_TGM)
-%         c_TGM{i} = c_TGM{i}';
-%     end
-% end
-% 
-% % Find significant clusters
-% sig_clus = find(p_TGM<=cluster_p);
-% nsig_clus = find(p_TGM>cluster_p);
-% 
-% sig_TGM = c_TGM(sig_clus); % Filter significant clusters
-% nsig_TGM = c_TGM(nsig_clus); % Filter significant clusters
-% 
-% % Check whether there are any clusters, and if those clusters are
-% % significant.
-% if isempty(sig_clus) && isempty(nsig_clus)~=1
-%     disp('No significant clusters detected in the TGM');
-%     clust_sig_ind = [];
-% elseif isempty(sig_clus) && isempty(nsig_clus)
-%     disp('No clusters detected in the TGM');
-%     clust_sig_ind = [];
-%     clust_nsig_ind = [];
-% elseif isempty(sig_clus)~=1 && isempty(nsig_clus)==1
-%     clust_nsig_ind = [];
-% end
-% 
-% % Vectorize significant clusters
-% for i = 1:numel(sig_TGM)
-%     if i == 1
-%         clust_sig_ind = sig_TGM{i};
-%     else
-%         clust_sig_ind = [clust_sig_ind;sig_TGM{i}];
-%     end
-% end
-% 
-% % Vectorize non-significant clusters
-% for i = 1:numel(nsig_TGM)
-%     if i == 1
-%         clust_nsig_ind = nsig_TGM{i};
-%     else
-%         clust_nsig_ind = [clust_nsig_ind;nsig_TGM{i}];
-%     end
-% end
-% 
-% %% PLOTTING
-% % Plot Diagonal option
-% if strcmp(mapmethod,'diag')
-%     % Calculate average diagonal
-%     diagavg = diag(TGMavg);
-%     diagavg_Z = squeeze(mean(emp_clus,2));
-%     
-%     figure;subplot(5,5,1:10);hold on;
-%     bt_figure(0);
-%     plot(diagavg_Z,'LineWidth',3,'Color',bt_colorscheme('diagonal'));
-%     
-%     try % For old Matlab versions
-%         yline(0,'LineWidth',1.5,'Color',[0.6 0.6 0.6]);
-%     catch
-%         vline(0);
-%     end
-%     
-%     xlim([0,numel(diagavg_Z)]);
-%     xlabel('Test data (bin)')
-%     ylabel('Z-value');
-%     
-%     if cluster_smooth == 0
-%         title('Z-scored average empirical TGM Diagonal (classifier time course)');
-%     else
-%         title('Smoothed Z-scored average empirical TGM Diagonal (classifier time course)');
-%     end
-%     % Adapt font
-%     set(gca,'FontName',bt_plotparams('FontName'));
-%     set(gca,'FontSize',bt_plotparams('FontSize'));
-%     
-%     % Plot points a little below lowest Z
-%     lim = min(diagavg_Z(:))*1.05;
-%     
-%     % Plot significant and non-significant datapoints
-%     if isempty(clust_sig_ind) && isempty(clust_nsig_ind)~=1
-%         c1 = plot(clust_nsig_ind,lim,'o','linewidth', 0.1, 'color',bt_colorscheme('nsigcluster'),'MarkerFaceColor',bt_colorscheme('nsigcluster'));hold on;
-%         legend(c1(1),'Non-significant clusters');
-%     elseif isempty(clust_sig_ind)~=1 && isempty(clust_nsig_ind)
-%         c1 = plot(clust_sig_ind,lim,'o','linewidth', 0.1, 'color',bt_colorscheme('sigcluster'),'MarkerFaceColor',bt_colorscheme('sigcluster'));hold on;
-%         legend(c1(1),'Significant clusters');
-%     elseif isempty(clust_sig_ind)~=1 && isempty(clust_nsig_ind)~=1
-%         c1 = plot(clust_sig_ind,lim,'o','linewidth', 0.1, 'color', bt_colorscheme('sigcluster'),'MarkerFaceColor',bt_colorscheme('sigcluster'));hold on;
-%         c2 = plot(clust_nsig_ind,lim,'o','linewidth', 0.1, 'color', bt_colorscheme('nsigcluster'),'MarkerFaceColor',bt_colorscheme('nsigcluster'));hold on;
-%         legend([c1(1),c2(1)],'Significant clusters', 'Non-significant clusters');
-%     end
-%     
-%     % Plot regular average diagonal;
-%     subplot(5,5,20:25);hold on;
-%     plot(diagavg,'LineWidth',3,'Color',bt_colorscheme('diagonal'));
-%     
-%     try % For old Matlab versions
-%         yline(0.5,'LineWidth',1.5,'Color',[0.6 0.6 0.6]);
-%     catch
-%         vline(0.5);
-%     end
-%     
-%     xlim([0,numel(diagavg_Z)]);
-%     xlabel('Test data (bin)')
-%     ylabel(MVPAcfg.metric);
-%     title('average empirical TGM Diagonal (classifier time course)');
-%     % Adapt font
-%     set(gca,'FontName',bt_plotparams('FontName'));
-%     set(gca,'FontSize',bt_plotparams('FontSize'));
-%     
-%     % Plot TGM option
-% else
-%     % Get average z-scored TGM
-%     TGMavg_Z = squeeze(mean(emp_clus,3));
-%     
-%     % Pre-allocate TGM mask and p-value dist
-%     TGM_sig_mask = zeros(size(TGMavg,1),size(TGMavg,2));
-%     TGM_nsig_mask = zeros(size(TGMavg,1),size(TGMavg,2));
-%     
-%     % Enter significant clusters into mask
-%     TGM_sig_mask(clust_sig_ind) = true;
-%     TGM_nsig_mask(clust_nsig_ind) = true;
-%     
-%     % Plot clusters in mean empirical TGM
-%     figure;hold on;
-%     bt_figure(0);
-%     subplot(10,2,[3 5 7 9 11 13 15]);
-%     cfg_plot = [];
-%     cfg_plot.colorbar = 1;
-%     cfg_plot.colorbar_location = 'EastOutside';
-%     cfg_plot.colorbar_title = 'Z-value';
-%     cfg_plot.climzero = 0;
-%     mv_plot_2D(cfg_plot,TGMavg_Z);hold on;
-%     colormap(bt_colorscheme('TGM'));freezeColors;
-%     if cluster_smooth == 0
-%         title('Z-scored average empirical TGM (clusters)')
-%     else
-%         title('Smoothed Z-scored average empirical TGM (clusters)')
-%     end
-%     xlabel('Test data (bin)')
-%     ylabel('Training data (bin)')
-%     % Adapt font
-%     set(gca,'FontName',bt_plotparams('FontName'));
-%     set(gca,'FontSize',bt_plotparams('FontSize'));
-%     
-%     contour(1:size(TGMavg,1),1:size(TGMavg,2),TGM_sig_mask,1,'linewidth', 2, 'color',bt_colorscheme('sigcluster'));hold on;
-%     contour(1:size(TGMavg,1),1:size(TGMavg,2),TGM_nsig_mask,1,'linewidth', 2, 'color',bt_colorscheme('nsigcluster'));
-%     legend('Significant clusters', 'Non-significant clusters');
-%     
-%     subplot(10,2,[4 6 8 10 12 14 16]);
-%     cfg_plot.colorbar_title = MVPAcfg.metric;
-%     cfg_plot.climzero = 0.5;
-%     mv_plot_2D(cfg_plot,TGMavg);hold on;
-%     colormap(bt_colorscheme('TGM'));freezeColors;
-%     title('Average empirical TGM')
-%     xlabel('Test data (bin)')
-%     ylabel('Training data (bin)')
-%     % Adapt font
-%     set(gca,'FontName',bt_plotparams('FontName'));
-%     set(gca,'FontSize',bt_plotparams('FontSize'));
-% end
-% 
-% %% Adapt output variable
-% % Add cluster correction information to output
-% stats2.clusters.clusters_inds = c_TGM;
-% stats2.clusters.clusters_p = p_TGM;
+
+cluster_nperm = 10^4;
+
+% Filter diagonal if diagonal is analyzed
+if strcmp(mapmethod,'diag')
+    for i = 1:size(empset_TGM_Z,3)
+        emp_clus(:,i) = diag(empset_TGM_Z(:,:,i))';
+        perm_clus(:,i) = diag(permset_TGM_Z(:,:,i))';
+    end
+else % Else just keep the whole TGM
+    emp_clus = empset_TGM_Z;
+    perm_clus = permset_TGM_Z;
+end
+
+% Smoothing
+if cluster_smooth~=0
+    emp_clus = imgaussfilt(emp_clus,cluster_smooth);
+    perm_clus = imgaussfilt(perm_clus,cluster_smooth);
+end
+
+% Notify
+disp('Testing for significant clusters, this may take a while...');
+
+% Perform cluster correction (Maris & Oostenveld, 2007; J Neurosci Methods)
+% where the empirical TGMs are compared against the average permuted TGMs
+[c_TGM,p_TGM,~,~] = permutest(emp_clus,perm_clus,true,cluster_p,cluster_nperm,false,cluster_n);
+
+% Transpose for diagonal
+if strcmp(mapmethod,'diag')
+    p_TGM = p_TGM';
+    c_TGM = c_TGM';
+    for i = 1:numel(c_TGM)
+        c_TGM{i} = c_TGM{i}';
+    end
+end
+
+% Find significant clusters
+sig_clus = find(p_TGM<=cluster_p);
+nsig_clus = find(p_TGM>cluster_p);
+
+sig_TGM = c_TGM(sig_clus); % Filter significant clusters
+nsig_TGM = c_TGM(nsig_clus); % Filter significant clusters
+
+% Check whether there are any clusters, and if those clusters are
+% significant.
+if isempty(sig_clus) && isempty(nsig_clus)~=1
+    disp('No significant clusters detected in the TGM');
+    clust_sig_ind = [];
+elseif isempty(sig_clus) && isempty(nsig_clus)
+    disp('No clusters detected in the TGM');
+    clust_sig_ind = [];
+    clust_nsig_ind = [];
+elseif isempty(sig_clus)~=1 && isempty(nsig_clus)==1
+    clust_nsig_ind = [];
+end
+
+% Vectorize significant clusters
+for i = 1:numel(sig_TGM)
+    if i == 1
+        clust_sig_ind = sig_TGM{i};
+    else
+        clust_sig_ind = [clust_sig_ind;sig_TGM{i}];
+    end
+end
+
+% Vectorize non-significant clusters
+for i = 1:numel(nsig_TGM)
+    if i == 1
+        clust_nsig_ind = nsig_TGM{i};
+    else
+        clust_nsig_ind = [clust_nsig_ind;nsig_TGM{i}];
+    end
+end
+
+%% PLOTTING
+% Plot Diagonal option
+if strcmp(mapmethod,'diag')
+    % Calculate average diagonal
+    diagavg = diag(TGMavg);
+    diagavg_Z = squeeze(mean(emp_clus,2));
+    
+    figure;subplot(5,5,1:10);hold on;
+    bt_figure(0);
+    plot(diagavg_Z,'LineWidth',3,'Color',bt_colorscheme('diagonal'));
+    
+    try % For old Matlab versions
+        yline(0,'LineWidth',1.5,'Color',[0.6 0.6 0.6]);
+    catch
+        vline(0);
+    end
+    
+    xlim([0,numel(diagavg_Z)]);
+    xlabel('Test data (bin)')
+    ylabel('Z-value');
+    
+    if cluster_smooth == 0
+        title('Z-scored average empirical TGM Diagonal (classifier time course)');
+    else
+        title('Smoothed Z-scored average empirical TGM Diagonal (classifier time course)');
+    end
+    % Adapt font
+    set(gca,'FontName',bt_plotparams('FontName'));
+    set(gca,'FontSize',bt_plotparams('FontSize'));
+    
+    % Plot points a little below lowest Z
+    lim = min(diagavg_Z(:))*1.05;
+    
+    % Plot significant and non-significant datapoints
+    if isempty(clust_sig_ind) && isempty(clust_nsig_ind)~=1
+        c1 = plot(clust_nsig_ind,lim,'o','linewidth', 0.1, 'color',bt_colorscheme('nsigcluster'),'MarkerFaceColor',bt_colorscheme('nsigcluster'));hold on;
+        legend(c1(1),'Non-significant clusters');
+    elseif isempty(clust_sig_ind)~=1 && isempty(clust_nsig_ind)
+        c1 = plot(clust_sig_ind,lim,'o','linewidth', 0.1, 'color',bt_colorscheme('sigcluster'),'MarkerFaceColor',bt_colorscheme('sigcluster'));hold on;
+        legend(c1(1),'Significant clusters');
+    elseif isempty(clust_sig_ind)~=1 && isempty(clust_nsig_ind)~=1
+        c1 = plot(clust_sig_ind,lim,'o','linewidth', 0.1, 'color', bt_colorscheme('sigcluster'),'MarkerFaceColor',bt_colorscheme('sigcluster'));hold on;
+        c2 = plot(clust_nsig_ind,lim,'o','linewidth', 0.1, 'color', bt_colorscheme('nsigcluster'),'MarkerFaceColor',bt_colorscheme('nsigcluster'));hold on;
+        legend([c1(1),c2(1)],'Significant clusters', 'Non-significant clusters');
+    end
+    
+    % Plot regular average diagonal;
+    subplot(5,5,20:25);hold on;
+    plot(diagavg,'LineWidth',3,'Color',bt_colorscheme('diagonal'));
+    
+    try % For old Matlab versions
+        yline(0.5,'LineWidth',1.5,'Color',[0.6 0.6 0.6]);
+    catch
+        vline(0.5);
+    end
+    
+    xlim([0,numel(diagavg_Z)]);
+    xlabel('Test data (bin)')
+    ylabel(MVPAcfg.metric);
+    title('average empirical TGM Diagonal (classifier time course)');
+    % Adapt font
+    set(gca,'FontName',bt_plotparams('FontName'));
+    set(gca,'FontSize',bt_plotparams('FontSize'));
+    
+    % Plot TGM option
+else
+    % Get average z-scored TGM
+    TGMavg_Z = squeeze(mean(emp_clus,3));
+    
+    % Pre-allocate TGM mask and p-value dist
+    TGM_sig_mask = zeros(size(TGMavg,1),size(TGMavg,2));
+    TGM_nsig_mask = zeros(size(TGMavg,1),size(TGMavg,2));
+    
+    % Enter significant clusters into mask
+    TGM_sig_mask(clust_sig_ind) = true;
+    TGM_nsig_mask(clust_nsig_ind) = true;
+    
+    % Plot clusters in mean empirical TGM
+    figure;hold on;
+    bt_figure(0);
+    subplot(10,2,[3 5 7 9 11 13 15]);
+    cfg_plot = [];
+    cfg_plot.colorbar = 1;
+    cfg_plot.colorbar_location = 'EastOutside';
+    cfg_plot.colorbar_title = 'Z-value';
+    cfg_plot.climzero = 0;
+    mv_plot_2D(cfg_plot,TGMavg_Z);hold on;
+    colormap(bt_colorscheme('TGM'));freezeColors;
+    if cluster_smooth == 0
+        title('Z-scored average empirical TGM (clusters)')
+    else
+        title('Smoothed Z-scored average empirical TGM (clusters)')
+    end
+    xlabel('Test data (bin)')
+    ylabel('Training data (bin)')
+    % Adapt font
+    set(gca,'FontName',bt_plotparams('FontName'));
+    set(gca,'FontSize',bt_plotparams('FontSize'));
+    
+    contour(1:size(TGMavg,1),1:size(TGMavg,2),TGM_sig_mask,1,'linewidth', 2, 'color',bt_colorscheme('sigcluster'));hold on;
+    contour(1:size(TGMavg,1),1:size(TGMavg,2),TGM_nsig_mask,1,'linewidth', 2, 'color',bt_colorscheme('nsigcluster'));
+    legend('Significant clusters', 'Non-significant clusters');
+    
+    subplot(10,2,[4 6 8 10 12 14 16]);
+    cfg_plot.colorbar_title = MVPAcfg.metric;
+    cfg_plot.climzero = 0.5;
+    mv_plot_2D(cfg_plot,TGMavg);hold on;
+    colormap(bt_colorscheme('TGM'));freezeColors;
+    title('Average empirical TGM')
+    xlabel('Test data (bin)')
+    ylabel('Training data (bin)')
+    % Adapt font
+    set(gca,'FontName',bt_plotparams('FontName'));
+    set(gca,'FontSize',bt_plotparams('FontSize'));
+end
+
+%% Adapt output variable
+% Add cluster correction information to output
+stats2.clusters.clusters_inds = c_TGM;
+stats2.clusters.clusters_p = p_TGM;
 end
