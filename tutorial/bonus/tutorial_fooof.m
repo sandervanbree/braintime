@@ -10,7 +10,7 @@
 %%% than 3.7 may not work) https://www.python.org/downloads/release/python-370/
 %%% You also need to pip install fooof
 %%% For all instructions, please go to the README file in the
-%%% external\fooof_mat\ folder.
+%%% ...\external\fooof_mat\ folder.
 
 % Step 1: Check whether Python is installed and accessible by MALAB
 pyversion
