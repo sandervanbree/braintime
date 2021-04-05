@@ -49,5 +49,4 @@ cfg.layout       = layout;           % load template for topography plotting
 
 %% Check data-to-cycle allocation
 cfg              = [];
-cfg.btsrate      = 128;              % determine sampling rate of bt data
 bt_checkallocation(cfg, ct_data, bt_carrier_1, bt_carrier_2);

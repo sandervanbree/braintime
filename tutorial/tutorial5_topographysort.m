@@ -1,7 +1,7 @@
 %%% In tutorial 5 we will make a template topography that can be 
-%%% used to bias the ranking of warping sources.
-%%% In addition, we will take this chance to look at another way of
-%%% analyzing TGMs: 'cutartefact'.
+%%% used to change the ranking of warping sources to activity in regions of
+%%% interest. In addition, we will take this opportunity to try out several
+%%% other available parameters.
 
 %% Generate a template topography
 % Create a template topography, which will be saved in the toolbox
@@ -63,6 +63,8 @@ cfgFT.foi        = 2:30;
 
 %% Select a warping source
 % Select a warping source with high power at 10 Hz, and parietal sources
+% The ordering of sources is now changed by their correlation to your
+% template topography.
 load layout_tutorial
 cfg              = [];
 cfg.layout       = layout;           % load template for topography plotting (not always needed)
@@ -70,8 +72,14 @@ cfg.layout       = layout;           % load template for topography plotting (no
 
 %% clock time to brain time
 cfg              = [];
-cfg.bt_srate     = 200;              % specify the sampling rate of bt_data
 cfg.removecomp   = 'no';             % remove component when using brain time warped data outside the toolbox to avoid circularity
+
+cfg.warpmethod   = 'waveshape';      % Let's try warping using the average waveshape in the data
+
+cfg.phasemethod  = 'GED';            % Generalized Eigendecomposition can be used to get a 
+                                     % holistic phase estimation of the warping frequency
+                                     % across the warping sources
+
 [bt_warpeddata]  = bt_clocktobrain(cfg,ct_data,bt_source);
 
 % cut ct_data to the same time window

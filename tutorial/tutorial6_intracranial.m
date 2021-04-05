@@ -42,7 +42,6 @@ cfg              = [];
 
 %% Warp original clock time data to brain time
 cfg              = [];
-cfg.btsrate      = 200;              % determine sampling rate of bt data
 [bt_struc]       = bt_clocktobrain(cfg,ct_data,bt_carrier);
 
 % cut ct_data to the same window

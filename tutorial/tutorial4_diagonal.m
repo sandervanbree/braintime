@@ -1,5 +1,5 @@
-%%% In tutorial 4 we will show that besides testing recurrence in TGMs, you
-%%% can also test for rhythmicity on the diagonal of TGMs. That is,
+%%% In tutorial 4 we will show that besides testing periodicity in TGMs,
+%%% you can also test for periodicity on the diagonal of TGMs. That is,
 %%% analyzing classification when training and testing on the same
 %%% timepoint, ignoring how training on one timepoint generalizes to other
 %%% timepoints. Tutorial 4 differs minimally from tutorial 2 and 3 -- the
@@ -70,7 +70,7 @@ end
 % Apply second level statistics
 cfg.numperms2      = 100000;                    % Number of second level Monte Carlo permutations
 cfg.multiplecorr   = 'fdr';                     % Multiple correction option
-cfg.cluster_p      = 0.55;                      % Threshold for TGM cluster significance testing
+cfg.cluster_p      = 0.05;                      % Threshold for TGM cluster significance testing
 cfg.cluster_n      = 10;                        % Maximum number of clusters
 cfg.cluster_smooth = 2;                         % Width of smoothing window (Gaussian SD), used only for cluster testing
 [ct_stats2] = bt_statslevel2(cfg,ct_stats1);    % Output matrix contains p-values and associated frequencies
