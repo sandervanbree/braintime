@@ -12,8 +12,6 @@ function [bt_warpeddata] = bt_clocktobrain(config, data, bt_source)
 %
 % Input Arguments:
 % config
-%   - bt_srate       % Sampling rate of the brain time data.
-%                    %
 %   - removecomp     % 'yes' (default): if the warping source is an ICA
 %                    % component, remove it from the brain time data. When
 %                    % analyzing brain time data using your own analysis
@@ -74,12 +72,8 @@ end
 mintime_ind = nearest(bt_source{5}.time,mintime);    % Index of start time of interest (differs for cutartefact)
 maxtime_ind = nearest(bt_source{5}.time,maxtime);    % Index of end time of interest
 
-% Set up sampling rate
-if isfield(config,'bt_srate')
-    phs_sr = config.bt_srate;
-else
-    phs_sr = 512; %Default sampling rate
-end
+% Set sampling rate of brain time to clock time sampling rate
+phs_sr = round(1/(data.time{1}(2)-data.time{1}(1)));
 
 %% Remove the component from original data if desired (default = yes)
 cfg           = [];
@@ -201,8 +195,6 @@ elseif strcmp(warpmethod,'waveshape')                         % warp using avera
         set(findobj(gcf,'type','axes'),'FontName',bt_plotparams('FontName'),'FontSize',bt_plotparams('FontSize'));
     end
 end
-
-
 
 for nt=1:size(phs,1)
     tmpphstrl=unwrap((phs(nt,:)));
