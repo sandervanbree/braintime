@@ -16,7 +16,7 @@
 pyversion
 
 % Load your warping source structure
-load tutorial1_output warpsources 
+load tutorial1_output warpsources
 
 % Restrict tutorial to 10 trials to speed things up
 cfg         = [];
