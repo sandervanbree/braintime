@@ -26,7 +26,7 @@ function [warpsigGED] = ged_foiComp(data,warpfreq)
 settings.trials  = 1:size(data.trial,1);                     % number of trials
 settings.foi     = warpfreq;                                 % warping frequency
 settings.fs      = round(1/(data.time(2)-data.time(1)));     % sampling rate
-settings.visopt  = 1;                                        % visualize results? Warning: only 3 example trials will be plotted
+settings.visopt  = 0;                                        % visualize results? Warning: only 3 example trials will be plotted
 
 % Full width at half maximum around the warping frequency (higher fwhm will include a more frequencies)
 % Use exponential function to determine FWHM
