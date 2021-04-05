@@ -51,7 +51,7 @@ cfg.warpfreqs    = [10 10];          % frequency range of interest for brain tim
 cfg.correct1f    = 'yes';            % apply 1/f correction after FFT, for plotting purposes only
 cfg.nwarpsources  = 10;              % consider only the 10 best warping sources
 cfg.rankmethod   = 'maxpow';         % sort warping sources by power in frequency range of interest.
-                                     %  Alternative: 'templatetopo' (see tutorial 4)
+                                     % Alternative: 'templatetopo' (see tutorial 4)
 cfg.cutmethod    = 'consistenttime'; % 'cutartefact' or 'consistenttime' See "help bt_analyzecarriers"
                                      % or our paper for details
 
@@ -76,9 +76,17 @@ cfg              = [];
 cfg.bt_srate     = ct_data.fsample;  % specify the sampling rate of bt_data
 cfg.removecomp   = 'no';             % remove component when using brain time warped data outside
                                      % the toolbox to avoid circularity
-cfg.warpmethod   = 'waveshape';      % 'stationary', 'waveshape'
-cfg.phasemethod  = 'GED';            % 'FFT', 'GED'
-cfg.visualcheck  = 'on';             % visualize several steps to check for errors
+cfg.warpmethod   = 'stationary';     % 'stationary': the toolbox warps the data using a stationary
+                                     % sinusoid at the warping frequency (default).
+                                     % 'waveshape': the toolbox warps to the average waveshape for
+                                     % the warping frequency.
+
+cfg.phasemethod  = 'FFT';            % 'FFT': the phase dynamics of the warping signal
+                                     % as estimated by ft_freqanalysis (default).
+                                     % 'GED': the phase dynamics of the warping signal 
+                                     % as estimated by Generalized Eigendecomposition
+                                     
+cfg.visualcheck  = 'on';             % Visualize several steps to check for errors
 [bt_warpeddata]  = bt_clocktobrain(cfg,ct_data,bt_source);
 
 % cut ct_data to the same time window
