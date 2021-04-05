@@ -229,7 +229,7 @@ while finish==0
         if src_ind > numel(srcrank) % make sure source cannot go out of bounds
             src_ind = 1;
         end
-    elseif value == 113 || value == 87  || value == 120 || value == 88 %stop the loop if it is not necessesary to keep visualising
+    elseif value == 113 || value == 87  || value == 120 || value == 88 || value == 32 %stop the loop if it is not necessesary to keep visualising
         fprintf('Warping signal will be the %0.2fHz phase in warping source %d.',maxfreq,currsrc)
         src_ind = (numel(srcrank))+1;
         close(f1)
