@@ -30,10 +30,15 @@ ct_data.trialinfo = clabel;
 % for details and recommendations.
 
 %% Step 2: Extract warping sources, which contain warping signals
-% "Warping source": The data that contains your warping signal. These can
-% be ICA components, source localized data, LFP from macrowires, etc.
-% "Warping signal": A signal of interest within warping sources. The
+% The toolbox requires two electrophysiology data structures: clock time
+% data and warping sources. The former is what you want to transform. The 
+% latter is what you use to transform. These can be ICA components, source
+% localized data, LFP from macrowires, or a channel from the clock time
+% data itself.
+% Each warping source contains potential warping signals - a frequency of
+% interest predicted to carry the studied cognitive process. The
 % clock time data will be warped according to this signal's dynamics.
+
 cfg              = [];
 cfg.method       = 'runica';
 cfg.runica.pca   = 30;               % Let's get 30 to save time
