@@ -48,7 +48,11 @@ cfgFT.foi        = 2:30;
 
 [fft_sources]   = bt_analyzesources(cfg,cfgFT,warpsources);
 
-% No layout needed as we are working with intracranial data
+% Select source
+cfg              = []; % No layout needed as we are working with intracranial data
+[bt_source]      = bt_selectsource(cfg,fft_sources,warpsources);
+
+% Clock to brain
 cfg              = [];
 cfg.warpmethod   = 'waveshape';    % Rodent theta can be quite asymmetric,
                                    % so warping using the average waveshape
@@ -59,9 +63,9 @@ cfg.visualcheck  = 'on';
 cfg.removecomp   = 'no';
 [bt_warpeddata]  = bt_clocktobrain(cfg,ct_data,bt_source);
 
-% cut ct_data to the same window
+% cut ct_data to the same time window
 cfg        = [];
-cfg.toilim = [bt_struc.toi(1) bt_struc.toi(2)];
+cfg.toilim = [bt_warpeddata.toi(1) bt_warpeddata.toi(2)];
 ct_data    = ft_redefinetrial(cfg, ct_data);
 
 %% Save results for tutorial 5

@@ -34,12 +34,12 @@ subj4.ct_data   = ct_data;
 % First level statistics (single subjects)
 cfg.mvpacfg         = cfg_mv;          % Input previous MVPA Light config structure
 cfg.figure          = 'yes';           % Plot first level stats of each participant
-cfg.numperms1       = 5;               % Number of permutations on the first level (per participant).
+cfg.numperms1       = 2;               % Number of permutations on the first level (per participant).
                                        % For real analyses, this should be higher.
 cfg.statsrange      = [1 22];          % Range of tested periodicity rates
 cfg.clabel          = clabel;          % We've saved clabel from last tutorial
 
-for subj = 1:4 % This takes a minute or two for this data
+for subj = 1:1 % This takes a minute or two for this data
 data = eval(strcat('subj',num2str(subj),'.ct_data'));
 quant = eval(strcat('subj',num2str(subj),'.ct_quant'));
 [ct_stats1{subj}] = bt_statslevel1(cfg,data,quant); %bt_statslevel2 requires one cell for each participant
@@ -49,14 +49,14 @@ end
 % just copy pasted datasets. Moreover, since our cfg.numperm1 is so low,
 % significant testing is disabled on the first level. Let's just close 
 % the plots and turn off 1st level plotting for now.
-close all;
-cfg.figure = 'no';
+% close all;
+% cfg.figure = 'no';
 
 % Apply second level statistics (group-level)
 cfg.numperms2      = 100000;                    % Number of second level Monte Carlo permutations
 cfg.multiplecorr   = 'fdr';                     % Multiple correction option
-cfg.cluster_p      = 0.05;                      % Threshold for TGM cluster significance testing
-cfg.cluster_n      = 10;                        % Maximum number of clusters
+cfg.cluster_p      = 0.35;                      % Threshold for TGM cluster significance testing
+cfg.cluster_n      = 20;                        % Maximum number of clusters
 cfg.cluster_smooth = 2;                         % Width of smoothing window (Gaussian SD), used only for cluster testing
 [ct_stats2] = bt_statslevel2(cfg,ct_stats1);    % Output matrix contains p-values and associated frequencies
 disp('Clock Time results (LOW periodicity)')

@@ -20,7 +20,7 @@ clabel             = bt_warpeddata.clabel;
 % Use MVPA Light to generate time generalization matrices (TGM)
 cfg_mv.classifier  = 'lda';     % Linear Discriminant Analysis
 cfg_mv.metric      = 'acc';     % Accuracy
-cfg_mv.repeat      = 2;         % Number of repetitions; use higher number for real data
+cfg_mv.repeat      = 1;         % Number of repetitions; use higher number for real data
 cfg_mv.cv          = 'kfold'; 
 cfg_mv.k           = 5;         % Number of folds
 [ct_TGM, ~]        = mv_classify_timextime(cfg_mv, ct_data.trial, clabel);
