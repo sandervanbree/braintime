@@ -68,7 +68,7 @@ msg = ['The warping sources are ranked by ',newline,...
     'components explain more variance)',newline,newline,...
     'Browse:       \leftarrow or \rightarrow arrow',newline,...
     'Highlight:     Click component',newline,...
-    'Quit:            Q, space, or enter'];
+    'Quit:            Q, X, or space'];
 
 % Prepare figure
 src_oi = -2; %source of interest
@@ -112,8 +112,9 @@ while finish==0
     minfoi_l = line([mintime,maxtime],[minfoi, minfoi],'Color',bt_colorscheme('foi_borders'),'LineWidth',1);
     maxfoi_l = line([mintime,maxtime],[maxfoi, maxfoi],'Color',bt_colorscheme('foi_borders'),'LineWidth',1);
     text((maxtime+mintime)/2,maxfreq+1,[num2str(maxfreq),' Hz'],'FontSize',14,'fontweight', 'bold','Color','k')
-    legend(warps_line','Warping signal')
-    set(gca,'FontSize',14);
+    l1 = legend(warps_line','Warping signal'); 
+    l1.FontSize = 14;
+    set(gca,'FontSize',14); 
     title(sprintf('Warping source %d | Warping signal: %0.3f power at %0.2fHz',currsrc,(srcrank(src_ind,4))/maxp,maxfreq),'FontSize',14)
     colormap(bt_colorscheme('ephys_tfr'));freezeColors;
     
@@ -180,7 +181,8 @@ while finish==0
     end
     
     set(gca,'FontSize',14);
-    legend(w_mrk,'Warping signal',['Warping signal (',num2str(maxfreq),' Hz'])
+    l2 = legend(w_mrk,'Warping signal',['Warping signal (',num2str(maxfreq),' Hz']);
+    l2.FontSize = 14;
     xlim([minfft maxfft]);
     ylim([-0.03 1.03])
     xlabel('Frequency (Hz)')
@@ -202,18 +204,14 @@ while finish==0
     % Adapt figure based on keypress
     keydown = waitforbuttonpress;
     value = double(get(gcf,'CurrentCharacter'));
-    [~,~,keyCode] = KbCheck;
-    key = KbName(find(keyCode));
     
     % Delete plots
     if exist('inst','var')
         delete(inst)
-    end
-    
+    end   
     if exist('sp2','var')
         delete(sp2)
     end
-    
     if exist('sp3','var')
         delete(sp3)
     end
@@ -231,7 +229,7 @@ while finish==0
         if src_ind > numel(srcrank) % make sure source cannot go out of bounds
             src_ind = 1;
         end
-    elseif sum(strcmp(key,'q'))>=1 || sum(strcmp(key,'space'))>=1 || sum(strcmp(key,'return'))>=1 %stop the loop if it is not necessesary to keep visualising
+    elseif value == 113 || value == 87  || value == 120 || value == 88 %stop the loop if it is not necessesary to keep visualising
         fprintf('Warping signal will be the %0.2fHz phase in warping source %d.',maxfreq,currsrc)
         src_ind = (numel(srcrank))+1;
         close(f1)
@@ -239,7 +237,7 @@ while finish==0
     end
 end
 
-%% Get General Eigendecomposition (GED) phase for warping frequency
+%% Get Generalized Eigendecomposition (GED) phase for warping frequency
 % A timelock format is well-geared for Mike X Cohen's functions.
 cfg                     = [];
 cfg.keeptrials          = 'yes';

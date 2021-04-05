@@ -209,7 +209,6 @@ srcrank = srcrank(1:nwarpsources,:); % take the best sources
 ncycles = 2; % Number of cycles to extract
 [asymmidx,asymmidx_t,wavshap] = bt_calcwaveshape(warpsources,ncycles,srcrank);
 
-
 %% Save information
 % Filter relevant frequency spectrum information
 fspecinfo.freq     = fspec.freq;
