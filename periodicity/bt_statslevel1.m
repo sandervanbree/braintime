@@ -125,9 +125,10 @@ if figopt == 1
     end
         
     %% Plot results
-    figure;hold on;bt_figure;
+    figure;hold on;bt_figure('clocktime_per');
 
     if strcmp(refdimension.dim,'braintime') % Only for brain time, separate warped frequency
+        bt_figure('braintime_per');
         subplot(1,10,1:3)
         
         % Plot the warped freq
@@ -162,7 +163,7 @@ if figopt == 1
            violinplot(allPerm,'test','ShowData',false,'ViolinColor',[0.8 0.8 0.8],'MedianColor',[0 0 0],'BoxColor',[0.5 0.5 0.5],'EdgeColor',[0 0 0],'ViolinAlpha',0.3);
            % Set legend
             h = get(gca,'Children');
-            l2 = legend(h([numel(h) 3]),'Empirical (emp) periodicity power','Permuted (perm) periodicity power');
+            l2 = legend(h([numel(h) 3]),'Empirical periodicity power','Permuted periodicity power');
             set(l2,'Location','best');
         catch
             boxplot(allPerm)           
@@ -173,7 +174,7 @@ if figopt == 1
             % Set legend
             toMark = findobj('Color','red','LineStyle','-');
             h = get(gca,'Children');
-            l2 = legend([h(2),toMark(1)],'Empirical (emp) periodicity power','Permuted (perm) periodicity power');
+            l2 = legend([h(2),toMark(1)],'Empirical periodicity power','Permuted periodicity power');
             set(l2,'Location','best');
         end
         
@@ -195,13 +196,13 @@ if figopt == 1
         % Adapt font
     set(gca,'FontName',bt_plotparams('FontName'));
     set(gca,'FontSize',bt_plotparams('FontSize'));
-        
+    l2.FontSize = bt_plotparams('FontSizeLegend');
+    
         % Now plot periodicity power spectrum
         subplot(1,10,5:10)
         hold on
     end
     
-    yyaxis left
     p1 = plot(f,pspec_emp,'LineStyle','-','LineWidth',3,'Color',bt_colorscheme('per_ps_emp')); %Mean across 1st level perms
     p2 = plot(f,mean(pspec_perm,1),'LineStyle','-','LineWidth',2,'Color',bt_colorscheme('per_ps_perm')); %Mean across 1st level perms
     xlim([f(1) f(end)]);
@@ -223,9 +224,9 @@ if figopt == 1
         p4 = patch([f fliplr(f)],[low_CI' fliplr(hi_CI')], 1,'FaceColor', bt_colorscheme('confidenceinterval'), 'EdgeColor', 'none', 'FaceAlpha', 0.15);
         
         % legend
-        l2 = legend([p1 p2 p3 p4],{'Average emp spectrum','Average perm spectrum', 'Warped frequency', 'Conf. interv. perm spectrum'});
+        l2 = legend([p1 p2 p3 p4],{'Empirical spectrum','Permuted spectrum', 'Warped frequency', 'Conf. interv. perm spectrum'});
     else
-        l2 = legend([p1 p2 p3],{'Average emp spectrum','Average perm spectrum','Warped frequency'});
+        l2 = legend([p1 p2 p3],{'Empirical spectrum','Permuted spectrum','Warped frequency'});
     end
     set(l2,'Location','best')
     
@@ -235,7 +236,8 @@ if figopt == 1
     % Adapt font
     set(gca,'FontName',bt_plotparams('FontName'));
     set(gca,'FontSize',bt_plotparams('FontSize'));
-    
+    l2.FontSize = bt_plotparams('FontSizeLegend');
+
     % Notify user about lack of p-values
     disp('p-values are calculated in the second-level statistics (bt_TGMstatslevel2)');
 end

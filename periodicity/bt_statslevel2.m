@@ -213,10 +213,11 @@ end
 %% Plot results
 % Relationship empirical and empirical power at all freqs
 figure;hold on;
-bt_figure;
+bt_figure('clocktime_per');
 
 if strcmp(refdimension.dim,'braintime') % Only for brain time, separate warped frequency
-    subplot(1,10,1:3)
+    subplot(1,10,1:3);
+    bt_figure('braintime_per');
     
     % Plot the warped freq
     wfreq_emp = PS_emp_avg(:,wfreq_i); % Empirical data at warped freq
@@ -250,7 +251,7 @@ if strcmp(refdimension.dim,'braintime') % Only for brain time, separate warped f
         violinplot(allPerm,'test','ShowData',false,'ViolinColor',bt_colorscheme('confidenceinterval'),'MedianColor',bt_colorscheme('per_ps_perm'),'BoxColor',[0.7 0.7 0.7],'EdgeColor',[1 1 1],'ViolinAlpha',0.15);
         % Set legend
         h = get(gca,'Children');
-        l2 = legend(h([numel(h) 3]),'Empirical (emp) periodicity power','Permuted (perm) periodicity power');
+        l2 = legend(h([numel(h) 3]),'Empirical periodicity power','Permuted periodicity power');
         set(l2,'Location','best');
     catch
         boxplot(allPerm)
@@ -261,7 +262,7 @@ if strcmp(refdimension.dim,'braintime') % Only for brain time, separate warped f
         % Set legend
         toMark = findobj('Color','red','LineStyle','-');
         h = get(gca,'Children');
-        l2 = legend([h(2),toMark(1)],'Empirical (emp) periodicity power','Permuted (perm) periodicity power');
+        l2 = legend([h(2),toMark(1)],'Empirical periodicity power','Permuted periodicity power');
         set(l2,'Location','best');
     end
     
@@ -283,6 +284,7 @@ if strcmp(refdimension.dim,'braintime') % Only for brain time, separate warped f
     % Adapt font
     set(gca,'FontName',bt_plotparams('FontName'));
     set(gca,'FontSize',bt_plotparams('FontSize'));
+    l2.FontSize = bt_plotparams('FontSizeLegend');
     
     title('2nd level periodicity')
     
@@ -336,6 +338,7 @@ title('Periodicity power spectra (2nd level stats)');
 % Adapt font
 set(gca,'FontName',bt_plotparams('FontName'));
 set(gca,'FontSize',bt_plotparams('FontSize'));
+l2.FontSize = bt_plotparams('FontSizeLegend');
 
 %% Adapt output variable
 % Add freq and pval information to output
@@ -414,14 +417,14 @@ disp('Testing for significant clusters, this may take a while...');
 % where the empirical TGMs are compared against the average permuted TGMs
 [c_TGM,p_TGM,~,~] = permutest(emp_clus,perm_clus,true,cluster_p,cluster_nperm,false,cluster_n);
 
-% Transpose for diagonal
-if strcmp(mapmethod,'diag')
+% Transpose depending on output orientation
+ if size(c_TGM{1},2) > size(c_TGM{1},1)
     p_TGM = p_TGM';
     c_TGM = c_TGM';
     for i = 1:numel(c_TGM)
         c_TGM{i} = c_TGM{i}';
     end
-end
+ end
 
 % Find significant clusters
 sig_clus = find(p_TGM<=cluster_p);
@@ -469,7 +472,7 @@ if strcmp(mapmethod,'diag')
     diagavg_Z = squeeze(mean(emp_clus,2));
     
     figure;subplot(5,5,1:10);hold on;
-    bt_figure(0);
+    bt_figure('halflong');
     plot(diagavg_Z,'LineWidth',3,'Color',bt_colorscheme('diagonal'));
     
     try % For old Matlab versions
@@ -497,14 +500,14 @@ if strcmp(mapmethod,'diag')
     % Plot significant and non-significant datapoints
     if isempty(clust_sig_ind) && isempty(clust_nsig_ind)~=1
         c1 = plot(clust_nsig_ind,lim,'o','linewidth', 0.1, 'color',bt_colorscheme('nsigcluster'),'MarkerFaceColor',bt_colorscheme('nsigcluster'));hold on;
-        legend(c1(1),'Non-significant clusters');
+        l1 = legend(c1(1),'Non-significant clusters');
     elseif isempty(clust_sig_ind)~=1 && isempty(clust_nsig_ind)
         c1 = plot(clust_sig_ind,lim,'o','linewidth', 0.1, 'color',bt_colorscheme('sigcluster'),'MarkerFaceColor',bt_colorscheme('sigcluster'));hold on;
-        legend(c1(1),'Significant clusters');
+        l1 = legend(c1(1),'Significant clusters');
     elseif isempty(clust_sig_ind)~=1 && isempty(clust_nsig_ind)~=1
         c1 = plot(clust_sig_ind,lim,'o','linewidth', 0.1, 'color', bt_colorscheme('sigcluster'),'MarkerFaceColor',bt_colorscheme('sigcluster'));hold on;
         c2 = plot(clust_nsig_ind,lim,'o','linewidth', 0.1, 'color', bt_colorscheme('nsigcluster'),'MarkerFaceColor',bt_colorscheme('nsigcluster'));hold on;
-        legend([c1(1),c2(1)],'Significant clusters', 'Non-significant clusters');
+        l1 = legend([c1(1),c2(1)],'Significant clusters', 'Non-significant clusters');
     end
     
     % Plot regular average diagonal;
@@ -524,6 +527,7 @@ if strcmp(mapmethod,'diag')
     % Adapt font
     set(gca,'FontName',bt_plotparams('FontName'));
     set(gca,'FontSize',bt_plotparams('FontSize'));
+    l1.FontSize = bt_plotparams('FontSizeLegend');
     
     % Plot TGM option
 else
@@ -540,7 +544,7 @@ else
     
     % Plot clusters in mean empirical TGM
     figure;hold on;
-    bt_figure(0);
+    bt_figure('cluster');
     subplot(10,2,[3 5 7 9 11 13 15]);
     cfg_plot = [];
     cfg_plot.colorbar = 1;
@@ -550,9 +554,9 @@ else
     mv_plot_2D(cfg_plot,TGMavg_Z);hold on;
     colormap(bt_colorscheme('TGM'));freezeColors;
     if cluster_smooth == 0
-        title('Z-scored average empirical TGM (clusters)')
+        title('Z-scored average TGM (clusters)')
     else
-        title('Smoothed Z-scored average empirical TGM (clusters)')
+        title('Smoothed Z-scored average TGM (clusters)')
     end
     xlabel('Test data (bin)')
     ylabel('Training data (bin)')
@@ -562,7 +566,7 @@ else
     
     contour(1:size(TGMavg,1),1:size(TGMavg,2),TGM_sig_mask,1,'linewidth', 2, 'color',bt_colorscheme('sigcluster'));hold on;
     contour(1:size(TGMavg,1),1:size(TGMavg,2),TGM_nsig_mask,1,'linewidth', 2, 'color',bt_colorscheme('nsigcluster'));
-    legend('Significant clusters', 'Non-significant clusters');
+    l1 = legend('Significant clusters', 'Non-significant clusters');
     
     subplot(10,2,[4 6 8 10 12 14 16]);
     cfg_plot.colorbar_title = MVPAcfg.metric;
@@ -575,6 +579,7 @@ else
     % Adapt font
     set(gca,'FontName',bt_plotparams('FontName'));
     set(gca,'FontSize',bt_plotparams('FontSize'));
+    l1.FontSize = bt_plotparams('FontSizeLegend');
 end
 
 %% Adapt output variable

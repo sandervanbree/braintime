@@ -137,7 +137,7 @@ end
 % Plotting TGM diagonal (no time generalization)
 if figopt == 1 && strcmp(mapmethod,'diag')
     % Plot Diagonal
-    figure; bt_figure('default');
+    figure; bt_figure('halfwide');
     subplot(2,1,1)
     xvec = linspace(timevec(1),timevec(end),numel(mp));
     plot(xvec,mp,'LineWidth',3,'Color',bt_colorscheme('diagonal'));
@@ -173,7 +173,7 @@ if figopt == 1 && strcmp(mapmethod,'diag')
     % Plotting TGMs and AC maps
 elseif figopt == 1 && strcmp(mapmethod,'tgm') || strcmp(mapmethod,'ac')
     % Plot TGM
-    figure; bt_figure(0);
+    figure; bt_figure('halfwide');
     subplot(2,2,1);
     cfg_plot= [];
     cfg_plot.clim = bt_plotparams('TGM_clim');
@@ -181,8 +181,8 @@ elseif figopt == 1 && strcmp(mapmethod,'tgm') || strcmp(mapmethod,'ac')
     cfg_plot.y   = linspace(timevec(1),timevec(end),size(mp,2));
     mv_plot_2D(cfg_plot, TGM);
     cb = colorbar;
-    colormap(bt_colorscheme('TGM'));freezeColors;
-    title(cb,MVPAcfg.metric)
+    colormap(bt_colorscheme('TGM'));
+    title(cb,MVPAcfg.metric);freezeColors;
     xlim([timevec(1) timevec(end)]);
     ylim([timevec(1) timevec(end)]);
     xticks(yticks) % make ticks the same on the two axes
@@ -216,13 +216,13 @@ elseif figopt == 1 && strcmp(mapmethod,'tgm') || strcmp(mapmethod,'ac')
     subplot(2,2,2);
     pcolor(timevec,timevec,mp2(1:numel(timevec),1:numel(timevec)));shading interp;title('Autocorrelation map');
     colormap(bt_colorscheme('AC'));
-    caxis(clim);freezeColors;
+    caxis(clim);
     xticks(linspace(timevec(1),timevec(end),6)); % Create 11 steps
     yticks(xticks);
     xticklabels(linspace(-50,50,6)); % Indicate % shifted
     yticklabels(xticklabels);
     cb=colorbar;
-    title(cb,'corr')
+    title(cb,'corr');freezeColors;
     xlabel('Map shifted by x%')
     ylabel('Map shifted by y%')
     % Adapt font
@@ -247,7 +247,8 @@ if strcmp(refdimension.dim,'braintime') %warp freq line is dependent on clock (w
     p3.Color(4) = 0.85;
     
     % Add legend
-    legend('Periodicity power','Warped frequency');
+    l1 = legend('Periodicity power','Warped frequency');
+    l1.FontSize = bt_plotparams('FontSizeLegend');
 end
 
 if strcmp(mapmethod,'diag')
