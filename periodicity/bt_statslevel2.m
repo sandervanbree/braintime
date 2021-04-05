@@ -325,9 +325,9 @@ sigind = find(pval_corr<=0.05);
 if isempty(sigind) ~= 1
     p5 = plot(f(sigind),0,'r*','MarkerSize',10,'LineWidth',1.5,'color',bt_colorscheme('sigstar'));
     % legend
-    l2 = legend([p1 p2 p3 p4 p5(1)],{'Average emp spectrum','Average perm spectrum', 'Conf. interv.', '-log10 p-value', 'p <= 0.05'});
+    l2 = legend([p1 p2 p3 p4 p5(1)],{'Empirical spectrum','Permuted spectrum', 'Conf. interv.', '-log10 p-value', 'p <= 0.05'});
 else
-    l2 = legend([p1 p2 p3 p4],{'Average emp spectrum','Average perm spectrum', 'Conf. interv.', '-log10 p-value'});
+    l2 = legend([p1 p2 p3 p4],{'Empirical spectrum','Permuted spectrum', 'Conf. interv.', '-log10 p-value'});
 end
 set(l2,'Location','best')
 
@@ -486,9 +486,9 @@ if strcmp(mapmethod,'diag')
     ylabel('Z-value');
     
     if cluster_smooth == 0
-        title('Z-scored average empirical TGM Diagonal (classifier time course)');
+        title('Z-scored empirical TGM Diagonal');
     else
-        title('Smoothed Z-scored average empirical TGM Diagonal (classifier time course)');
+        title('Smoothed Z-scored empirical TGM Diagonal');
     end
     % Adapt font
     set(gca,'FontName',bt_plotparams('FontName'));
