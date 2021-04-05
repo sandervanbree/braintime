@@ -76,6 +76,9 @@ cfg              = [];
 cfg.bt_srate     = ct_data.fsample;  % specify the sampling rate of bt_data
 cfg.removecomp   = 'no';             % remove component when using brain time warped data outside
                                      % the toolbox to avoid circularity
+cfg.warpmethod   = 'waveshape';      % 'stationary', 'waveshape'
+cfg.phasemethod  = 'GED';            % 'FFT', 'GED'
+cfg.visualcheck  = 'on';             % visualize several steps to check for errors
 [bt_warpeddata]  = bt_clocktobrain(cfg,ct_data,bt_source);
 
 % cut ct_data to the same time window
