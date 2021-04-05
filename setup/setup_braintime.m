@@ -1,6 +1,24 @@
 function setup_braintime
-% Check for Signal Processing Toolbox, FieldTrip and MVPA Light, and add
-% brain time folders to path.
+% Add all folders to path, and check for Signal Processing Toolbox,
+% FieldTrip and MVPA Light.
+
+% Add all folders and subfolders to path
+braintime_path = fileparts(fileparts(mfilename('fullpath')));
+try
+    addpath(genpath(fullfile(braintime_path,'setup')));
+    addpath(genpath(fullfile(braintime_path,'utilities')));
+    addpath(genpath(fullfile(braintime_path,'clocktobrain')));
+    addpath(genpath(fullfile(braintime_path,'tutorial')));
+    addpath(genpath(fullfile(braintime_path,'periodicity')));
+    addpath(genpath(fullfile(braintime_path,'datacheck')));
+    addpath(genpath(fullfile(braintime_path,'warpingsource')));
+    addpath(genpath(fullfile(braintime_path,'external')));
+    addpath(genpath(fullfile(braintime_path,'topography')));
+    addpath(genpath(fullfile(braintime_path,'dipolesimulation')));
+catch
+    error('Unable to add folders and subfolders to path. Please add all folders and subfolders to get started.');
+end
+    disp('All folders were successfully added to path.')
 
 % Check for Signal Processing Toolbox
 if exist('dtw') ~= 2
@@ -22,25 +40,6 @@ error('Unable to locate MVPA Light. Please set it up (using startup.m) or downlo
 else
 disp('MVPA Light is up and running...');    
 end
-
-% Add all folders and subfolders to path
-braintime_path = fileparts(fileparts(mfilename('fullpath')));
-try
-    addpath(genpath(fullfile(braintime_path,'setup')));
-    addpath(genpath(fullfile(braintime_path,'utilities')));
-    addpath(genpath(fullfile(braintime_path,'clocktobrain')));
-    addpath(genpath(fullfile(braintime_path,'tutorial')));
-    addpath(genpath(fullfile(braintime_path,'periodicity')));
-    addpath(genpath(fullfile(braintime_path,'datacheck')));
-    addpath(genpath(fullfile(braintime_path,'warpingsource')));
-    addpath(genpath(fullfile(braintime_path,'external')));
-    addpath(genpath(fullfile(braintime_path,'topography')));
-    addpath(genpath(fullfile(braintime_path,'dipolesimulation')));
-catch
-    error('Unable to add folders and subfolders to path. Please add all folders and subfolders to get started.');
-end
-    disp('All folders were successfully added to path.')
-
 
 % If we reach here, all checks have passed
 disp('Brain Time Toolbox setup successful - happy warping! The tutorials are a good place to start.');
