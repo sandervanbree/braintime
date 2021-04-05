@@ -88,4 +88,4 @@ pk_freqs = freq_avg(pk_inds);                                      % Get frequen
 for i = numel(pk_freqs)
 xline(pk_freqs(i),'LineWidth',2,'Color','g');
 end
-legend('Original Spectrum', 'Full Model Fit', 'Aperiodic Fit','Warping frequency');
+legend('Original Spectrum', 'Full Model Fit', 'Aperiodic Fit','Potential warping frequency');
