@@ -10,6 +10,9 @@ FontName = 'Arial';
 % Font size (except for bt_selectsource)
 FontSize = 15.5;
 
+% Font size for legends
+FontSizeLegend = 12;
+
 %% Axis limits 
 % By default, temporal generalization matrices (TGM), autocorrelation maps
 % (AC), and diagonal classification timecourses have a data-driven limit.
