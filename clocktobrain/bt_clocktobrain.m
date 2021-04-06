@@ -76,16 +76,30 @@ maxtime_ind = nearest(bt_source{5}.time,maxtime);    % Index of end time of inte
 phs_sr = round(1/(data.time{1}(2)-data.time{1}(1)));
 
 %% Remove the component from original data if desired (default = yes)
+circwarning   = 1;        % Warn the user for potential circularity by default
+
 cfg           = [];
 cfg.component = src_oi;
 if isfield(config,'removecomp')
     if strcmp(config.removecomp,'yes')
-        data = ft_rejectcomponent (cfg, warpsources, data);
+        if isfield(warpsources,'cfg') && isfield(warpsources.cfg,'method')
+            if strcmp(warpsources.cfg.method,'runica')
+                data = ft_rejectcomponent (cfg, warpsources, data);
+                circwarning = 0; % Component removed, so no need for a warning
+            else
+                error(['It is not possible to remove the warping component, because'...
+                    ' the warping sources are not ICA components.']);
+            end
+        else
+            error(['It is not possible to remove the warping component, because'...
+                ' the warping sources are not ICA components.']);
+        end
     end
 else
     % if the removal option is not specified, remove by default
-    if strcmp(warpsources.cfg.method,'runica')
+    if isfield(warpsources,'cfg') && isfield(warpsources.cfg,'method') && strcmp(warpsources.cfg.method,'runica')
         data = ft_rejectcomponent (cfg, warpsources, data);
+        circwarning = 0;
     end
 end
 
@@ -170,7 +184,7 @@ elseif strcmp(warpmethod,'waveshape')                         % warp using avera
     tempphs = imresize(tempphs,[1 tempsr*nsec]);              % resize to the desired length
     
     if strcmp(visualcheck,'on')                               % perform visual check
-        figure; hold on; bt_figure('half');
+        figure; hold on; bt_figure('halflong');
         
         subplot(3,1,1);
         tempsig_check = imresize(tempsig,[1 numel(timephs)]);                % Resize to timephs for plotting
@@ -189,7 +203,7 @@ elseif strcmp(warpmethod,'waveshape')                         % warp using avera
         plot(timephs,tempphs_check,'LineWidth',3,'Color',[0.8 0.1 0.1]);     % Unwrapped phase
         title('Unwrapped phase');
         xlabel('Time (cycles or seconds)');
-        ylabel('Unwrapped phase (Template [warped-to] signal)');
+        ylabel('Unwrapped phase');
         
         % Adapt font
         set(findobj(gcf,'type','axes'),'FontName',bt_plotparams('FontName'),'FontSize',bt_plotparams('FontSize'));
@@ -268,6 +282,21 @@ if strcmp(cutmethod,'cutartefact')
 else
     min_t = mintime_fft;
     max_t = maxtime_fft;
+end
+
+% Warn user for circularity
+if circwarning == 1
+    if isfield(warpsources,'cfg') && isfield(warpsources.cfg,'method') && strcmp(warpsources.cfg.method,'runica')
+        warning(['The warping sources look like ICA components obtained from the'...
+            ' clock time data. When using brain time transformed data for analyses outside of'...
+            ' the toolbox, it is strongly recommended to remove the component'...
+            ' by specifying cfg.removecomp = ''yes''.'])
+    else
+        warning(['When using brain time transformed data for analyses outside of the toolbox,'...
+            ' please ensure that the clock time data and warping sources used in'...
+            ' the toolbox were sufficiently independent. This is important to'...
+            ' avoid circularity issues.'])
+    end
 end
 
 %% Reformat data structure and include basic info
