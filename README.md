@@ -2,6 +2,7 @@
 
 TO DO:
 - in bt_analyzesources, nudge toward centering the specified frequencies exactly on warping frequency
+- how to deal with outliers in lvl 2
 - random gaussian field theory to perform multiple testing correction over power spectra and TGMs?
 
 LOW URGENCY:
