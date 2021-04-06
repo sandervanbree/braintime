@@ -180,6 +180,7 @@ elseif figopt == 1 && strcmp(mapmethod,'tgm') || strcmp(mapmethod,'ac')
     cfg_plot.x   = linspace(timevec(1),timevec(end),size(mp,1));
     cfg_plot.y   = linspace(timevec(1),timevec(end),size(mp,2));
     mv_plot_2D(cfg_plot, TGM);
+    axis square
     cb = colorbar;
     colormap(bt_colorscheme('TGM'));
     title(cb,MVPAcfg.metric);freezeColors;
@@ -215,7 +216,8 @@ elseif figopt == 1 && strcmp(mapmethod,'tgm') || strcmp(mapmethod,'ac')
     
     subplot(2,2,2);
     pcolor(timevec,timevec,mp2(1:numel(timevec),1:numel(timevec)));shading interp;title('Autocorrelation map');
-    colormap(bt_colorscheme('AC'));
+    axis square
+    colormap(bt_colorscheme('AC')); 
     caxis(clim);
     xticks(linspace(timevec(1),timevec(end),6)); % Create 11 steps
     yticks(xticks);

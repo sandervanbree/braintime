@@ -552,6 +552,7 @@ else
     cfg_plot.colorbar_title = 'Z-value';
     cfg_plot.climzero = 0;
     mv_plot_2D(cfg_plot,TGMavg_Z);hold on;
+    axis square
     colormap(bt_colorscheme('TGM'));freezeColors;
     if cluster_smooth == 0
         title('Z-scored average TGM (clusters)')
@@ -572,6 +573,7 @@ else
     cfg_plot.colorbar_title = MVPAcfg.metric;
     cfg_plot.climzero = 0.5;
     mv_plot_2D(cfg_plot,TGMavg);hold on;
+    axis square
     colormap(bt_colorscheme('TGM'));freezeColors;
     title('Average empirical TGM')
     xlabel('Test data (bin)')
