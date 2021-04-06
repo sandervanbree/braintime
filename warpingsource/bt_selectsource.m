@@ -49,7 +49,7 @@ wavshap = fft_sources{12};                             % Waveshape per warping s
 
 mintime_ind = nearest(fspecinfo.time,mintime);         % Index of start time of interest (differs for cutartefact)
 maxtime_ind = nearest(fspecinfo.time,maxtime);         % Index of end time of interest
-
+    
 %% Plot ranked warping sources
 % Find out ranking type
 if strcmp(rankmethod,'maxpow')
@@ -265,6 +265,7 @@ end
 
 %% Save basic info
 bt_source{1} = src_oi;                             % Warping source which contains the warping signal
+%               ^ this is the source index, not channel name!
 bt_source{2} = FFT_phs(src_oi);                    % Phase of all frequencies in this warping source
 bt_source{3} = warpsources;                        % Warping sources data
 bt_source{4} = srcrank(src_oi,:);                  % Time freq data of chosen warping source
