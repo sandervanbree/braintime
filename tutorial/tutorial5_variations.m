@@ -3,7 +3,8 @@
 %%% used to change the ranking of warping sources to activity in regions of
 %%% interest. Another change is that we apply the cutartefact method
 %%% during bt_analyzesources, to cope with an artefact that may alter
-%%% subsequent analyses. In addition, several toolbox tips are included.
+%%% subsequent analyses. We will also change the warping and phase method
+%%% used in bt_clocktobrain. Several tips will be included.
 
 %% Generate a template topography
 % Create a template topography, which will be saved in the toolbox
