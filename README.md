@@ -1,6 +1,6 @@
 |ProjectStatus|_ 
 
-.. |ProjectStatus| image:: http://www.repostatus.org/badges/latest/WIP.svg
+.. |ProjectStatus| image:: http://www.repostatus.org/badges/latest/wip.svg
 .. _ProjectStatus: https://www.repostatus.org/#wip
 
 ### Current to do list (for devs) | Official documentation starts below
