@@ -8,26 +8,32 @@
 %%% analysis is optimal when the neural signature underlying your classes
 %%% evolves within your time window of interest.
 
-% Since everything was saved, we can jump right into bt_TGMquantify
-load tutorial2_output 
+% Let's start off with the variables we had right before bt_quantify
+load tutorial2_output cfg_mv ct_data bt_data clabel bt_warpeddata
+
+% mv_classify_timextime (TGM) ---> mv_classify_across_time (Diagonal)
+[~, ct_mv]       = mv_classify_across_time(cfg_mv, ct_data.trial, clabel);
+[~, bt_mv]       = mv_classify_across_time(cfg_mv, bt_data.trial, clabel); 
 
 %% Quantify TGM periodicity (compare clock and brain time)
 cfg = [];
 cfg.bt_warpeddata   = bt_warpeddata;              % The warped data structure is required input
-cfg.MVPAcfg         = cfg_mv;                     % Input the MVPA Light config structure
 cfg.figure          = 'yes';
-cfg.mapmethod       = 'diag';                     % Let's see what the output looks like
-                                                  % when analyzing only the diagonal of TGMs.
-                                                                                                    
-cfg.periodicityfoi   = [1 22];                     % Range of tested periodicity rates
+% cfg.method          = 'tgm';                    % This is not needed - there is only one method for
+                                                  % diagonal analysis
+cfg.periodicityfoi   = [1 22];                    % Range of tested periodicity rates
 
 cfg.refdimension    = 'clocktime';                % Quantify periodicity as a function of seconds in the data
-ct_quant            = bt_quantify(cfg,ct_TGM);    % Clock time
+ct_quant            = bt_quantify(cfg,ct_mv);    % Clock time
 title('Clock time periodicity');
 
 cfg.refdimension    = 'braintime';                % Quantify periodicity as a function of passed cycles in the data
-bt_quant            = bt_quantify(cfg,bt_TGM);    % Brain time
+bt_quant            = bt_quantify(cfg,bt_mv);    % Brain time
 title('Brain time periodicity');
+
+% Note how recurrence may be higher than the warped frequency. Depending
+% on the underlying process, periodicity may be expected at 0.5x, 1x or 2x
+% the warped frequency. See the Brain Time Toolbox paper for more details.
 
 %% Create four dummy participants with identical data
 subj1.bt_quant  = bt_quant; % brain time quantified TGMs
@@ -54,26 +60,26 @@ subj4.ct_data   = ct_data;
 % Let's first show that the original data shows little to no periodicity
 
 % First level statistics (single subjects)
-cfg.mvpacfg         = cfg_mv;          % Input previous MVPA Light config structure
 cfg.figure          = 'no'; 
 cfg.numperms1       = 5;               % Number of permutations on the first level (per participant).
                                        % For real analyses, this should be higher.
 cfg.statsrange      = [1 22];          % Range of tested periodicity rates
-cfg.clabel          = clabel;          % We've saved clabel from last tutorial
 
 for subj = 1:4 % This takes a minute or two for this data
 data = eval(strcat('subj',num2str(subj),'.ct_data'));
 quant = eval(strcat('subj',num2str(subj),'.ct_quant'));
-[ct_stats1{subj}] = bt_statslevel1(cfg,data,quant); %bt_statslevel2 requires one cell for each participant
+[ct_stats1{subj}] = bt_statslevel1(cfg,data,quant); 
 end
 
 % Apply second level statistics
 cfg.numperms2      = 100000;                    % Number of second level Monte Carlo permutations
 cfg.multiplecorr   = 'fdr';                     % Multiple correction option
-cfg.cluster_p      = 0.05;                      % Threshold for TGM cluster significance testing
-cfg.cluster_n      = 10;                        % Maximum number of clusters
-cfg.cluster_smooth = 2;                         % Width of smoothing window (Gaussian SD), used only for cluster testing
-[ct_stats2] = bt_statslevel2(cfg,ct_stats1);    % Output matrix contains p-values and associated frequencies
+
+% By the way, many cfg_clus parameters are set to default values when not set manually
+cfg_clus.test             = 'permutation';            
+cfg_clus.correctm         = 'cluster';           
+cfg_clus.n_permutations   = 1000;               
+[ct_stats2] = bt_statslevel2(cfg,cfg_clus,ct_stats1);    
 disp('Clock Time results (LOW periodicity)')
 
 %% Brain time statistics
@@ -83,7 +89,7 @@ quant = eval(strcat('subj',num2str(subj),'.bt_quant'));
 [bt_stats1{subj}] = bt_statslevel1(cfg,data,quant);
 end
 
-[bt_stats2] = bt_statslevel2(cfg,bt_stats1); 
+[bt_stats2] = bt_statslevel2(cfg,cfg_clus,bt_stats1); 
 disp('Brain Time results (HIGH periodicity)')
 
 % Depending on the data structure, the TGM and diagonal may show recurrence

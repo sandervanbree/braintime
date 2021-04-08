@@ -32,14 +32,12 @@ subj4.ct_data   = ct_data;
 % Let's first show that the original data shows little to no periodicity
 
 % First level statistics (single subjects)
-cfg.mvpacfg         = cfg_mv;          % Input previous MVPA Light config structure
 cfg.figure          = 'yes';           % Plot first level stats of each participant
-cfg.numperms1       = 2;               % Number of permutations on the first level (per participant).
+cfg.numperms1       = 5;               % Number of permutations on the first level (per participant).
                                        % For real analyses, this should be higher.
 cfg.statsrange      = [1 22];          % Range of tested periodicity rates
-cfg.clabel          = clabel;          % We've saved clabel from last tutorial
 
-for subj = 1:1 % This takes a minute or two for this data
+for subj = 1:4 % This takes a minute or two for this data
 data = eval(strcat('subj',num2str(subj),'.ct_data'));
 quant = eval(strcat('subj',num2str(subj),'.ct_quant'));
 [ct_stats1{subj}] = bt_statslevel1(cfg,data,quant); %bt_statslevel2 requires one cell for each participant
@@ -55,10 +53,27 @@ end
 % Apply second level statistics (group-level)
 cfg.numperms2      = 100000;                    % Number of second level Monte Carlo permutations
 cfg.multiplecorr   = 'fdr';                     % Multiple correction option
-cfg.cluster_p      = 0.35;                      % Threshold for TGM cluster significance testing
-cfg.cluster_n      = 20;                        % Maximum number of clusters
-cfg.cluster_smooth = 2;                         % Width of smoothing window (Gaussian SD), used only for cluster testing
-[ct_stats2] = bt_statslevel2(cfg,ct_stats1);    % Output matrix contains p-values and associated frequencies
+
+% A plethora of cluster parameters are available that are sent to MVPA
+% Light for cluster correction. For details on each parameter, check out
+% .../MVPA-Light-master/examples/understanding_statistics.m
+
+cfg_clus.test             = 'permutation';  
+cfg_clus.correctm         = 'cluster';           
+cfg_clus.n_permutations   = 1000;                % Number of permutations
+cfg_clus.clusterstatistic = 'maxsum';            % Sums cluster statistics
+cfg_clus.tail             = 1;                   % One-sided test for above chance performance
+cfg_clus.alpha            = 0.05;                % Alpha value
+cfg_clus.statistic        = 'wilcoxon';          % Non-parametric counterpart to t-stats
+cfg_clus.null             = 0.5;                 % By default, most performance
+                                                 % metric's null is at 0.5
+cfg_clus.clustercritval   = 1.96;                % The critical z-value 
+% (From MVPA Light documentation):
+% z-val = 1.65 corresponds to uncorrected p-value = 0.1
+% z-val = 1.96 corresponds to uncorrected p-value = 0.05
+% z-val = 2.58 corresponds to uncorrected p-value = 0.01
+
+[ct_stats2] = bt_statslevel2(cfg,cfg_clus,ct_stats1);    % Output matrix contains p-values and associated frequencies
 disp('Clock Time results (LOW periodicity)')
 
 %% Brain time statistics
@@ -74,16 +89,13 @@ quant = eval(strcat('subj',num2str(subj),'.bt_quant'));
 [bt_stats1{subj}] = bt_statslevel1(cfg,data,quant);
 end
 
-[bt_stats2] = bt_statslevel2(cfg,bt_stats1); 
+[bt_stats2] = bt_statslevel2(cfg,cfg_clus,bt_stats1); 
 disp('Brain Time results (HIGH periodicity)')
 
 %% Results extraction
 disp(bt_stats2.warpedfreqs);   % Displays the warping frequency and its harmonics.
                                % Results are predicted at one of these frequencies.
                                
-disp(bt_stats2.mapmethod);     % Was the analysis performed over the TGM, its
-                               % AC map, or the diagonal?
-
 disp(bt_stats2.periodicity);   % A vector of the second level periodicity spectra;
                                % their frequency and corrected p-values.
                                % Specifically the bt_stats2.warpedfreqs are
@@ -91,6 +103,8 @@ disp(bt_stats2.periodicity);   % A vector of the second level periodicity spectr
                                % because periodicity is predicted at those
                                % rates.
                                
-disp(bt_stats2.clusters);      % These are the clusters in the tested dimension,
-                               % and their associated p-values.
+disp(bt_stats2.analysistype);  % Was the analysis performed over the TGM, its
+                               % AC map, or the diagonal?
 
+disp(bt_stats2.clusters);      % MVPA Light cluster results structure, with p-values
+                               % and cluster indices
