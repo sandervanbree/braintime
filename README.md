@@ -39,6 +39,7 @@ Warp electrophysiological data from clock time to brain time and analyze the per
 | Periodicity | rhythmic patterns of classification performance |
 |             |                                                 |
 | **General term** |           |
+| Classification timecourse (Diagonal) | training and testing a classifier on one timepoint |
 | Temporal generalization matrix (TGM) | training a classifier on one timepoint, and testing it on all other timepoints in the data |
 | fast Fourier Transform (FFT)         | an algorithm to go between the frequency and time domain of a signal | 
 | Generalized eigendecomposition (GED) | a mathematical approach to combine signals in different warping sources into a single timeseries |
