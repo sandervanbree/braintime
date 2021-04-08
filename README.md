@@ -1,4 +1,5 @@
 [![HitCount](http://hits.dwyl.com/sandervanbree/braintime.svg)](http://hits.dwyl.com/sandervanbree/braintime)
+https://www.repostatus.org/#WIP
 
 ### Current to do list (for devs) | Official documentation starts below
 
