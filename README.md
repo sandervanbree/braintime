@@ -38,10 +38,11 @@ Warp electrophysiological data from clock time to brain time and analyze the per
 | Brain time warping | a transformation of clock time data that employs the phase dynamics of the warping signal |
 | Periodicity | rhythmic patterns of classification performance |
 |             |                                                 |
-| **General term** |                                            |
+| **General term** | description |
 | Temporal generalization matrix (TGM) | training a classifier on one timepoint, and testing it on all other timepoints in the data |
 | Generalized eigendecomposition (GED) | a mathematical approach to combine signals in different warping sources into a single timeseries |
 | Independent component analysis (ICA) | a mathematical approach to separating electrophysiological data into additive subcomponents |
+| fast Fourier Transform (FFT)         | an algorithm to go between the frequency and time domain of a signal | 
 
 ## Table of contents
 [Installation](#installation)
