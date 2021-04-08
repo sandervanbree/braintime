@@ -1,5 +1,7 @@
 [![HitCount](http://hits.dwyl.com/sandervanbree/braintime.svg)](http://hits.dwyl.com/sandervanbree/braintime)
-https://www.repostatus.org/#wip
+.. image:: https://www.repostatus.org/badges/latest/wip.svg
+   :alt: Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.
+   :target: https://www.repostatus.org/#wip
 
 ### Current to do list (for devs) | Official documentation starts below
 
