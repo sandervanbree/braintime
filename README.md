@@ -1,6 +1,8 @@
+
 [![HitCount](http://hits.dwyl.com/sandervanbree/braintime.svg)](http://hits.dwyl.com/sandervanbree/braintime)
 
-javascript:showsample('wip','md')
+.. |ProjectStatus| image:: http://www.repostatus.org/badges/latest/WIP.svg
+.. _ProjectStatus: https://www.repostatus.org/#wip
 
 ### Current to do list (for devs) | Official documentation starts below
 
