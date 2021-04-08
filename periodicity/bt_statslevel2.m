@@ -1,22 +1,22 @@
-function [stats2] = bt_statslevel2(config, stats1)
+function [stats2] = bt_statslevel2(config,config_clus,stats1)
 % Performs second level statistics of periodicity power spectra, and tests
-% which TGM datapoints are significantly higher than the distribution of
-% permuted TGMs.
+% which TGM or diagonal datapoints are significantly higher than the
+% permutation distribution. Both the empirical and permuted spectra are
+% z-scored.
 %
-% - Second level statistics uses the first level permutated data. Numperm2
-% times, grab a random power spectrum of every participants' numperm1 pool
-% of permutated data and average. Then, for every frequency, the pvalue is
-% the percentile of the average empirical data's periodicity power spectra
-% in the null distribution of the permuted data's periodicity power spectra.
+% Second level statistics uses the first level permuted data.
+% Specifically, nperm2 times, grab a random power spectrum of every
+% participants' nperm1 pool and average it. Then, for each frequency, the
+% p-value is calculated as the percentile of the empirical power in the
+% nperm2 null distribution.
 %
-% - TGM significance testing compares each empirical TGM datapoint to
-% the same datapoint in the permuted distribution and tests whether
-% classifier performance exceeds 5%. Empirical and permuted  TGMs are
-% normalized using the mean and standard deviation of the permuted TGMs.
+% Finally, performance in the TGM or diagonal is tested for statistical 
+% significance using cluster correction. For this, the toolbox calls MVPA
+% Light.
 %
 % Use:
-% [pval] = bt_statslevel2(config, stats1), where stats1 has one cell
-% for each participant.
+% [stats2] = bt_statslevel2(config, config_clus, stats1), where stats1 has
+% one cell for each participant.
 %
 % Input Arguments:
 % config
@@ -28,17 +28,34 @@ function [stats2] = bt_statslevel2(config, stats1)
 %                    % on the False Discovery Rate, and 'bonferroni' for
 %                    % Bonferroni correction.
 %                    %
-%   - cluster_p      % The threshold for significant clusters in the
-%                    % cluster correction (default = 0.05).
+%   - cfg_clus       % Separate structure with cluster correction
+%                    % parameters, used as input to MVPA Light.
+%                    % For detailed information on all parameters, call
+%                    % "help mv_statistics" or see ".../MVPA-Light-master/
+%                    % examples/understanding_statistics.m"
+%                    %
+%                    % Primary parameters include:
+%                    % .test              ['binomial', 'permutation']
+%                    % .correctm          ['none', 'bonferroni', 'cluster']
+%                    % .tail              [-1 or +1]
+%                    % .n_permutations    [1000]
+%                    % .clusterstatistic  ['maxsum', 'maxsize']
+%                    % .alpha             [0.05]
+%                    % .statistic         ['ttest' 'wilcoxon' 'mean']
+%                    % .null              [0.5]
+%                    % .clustercritval    [z-value; 1.96]
 %                    %
 % stats1             % Output structure obtained using bt_statslevel1.
-%                    % Each cell contains one participants' empirical TGM,
-%                    % permuted TGMs, periodicity power spectrum of the
-%                    % empirical and permuted TGM, and the associated
-%                    % frequency vector.
+%                    % Each cell contains one participant's empirical and
+%                    % permuted TGMs/diagonals, the empirical and permuted
+%                    % periodicity power spectra, and the tested
+%                    % frequencies.
 %                    %
-% Output:            %
-% UPDATE
+% Output:            % 
+% stats2             % Output structure that contains periodicity p-values
+%                    % and tested frequencies, the employed analysis type,
+%                    % and a cluster statistics structure from MVPA Light.
+
 
 %% Crop away empty participant cells
 stats1 = stats1(~cellfun('isempty',stats1));
@@ -46,23 +63,34 @@ stats1 = stats1(~cellfun('isempty',stats1));
 %% Get information
 numsubj = numel(stats1);                             % Number of participants
 numperms1 = size(stats1{1}.permspec,1);              % Number of first level permutations
-mapmethod = stats1{1}.mapmethod;                     % Save whether analysis is done over TGM, AC map, or diag
-MVPAcfg = stats1{1}.MVPAcfg;                         % MVPA Light configuration structured used to obtain TGM
-
-cluster_p = bt_defaultval(config,'cluster_p',0.05);          % Cluster-correction p-value threshold
-cluster_n = bt_defaultval(config,'cluster_n',10);            % Cluster-correction number of clusters
-cluster_smooth = bt_defaultval(config,'cluster_smooth',0);   % Smoothing for better Cluster-correction
-numperms2 = bt_defaultval(config,'numperms2',10^5);          % Number of second level permutations
+numperms2 = config.numperms2;                        % Number of second level permutations
+mv_cfg = stats1{1}.mv_results.cfg;                   % MVPA Light results structure
 
 refdimension = stats1{1}.refdimension;               % Find out the reference dimension (clock or brain time)
 
-% Sanity check
+% Check
 if numperms2 <10^5
     numperms2 = 10^5;
     warning(['Due to high variance in this statistical procedure, the number of second level permutations has been increased from ', num2str(numperms2),' to 100000.']);
 end
 
-%% STEP 1: SECOND LEVEL STATISTICS OF PERIODICITY POWER SPECTRA
+%% STEP 1: Z-SCORE EMPIRICAL AND PERMUTED PERIODICITY POWER SPECTRA
+for i = 1:numel(stats1)                              % For each participant...
+    
+    % Empirical
+    mn_emp = mean(stats1{i}.empspec);
+    sd_emp = std(stats1{i}.empspec);
+    stats1{i}.empspec = (stats1{i}.empspec-mn_emp)./sd_emp;
+    
+    % Permuted
+    for p = 1:size(stats1{i}.permspec,1)             % Loop through permutations
+    mn_perm = mean(stats1{i}.permspec(p,:));
+    sd_perm = std(stats1{i}.permspec(p,:));
+    stats1{i}.permspec(p,:) = (stats1{i}.permspec(p,:)-mn_perm)./sd_perm;
+    end
+end
+
+%% STEP 2: SECOND LEVEL STATISTICS OF PERIODICITY POWER SPECTRA
 %% Scale the results to be of the same frequency range and length
 % Determine frequency ranges of participants
 for i = 1:numel(stats1)                              % Find each participant's min and max freq
@@ -169,7 +197,7 @@ if isfield(config,'multiplecorr')
     elseif strcmp(config.multiplecorr,'none')
         pval_corr = pval_corr;
     else
-        error(['Multiple correction option "',config.multiplecorr,'" is not recognized. Please avoid capital letters or see help bt_TGMstatslevel2 for all options.'])
+        error(['Multiple correction option "',config.multiplecorr,'" is not recognized. Please avoid capital letters or see help bt_statslevel2 for all options.'])
     end
 end
 
@@ -251,7 +279,7 @@ if strcmp(refdimension.dim,'braintime') % Only for brain time, separate warped f
         violinplot(allPerm,'test','ShowData',false,'ViolinColor',bt_colorscheme('confidenceinterval'),'MedianColor',bt_colorscheme('per_ps_perm'),'BoxColor',[0.7 0.7 0.7],'EdgeColor',[1 1 1],'ViolinAlpha',0.15);
         % Set legend
         h = get(gca,'Children');
-        l2 = legend(h([numel(h) 3]),'Empirical periodicity power','Permuted periodicity power');
+        l2 = legend(h([numel(h) 3]),'Empirical power','Permuted power');
         set(l2,'Location','best');
     catch
         boxplot(allPerm)
@@ -262,12 +290,12 @@ if strcmp(refdimension.dim,'braintime') % Only for brain time, separate warped f
         % Set legend
         toMark = findobj('Color','red','LineStyle','-');
         h = get(gca,'Children');
-        l2 = legend([h(2),toMark(1)],'Empirical periodicity power','Permuted periodicity power');
+        l2 = legend([h(2),toMark(1)],'Empirical power','Permuted power');
         set(l2,'Location','best');
     end
     
     % Set up axes
-    ylabel('Periodicity power');
+    ylabel('Average power (Z)');
     title('2nd level periodicity')
     
     % Adapt xticklabels depending on which freqs are in range
@@ -300,8 +328,8 @@ end
 yyaxis left
 p1 = plot(f,PS_emp_avg,'LineStyle','-','LineWidth',3,'Color',bt_colorscheme('per_ps_emp'),'Marker','none'); %Mean across 2nd level perms
 p2 = plot(f,perms2PS_avg,'LineStyle','-','LineWidth',2,'Color',bt_colorscheme('per_ps_perm'),'Marker','none'); %Mean across 2nd level perms
-xlabel('Periodicity frequency')
-ylabel('Mean power across participants')
+xlabel('Periodicity frequency (Hz)')
+ylabel('Average power (Z)')
 
 % Plot confidence interval
 c2 = plot(f,low_CI,'LineWidth',0.5,'Color',[0 0 0],'Marker','none','LineStyle','none');
@@ -325,9 +353,9 @@ sigind = find(pval_corr<=0.05);
 if isempty(sigind) ~= 1
     p5 = plot(f(sigind),0,'r*','MarkerSize',10,'LineWidth',1.5,'color',bt_colorscheme('sigstar'));
     % legend
-    l2 = legend([p1 p2 p3 p4 p5(1)],{'Empirical spectrum','Permuted spectrum', 'Conf. interv.', '-log10 p-value', 'p <= 0.05'});
+    l2 = legend([p1 p2 p3 p4 p5(1)],{'Empirical','Permuted', 'Conf. interv.', '-log10 p-value', 'p <= 0.05'});
 else
-    l2 = legend([p1 p2 p3 p4],{'Empirical spectrum','Permuted spectrum', 'Conf. interv.', '-log10 p-value'});
+    l2 = legend([p1 p2 p3 p4],{'Empirical','Permuted', 'Conf. interv.', '-log10 p-value'});
 end
 set(l2,'Location','best')
 
@@ -344,248 +372,90 @@ l2.FontSize = bt_plotparams('FontSizeLegend');
 % Add freq and pval information to output
 stats2.periodicity.pval_corr = pval_corr;
 stats2.periodicity.frequency = f;
-stats2.mapmethod = mapmethod;
+stats2.analysistype = ['Periodicity was measured across the ', upper(stats1{1}.method)];
 
 % Print results for brain time
 disp('See the output structure for:')
 disp('(1) the (corrected) p-values per frequency');
 disp('(2) the range of tested frequencies');
 disp('(3) for brain time, the (corrected) p-value of 0.5x, 1x, and 2x the warped frequency');
+disp('(4) The analysis type employed');
 
-%% STEP 2: TEST SIGNIFICANCE OF TGM OR DIAGONAL
-% Pre-allocate
-empset_TGM_Z = zeros(size(stats1{1}.empTGM,1),size(stats1{1}.empTGM,2),numel(stats1));
-permset_TGM_Z = zeros(size(stats1{1}.permTGM,1),size(stats1{1}.permTGM,2),size(stats1{1}.permTGM,3),numel(stats1));
-empset_TGM_ori = zeros(size(stats1{1}.empTGM,1),size(stats1{1}.empTGM,2),numel(stats1));
+%% STEP 3: TEST SIGNIFICANCE OF TGM OR DIAGONAL USING MVPA LIGHT
 
-% Put each participant's empirical and permuted data into one matrix, whilst z-scoring based on permuted data
-disp('To test for significant points in the TGM, the toolbox normalizes to');
-disp('the mean and standard deviation of permuted TGMs');
-for i = 1:numel(stats1)
-    % Calculate mean and std of the permuted TGMs
-    mn = mean(stats1{i}.permTGM(:));
-    sd = std(stats1{i}.permTGM(:));
-    
-    % Save original
-    empset_TGM_ori(:,:,i) = stats1{i}.empTGM;
-    
-    % Subtract the mean and divide by std to normalize across participants
-    empset_TGM_Z(:,:,i) = (stats1{i}.empTGM-mn)./sd;
-    permset_TGM_Z(:,:,:,i) = (stats1{i}.permTGM-mn)./sd;
+for i = 1:numsubj                                              % Prepare group structure
+    mv_clus{i} = stats1{i}.mv_results;
 end
 
-% For every participant, average the permuted TGMs
-permset_TGM_Z = squeeze(mean(permset_TGM_Z,1));
+config_clus.metric = mv_cfg.metric;                            % Append config parameters that are fixed
+config_clus.design = 'within';
 
-% Compute average TGM
-TGMavg = squeeze(mean(empset_TGM_ori,3));
-
-% Determine number of cluster permutations based on TGM size (larger TGM =
-% fewer permutations).
-% TGMsz = numel(stats1{1}.empTGM(:));
-% cluster_nperm = 1./(TGMsz/(10^6));
-% cluster_nperm = round(cluster_nperm.*10^4);
-% if cluster_nperm < 10^4 % Minimum
-%     cluster_nperm = 10^4;
-% elseif cluster_nperm > 10^5 % Maximum
-%     cluster_nperm = 10^5;
-% end
-
-cluster_nperm = 10^4;
-
-% Filter diagonal if diagonal is analyzed
-if strcmp(mapmethod,'diag')
-    for i = 1:size(empset_TGM_Z,3)
-        emp_clus(:,i) = diag(empset_TGM_Z(:,:,i))';
-        perm_clus(:,i) = diag(permset_TGM_Z(:,:,i))';
-    end
-else % Else just keep the whole TGM
-    emp_clus = empset_TGM_Z;
-    perm_clus = permset_TGM_Z;
+try clus_level2 = mv_statistics(config_clus, mv_clus);         % Run cluster statistics
+catch
+    clus_level2.p = ['No clusters reached statistical significance '...
+        'cfg_clus.clustercritval may be set too conservatively.'];
+    clus_level2.mask = [];
 end
 
-% Smoothing
-if cluster_smooth~=0
-    emp_clus = imgaussfilt(emp_clus,cluster_smooth);
-    perm_clus = imgaussfilt(perm_clus,cluster_smooth);
-end
+mapmask = clus_level2.mask;                                    % Extract mask
+mv_clus_average = mv_combine_results(mv_clus, 'average');      % Combine MVPA results
 
-% Notify
-disp('Testing for significant clusters, this may take a while...');
-
-% Perform cluster correction (Maris & Oostenveld, 2007; J Neurosci Methods)
-% where the empirical TGMs are compared against the average permuted TGMs
-[c_TGM,p_TGM,~,~] = permutest(emp_clus,perm_clus,true,cluster_p,cluster_nperm,false,cluster_n);
-
-% Transpose depending on output orientation
- if size(c_TGM{1},2) > size(c_TGM{1},1)
-    p_TGM = p_TGM';
-    c_TGM = c_TGM';
-    for i = 1:numel(c_TGM)
-        c_TGM{i} = c_TGM{i}';
-    end
- end
-
-% Find significant clusters
-sig_clus = find(p_TGM<=cluster_p);
-nsig_clus = find(p_TGM>cluster_p);
-
-sig_TGM = c_TGM(sig_clus); % Filter significant clusters
-nsig_TGM = c_TGM(nsig_clus); % Filter significant clusters
-
-% Check whether there are any clusters, and if those clusters are
-% significant.
-if isempty(sig_clus) && isempty(nsig_clus)~=1
-    disp('No significant clusters detected in the TGM');
-    clust_sig_ind = [];
-elseif isempty(sig_clus) && isempty(nsig_clus)
-    disp('No clusters detected in the TGM');
-    clust_sig_ind = [];
-    clust_nsig_ind = [];
-elseif isempty(sig_clus)~=1 && isempty(nsig_clus)==1
-    clust_nsig_ind = [];
-end
-
-% Vectorize significant clusters
-for i = 1:numel(sig_TGM)
-    if i == 1
-        clust_sig_ind = sig_TGM{i};
-    else
-        clust_sig_ind = [clust_sig_ind;sig_TGM{i}];
-    end
-end
-
-% Vectorize non-significant clusters
-for i = 1:numel(nsig_TGM)
-    if i == 1
-        clust_nsig_ind = nsig_TGM{i};
-    else
-        clust_nsig_ind = [clust_nsig_ind;nsig_TGM{i}];
-    end
-end
-
-%% PLOTTING
-% Plot Diagonal option
-if strcmp(mapmethod,'diag')
-    % Calculate average diagonal
-    diagavg = diag(TGMavg);
-    diagavg_Z = squeeze(mean(emp_clus,2));
+% Plotting
+if strcmp(mv_clus_average.function,'mv_classify_timextime')    % For cross temporal generalization
     
-    figure;subplot(5,5,1:10);hold on;
-    bt_figure('halflong');
-    plot(diagavg_Z,'LineWidth',3,'Color',bt_colorscheme('diagonal'));
+    TGM_avg = mv_clus_average.perf{1};                         % Fetch TGM average
     
-    try % For old Matlab versions
-        yline(0,'LineWidth',1.5,'Color',[0.6 0.6 0.6]);
-    catch
-        vline(0);
-    end
-    
-    xlim([0,numel(diagavg_Z)]);
-    xlabel('Test data (bin)')
-    ylabel('Z-value');
-    
-    if cluster_smooth == 0
-        title('Z-scored empirical TGM Diagonal');
-    else
-        title('Smoothed Z-scored empirical TGM Diagonal');
-    end
-    % Adapt font
-    set(gca,'FontName',bt_plotparams('FontName'));
-    set(gca,'FontSize',bt_plotparams('FontSize'));
-    
-    % Plot points a little below lowest Z
-    lim = min(diagavg_Z(:))*1.05;
-    
-    % Plot significant and non-significant datapoints
-    if isempty(clust_sig_ind) && isempty(clust_nsig_ind)~=1
-        c1 = plot(clust_nsig_ind,lim,'o','linewidth', 0.1, 'color',bt_colorscheme('nsigcluster'),'MarkerFaceColor',bt_colorscheme('nsigcluster'));hold on;
-        l1 = legend(c1(1),'Non-significant clusters');
-    elseif isempty(clust_sig_ind)~=1 && isempty(clust_nsig_ind)
-        c1 = plot(clust_sig_ind,lim,'o','linewidth', 0.1, 'color',bt_colorscheme('sigcluster'),'MarkerFaceColor',bt_colorscheme('sigcluster'));hold on;
-        l1 = legend(c1(1),'Significant clusters');
-    elseif isempty(clust_sig_ind)~=1 && isempty(clust_nsig_ind)~=1
-        c1 = plot(clust_sig_ind,lim,'o','linewidth', 0.1, 'color', bt_colorscheme('sigcluster'),'MarkerFaceColor',bt_colorscheme('sigcluster'));hold on;
-        c2 = plot(clust_nsig_ind,lim,'o','linewidth', 0.1, 'color', bt_colorscheme('nsigcluster'),'MarkerFaceColor',bt_colorscheme('nsigcluster'));hold on;
-        l1 = legend([c1(1),c2(1)],'Significant clusters', 'Non-significant clusters');
-    end
-    
-    % Plot regular average diagonal;
-    subplot(5,5,20:25);hold on;
-    plot(diagavg,'LineWidth',3,'Color',bt_colorscheme('diagonal'));
-    
-    try % For old Matlab versions
-        yline(0.5,'LineWidth',1.5,'Color',[0.6 0.6 0.6]);
-    catch
-        vline(0.5);
-    end
-    
-    xlim([0,numel(diagavg_Z)]);
-    xlabel('Test data (bin)')
-    ylabel(MVPAcfg.metric);
-    title('average empirical TGM Diagonal (classifier time course)');
-    % Adapt font
-    set(gca,'FontName',bt_plotparams('FontName'));
-    set(gca,'FontSize',bt_plotparams('FontSize'));
-    l1.FontSize = bt_plotparams('FontSizeLegend');
-    
-    % Plot TGM option
-else
-    % Get average z-scored TGM
-    TGMavg_Z = squeeze(mean(emp_clus,3));
-    
-    % Pre-allocate TGM mask and p-value dist
-    TGM_sig_mask = zeros(size(TGMavg,1),size(TGMavg,2));
-    TGM_nsig_mask = zeros(size(TGMavg,1),size(TGMavg,2));
-    
-    % Enter significant clusters into mask
-    TGM_sig_mask(clust_sig_ind) = true;
-    TGM_nsig_mask(clust_nsig_ind) = true;
-    
-    % Plot clusters in mean empirical TGM
-    figure;hold on;
-    bt_figure('cluster');
-    subplot(10,2,[3 5 7 9 11 13 15]);
+    figure;hold on;bt_figure('cluster');
     cfg_plot = [];
+    cfg_plot.ylim = [1 size(TGM_avg,1)];
+    cfg_plot.xlim = [1 size(TGM_avg,2)];
     cfg_plot.colorbar = 1;
     cfg_plot.colorbar_location = 'EastOutside';
-    cfg_plot.colorbar_title = 'Z-value';
-    cfg_plot.climzero = 0;
-    mv_plot_2D(cfg_plot,TGMavg_Z);hold on;
-    axis square
+    cfg_plot.colorbar_title = mv_cfg.metric;
+    cfg_plot.climzero = config_clus.null;
+    mv_plot_2D(cfg_plot,TGM_avg);hold on;
+    axis square;
+    ax = gca;
+    ax.YLim = [1 size(TGM_avg,1)];
+    ax.XLim = [1 size(TGM_avg,2)];
     colormap(bt_colorscheme('TGM'));freezeColors;
-    if cluster_smooth == 0
-        title('Z-scored average TGM (clusters)')
+    xlabel('Test data (bin)')
+    ylabel('Training data (bin)')
+    % Adapt font
+    set(gca,'FontName',bt_plotparams('FontName'));
+    set(gca,'FontSize',bt_plotparams('FontSize'));
+    title('Average TGM with significant clusters');
+    
+    if isempty(mapmask)~=1
+        % Add contour
+        contour(1:size(TGM_avg,1),1:size(TGM_avg,2),mapmask,1,'linewidth', 2, 'color',bt_colorscheme('sigcluster_TGM'));hold on;
     else
-        title('Smoothed Z-scored average TGM (clusters)')
+        warning('No significant clusters were found. Try changing cfg_clust.clustercritval.')
     end
+    
+elseif strcmp(mv_clus_average.function,'mv_classify_across_time')    % For diagonal classification
+    
+    
+    time_plot = 1:size(stats1{1}.mv_results.perf,1);     % in data bins because time vectors may differ for brain time
+    result_average = mv_combine_results(mv_clus, 'average');
+    
+    figure;hold on;bt_figure('cluster');                 % Plot average results
+    mv_plot_result(result_average, time_plot, 'mask', clus_level2.mask, 'new_figure', 0)
+    h = findobj(gca,'Type','line');
+    for i = numel(h)
+        h(i).LineWidth = h(i).LineWidth+1;
+    end
+    
     xlabel('Test data (bin)')
-    ylabel('Training data (bin)')
+    ylabel(mv_cfg.metric);
+    title('Average empirical Diagonal (classifier time course)');
     % Adapt font
     set(gca,'FontName',bt_plotparams('FontName'));
     set(gca,'FontSize',bt_plotparams('FontSize'));
     
-    contour(1:size(TGMavg,1),1:size(TGMavg,2),TGM_sig_mask,1,'linewidth', 2, 'color',bt_colorscheme('sigcluster'));hold on;
-    contour(1:size(TGMavg,1),1:size(TGMavg,2),TGM_nsig_mask,1,'linewidth', 2, 'color',bt_colorscheme('nsigcluster'));
-    l1 = legend('Significant clusters', 'Non-significant clusters');
-    
-    subplot(10,2,[4 6 8 10 12 14 16]);
-    cfg_plot.colorbar_title = MVPAcfg.metric;
-    cfg_plot.climzero = 0.5;
-    mv_plot_2D(cfg_plot,TGMavg);hold on;
-    axis square
-    colormap(bt_colorscheme('TGM'));freezeColors;
-    title('Average empirical TGM')
-    xlabel('Test data (bin)')
-    ylabel('Training data (bin)')
-    % Adapt font
-    set(gca,'FontName',bt_plotparams('FontName'));
-    set(gca,'FontSize',bt_plotparams('FontSize'));
-    l1.FontSize = bt_plotparams('FontSizeLegend');
 end
 
 %% Adapt output variable
-% Add cluster correction information to output
-stats2.clusters.clusters_inds = c_TGM;
-stats2.clusters.clusters_p = p_TGM;
+% Add cluster correction information to output (from MVPA Light)
+stats2.clusters = clus_level2;
 end
