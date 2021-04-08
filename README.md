@@ -1,5 +1,6 @@
 [![HitCount](http://hits.dwyl.com/sandervanbree/braintime.svg)](http://hits.dwyl.com/sandervanbree/braintime)
 
+javascript:showsample('wip','md')
 
 ### Current to do list (for devs) | Official documentation starts below
 
