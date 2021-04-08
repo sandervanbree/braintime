@@ -1,4 +1,5 @@
 [![HitCount](http://hits.dwyl.com/sandervanbree/braintime.svg)](http://hits.dwyl.com/sandervanbree/braintime)
+[![Github All Releases](https://img.shields.io/github/downloads/sandervanbree/braintime/total.svg)]()
 
 ### Current to do list (for devs) | Official documentation starts below
 
