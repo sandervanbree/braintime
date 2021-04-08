@@ -35,8 +35,8 @@ disp ('FieldTrip is up and running...');
 end
 
 % Check for MVPA Light
-if exist('mv_classify_timextime') ~= 2
-error('Unable to locate MVPA Light. Please set it up (using startup.m) or download it here: https://github.com/treder/MVPA-Light');   
+if exist('mv_combine_results') ~= 2
+error('Unable to locate a recent MVPA Light version. Please set it up (using startup.m) or download here: https://github.com/treder/MVPA-Light');   
 else
 disp('MVPA Light is up and running...');    
 end
