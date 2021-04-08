@@ -1,5 +1,4 @@
-
-[![HitCount](http://hits.dwyl.com/sandervanbree/braintime.svg)](http://hits.dwyl.com/sandervanbree/braintime)
+|ProjectStatus|_ 
 
 .. |ProjectStatus| image:: http://www.repostatus.org/badges/latest/WIP.svg
 .. _ProjectStatus: https://www.repostatus.org/#wip
