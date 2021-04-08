@@ -89,6 +89,11 @@ cfg.warpmethod   = 'waveshape';      % Let's try warping using the average waves
 cfg.phasemethod  = 'GED';            % Generalized Eigendecomposition can be used to get a 
                                      % holistic phase estimation of the warping frequency
                                      % across the warping sources
+                                     
+cfg.visualcheck = 'yes';             % With warpmethod 'waveshape', you see an additional step:
+                                     % the construction of the template phase signal based
+                                     % on the average waveshape (its concatenation, and phase
+                                     % estimation).
 
 [bt_warpeddata]  = bt_clocktobrain(cfg,ct_data,bt_source);
 

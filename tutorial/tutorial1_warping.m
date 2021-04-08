@@ -93,6 +93,15 @@ cfg.phasemethod  = 'FFT';            % 'FFT': the phase dynamics of the warping 
 cfg.visualcheck  = 'on';             % Visualize several steps to check for errors
 [bt_warpeddata]  = bt_clocktobrain(cfg,ct_data,bt_source);
 
+% Let's take a look at the output of visualcheck. The toolbox prints the warping path
+% for three example trials. At the top, you see (1) the unwrapped phase of the chosen warping
+% signal (blue), and (2) the unwarpped phase of a template oscillation - in this case a stationary
+% sinusoid (orange) (see warpmethod). In the bottom, you see what happens after applying warping: 
+% the algorithm attempts to minimize the difference of the two signals. The main premise of the
+% toolbox is that the warping path between the signals reveals moments in each trial when the warping
+% signal - which orchestrates the studied cognitive process - falls out of tune with clock time.
+% The toolbox uses this information to dynamically rescale the data at such moments.
+
 % cut ct_data to the same time window
 cfg        = [];
 cfg.toilim = [bt_warpeddata.toi(1) bt_warpeddata.toi(2)];
