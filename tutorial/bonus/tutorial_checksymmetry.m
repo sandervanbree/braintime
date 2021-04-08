@@ -1,4 +1,4 @@
-%%% In this script we will use the legacy function bt_checksymmetry to
+%%% In this tutorial we will use the legacy function bt_checksymmetry to
 %%% test the asymmetry of all warping sources. The function extracts the
 %%% average waveshape and asymmetry indices for each desired frequency.
 %%% It returns a ranking of warping sources from most to least symmetric,

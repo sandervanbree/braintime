@@ -39,7 +39,7 @@ f_range  = [2, 30];   % Specify frequency range of interest
 for trl = 1:ntrls                                           % Loop over all trial every trial
     
     disp(['FOOOFing trial ',num2str(trl),...               % Notify user of progress
-        ' out of ',num2str(numel(warpsources.trial))]); 
+        ' out of ',num2str(ntrls)]); 
     
     for ws = 1:nwarpsrc                                     % Loop over all warping sources
         currtrl = warpsources.trial{trl}(ws,:)';
