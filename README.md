@@ -29,7 +29,7 @@ Warp electrophysiological data from clock time to brain time and analyze the per
 - [Several functions](external) included in the toolbox
 
 ### Glossary
-| Brain Time Toolbox term | description |
+| Toolbox term | description |
 | --- | --- |
 | Clock time (CT) | data ordered by sequences of seconds |
 | Brain time (BT) | data transformed according to the dynamics of a warping signal |
