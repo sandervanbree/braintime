@@ -1,7 +1,4 @@
-|ProjectStatus|_ 
-
-.. |ProjectStatus| image:: http://www.repostatus.org/badges/latest/wip.svg
-.. _ProjectStatus: https://www.repostatus.org/#wip
+[![HitCount](http://hits.dwyl.com/sandervanbree/braintime.svg)](http://hits.dwyl.com/sandervanbree/braintime)
 
 ### Current to do list (for devs) | Official documentation starts below
 
