@@ -27,7 +27,7 @@ per_ps_perm = [0.4 0.4 0.4];
 asymm_wavshap = [0.18 0 0.21];
 
 % Diagonal classification timecourse
-diagonal = [0.04 0.23 0.03];
+diagonal = [0.53 0.03 0.03];
 
 % P-value line in 1st and 2nd level statistics
 pval = [1 0.68 0.12];
@@ -39,11 +39,11 @@ sigstar = [1 0.68 0.12];
 % Confidence interval fill color (is highly transparent)
 confidenceinterval = [0.2 0.2 0.2]; 
 
-% Significant cluster outline
-sigcluster = [1 0.68 0.12];
+% Significant cluster outline TGM
+sigcluster_TGM = [0 0 0];
 
-% Non-significant cluster outline
-nsigcluster = [0 0 0];
+% Significant cluster line diagonal
+sigcluster_diag = [0.02 0.13 0.01];
 
 % Figure background
 background = [1 1 1];

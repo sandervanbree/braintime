@@ -24,7 +24,7 @@ switch size
     case 'halfwide'
         set(gcf,'units','normalized','outerposition',[0.2 0.15 0.55 0.75]);
     case 'cluster'
-        set(gcf,'units','normalized','outerposition',[0.1224 0.2685 0.7495 0.6009])
+        set(gcf,'units','normalized','outerposition',[0.2 0.15 0.55 0.75])
     case 'braintime_per'
         set(gcf,'units','normalized','outerposition',[0.0948 0.1630 0.8047 0.6639])
     case 'clocktime_per'

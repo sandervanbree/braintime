@@ -4,12 +4,17 @@ function [PS,f] = bt_fft(mp,powspecrange,timevec)
 % Hanning window and perform multitaper FFT.
 
 % Check number of rows and columns
-nrows = numel(mp(:,1));
-ncols = numel(mp(:,2));
+nrows = size(mp,1);
+ncols = size(mp,2);
 
-if nrows == 1 % Diag
-    ftdat.trial{1} = mp(1,:);
+if ncols == 1 % Diag
+    mp = mp'; % flip to row vector
+    ftdat.trial{1} = mp;
     ftdat.time{1} = timevec;
+elseif nrows == 1 % Diag
+    ftdat.trial{1} = mp;
+    ftdat.time{1} = timevec;
+
 else          % TGM or AC
     for row = 1:nrows % Perform FFT over rows
         ftdat.trial{row} = mp(row,:);
@@ -20,9 +25,9 @@ else          % TGM or AC
         ftdat.time{col+nrows} = timevec;
     end
 end
+
 ftdat.label = {'dummy'};
 ftdat.sampleinfo = [1 size(mp,1)];
-
 
 % Run Multitaper FFT
 cfg = [];
