@@ -5,13 +5,9 @@
 
 TO DO:
 - in bt_analyzesources, nudge toward centering the specified frequencies exactly on warping frequency
-- how to deal with outliers in lvl 2
 - random gaussian field theory to perform multiple testing correction over power spectra and TGMs?
 
 LOW URGENCY:
-- Fix dots in the asymmetry plot in bt_selectsource
-- Add licenses! 
-- Update tutorial 4 to 6
 - In the paper, remind users to be very careful with high pass filtering; https://doi.org/10.1101/530220
 
 ### Start documentation:
