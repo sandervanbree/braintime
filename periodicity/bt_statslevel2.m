@@ -143,7 +143,7 @@ PS_emp_avg = mean(PS_emp,1);
 % Pre-allocate
 perm1PS = zeros(numsubj,mode(nfbins));
 perm2PS = zeros(numperms2,mode(nfbins));
-progbar = round(linspace(0,numperms2,100));
+progbar = round(linspace(0,numperms2,11));
 
 % Loop through numperms2
 for perm2=1:numperms2
