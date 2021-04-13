@@ -2,7 +2,8 @@ function [stats2] = bt_statslevel2(config,config_clus,stats1)
 % Performs second level statistics of periodicity power spectra, and tests
 % which TGM or diagonal datapoints are significantly higher than the
 % permutation distribution. Both the empirical and permuted spectra are
-% z-scored.
+% z-scored according to the mean and standard deviation of the permuted
+% spectra.
 %
 % Second level statistics uses the first level permuted data.
 % Specifically, nperm2 times, grab a random power spectrum of every
@@ -168,10 +169,7 @@ for f_ind = 1:numel(f)
     
     % p-value
     pval(f_ind) = numel(find(perm2PS(:,f_ind)>=PS_emp_avg(f_ind)))/numperms2;
-    
-    % Confidence interval
-    low_CI(f_ind,:) = prctile(perm2PS(:,f_ind),2.5);
-    hi_CI(f_ind,:) = prctile(perm2PS(:,f_ind),97.5);
+
 end
 
 %% Get the indices of warping frequency harmonics
@@ -250,55 +248,48 @@ if strcmp(refdimension.dim,'braintime') % Only for brain time, separate warped f
     bt_figure('braintime_per');
     
     % Plot the warped freq
-    wfreq_emp = PS_emp_avg(:,wfreq_i); % Empirical data at warped freq
-    wfreq_perm = perm2PS(:,wfreq_i); % Permuted data at warped freq
-    plot(2,wfreq_emp,'o','MarkerSize',9,'MarkerEdgeColor',bt_colorscheme('per_ps_emp'),'MarkerFaceColor',bt_colorscheme('per_ps_emp'));hold on; %Plot marker of empirical power
-    
+    wfreq_emp = PS_emp(:,wfreq_i);     % Distribution of all participants
+
     if exist('wfreq_half_i','var') == 1 %Plot half the warped freq?
-        half_wfreq_emp = PS_emp_avg(:,wfreq_half_i);
-        half_wfreq_perm = perm2PS(:,wfreq_half_i);
-        plot(1,half_wfreq_emp,'o','MarkerSize',9,'MarkerEdgeColor',bt_colorscheme('per_ps_emp'),'MarkerFaceColor',bt_colorscheme('per_ps_emp'));hold on; %Plot marker of empirical power
+        half_wfreq_emp = PS_emp(:,wfreq_half_i);
     else
         half_wfreq_emp = zeros(size(wfreq_emp));
-        half_wfreq_perm = zeros(size(wfreq_perm));
     end
     
     if exist('wfreq_double_i','var') == 1 %Plot double the warped freq?
-        double_wfreq_emp = PS_emp_avg(:,wfreq_double_i);
-        double_wfreq_perm = perm2PS(:,wfreq_double_i);
-        plot(3,double_wfreq_emp,'o','MarkerSize',9,'MarkerEdgeColor',bt_colorscheme('per_ps_emp'),'MarkerFaceColor',bt_colorscheme('per_ps_emp'));hold on; %Plot marker of empirical power
+        double_wfreq_emp = PS_emp(:,wfreq_double_i);
     else
         double_wfreq_emp = zeros(size(wfreq_emp));
-        double_wfreq_perm = zeros(size(wfreq_perm));
     end
     
     % Put all the three frequencies in one matrix
-    allPerm = [half_wfreq_perm,wfreq_perm,double_wfreq_perm];
     allEmp = [half_wfreq_emp,wfreq_emp,double_wfreq_emp];
     
     % Create a Violin plot. If this does not work because of an older MATLAB version, make a boxplot instead
     try
-        violinplot(allPerm,'test','ShowData',false,'ViolinColor',bt_colorscheme('confidenceinterval'),'MedianColor',bt_colorscheme('per_ps_perm'),'BoxColor',[0.7 0.7 0.7],'EdgeColor',[1 1 1],'ViolinAlpha',0.15);
-        % Set legend
+        violinplot(allEmp,'test','ShowData',false,'ViolinColor',bt_colorscheme('confidenceinterval'),'MedianColor',bt_colorscheme('per_ps_emp'),'BoxColor',[0.7 0.7 0.7],'EdgeColor',[1 1 1],'ViolinAlpha',0.15);
         h = get(gca,'Children');
-        l2 = legend(h([numel(h) 3]),'Empirical power','Permuted power');
+        l2 = legend(h(3),'Empirical median');
         set(l2,'Location','best');
     catch
-        boxplot(allPerm)
+        boxplot(allEmp)
         % Set up y-axis
-        maxy = max([allPerm(:);allEmp(:)]);
-        miny = min([allPerm(:);allEmp(:)]);
+        maxy = max([allEmp(:);allEmp(:)]);
+        miny = min([allEmp(:);allEmp(:)]);
         ylim([miny*0.9,maxy*1.1]); % slightly below min and max
         % Set legend
         toMark = findobj('Color','red','LineStyle','-');
         h = get(gca,'Children');
-        l2 = legend([h(2),toMark(1)],'Empirical power','Permuted power');
+        l2 = legend(toMark(1),'Empirical median');
         set(l2,'Location','best');
     end
     
     % Set up axes
     ylabel('Average power (Z)');
-    title('2nd level periodicity')
+    title('Periodicity distribution')
+    xlim([0.5 3.5]);
+    xticks([1 2 3]);
+   
     
     % Adapt xticklabels depending on which freqs are in range
     if sum(half_wfreq_emp) == 0 && sum(double_wfreq_emp) == 0
@@ -328,36 +319,39 @@ if strcmp(refdimension.dim,'braintime') % Only for brain time, separate warped f
 end
 
 yyaxis left
-p1 = plot(f,PS_emp_avg,'LineStyle','-','LineWidth',3,'Color',bt_colorscheme('per_ps_emp'),'Marker','none'); %Mean across 2nd level perms
-p2 = plot(f,perms2PS_avg,'LineStyle','-','LineWidth',2,'Color',bt_colorscheme('per_ps_perm'),'Marker','none'); %Mean across 2nd level perms
+p1 = plot(f,PS_emp_avg,'LineStyle','-','LineWidth',5,'Color',bt_colorscheme('per_ps_emp'),'Marker','none'); %Mean across 2nd level perms
 xlabel('Periodicity frequency (Hz)')
 ylabel('Average power (Z)')
-
-% Plot confidence interval
-c2 = plot(f,low_CI,'LineWidth',0.5,'Color',[0 0 0],'Marker','none','LineStyle','none');
-c3 = plot(f,hi_CI,'LineWidth',0.5,'Color',[0 0 0],'Marker','none','LineStyle','none');
-p3 = patch([f fliplr(f)],[low_CI' fliplr(hi_CI')], 1,'FaceColor', bt_colorscheme('confidenceinterval'), 'EdgeColor', 'none', 'FaceAlpha', 0.15);
 
 % p-value axis
 yyaxis right
 ax = gca;
 ax.YAxis(1).Color = 'black';
-p4 = plot(f,logpval,'LineStyle','-','LineWidth',2,'Color',bt_colorscheme('pval'));
-p4.Color(4) = 0.3;
-ylim([-0.05,4])
+p2 = plot(f,logpval,'LineStyle','-','LineWidth',2.5,'Color',bt_colorscheme('pval'));
+p2.Color(4) = 0.3;
 ylabel('-log10 p-value')
 
-% plot star at every significant frequency
+% Create second y-axis
 yyaxis left
+
+% Fix axes y limits
 ax = gca;
+ymin = min(PS_emp_avg);
+ymax = max(PS_emp_avg);
+ydiff = ymax-ymin;
+ax.YAxis(1).Limits = [ymin-ydiff*0.03 ymax*1.1]; % Left axis
+ax.YAxis(2).Limits = [-0.02,4.05];       % Right axis
+
+yyaxis right
+% plot star at every significant frequency
 ax.YAxis(2).Color = bt_colorscheme('pval');
 sigind = find(pval_corr<=0.05);
 if isempty(sigind) ~= 1
-    p5 = plot(f(sigind),0,'r*','MarkerSize',10,'LineWidth',1.5,'color',bt_colorscheme('sigstar'));
+    p3 = plot(f(sigind),0.02,'r*','MarkerSize',6,'LineWidth',2,'color',bt_colorscheme('sigstar'));
     % legend
-    l2 = legend([p1 p2 p3 p4 p5(1)],{'Empirical','Permuted', 'Conf. interv.', '-log10 p-value', 'p <= 0.05'});
+    l2 = legend([p1 p2 p3(1)],{'Empirical','-log10 p-value', 'p <= 0.05'});
 else
-    l2 = legend([p1 p2 p3 p4],{'Empirical','Permuted', 'Conf. interv.', '-log10 p-value'});
+    l2 = legend([p1 p2],{'Empirical','-log10 p-value'});
 end
 set(l2,'Location','best')
 

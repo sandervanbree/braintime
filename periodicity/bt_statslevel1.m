@@ -60,7 +60,7 @@ for perm1 = 1:numperms1
     fprintf('First level permutation number %i\n', perm1);
     clabel = clabel(randperm(numel(clabel)));
     
-    if strcmp(method,'tgm')
+    if strcmp(method,'tgm') || strcmp(method,'ac')
         [mv_perm(perm1,:,:),~] = mv_classify_timextime(mv_cfg, data.trial, clabel);
     elseif strcmp(method,'diag')
         [mv_perm(perm1,:,:),~] = mv_classify_across_time(mv_cfg, data.trial, clabel);
@@ -123,62 +123,39 @@ if strcmp(figopt,'yes')
     end
     
     %% Plot results
-    figure;hold on;bt_figure('clocktime_per');
+    figure;hold on;
+    bt_figure('clocktime_per');
     
     if strcmp(refdimension.dim,'braintime') % Only for brain time, separate warped frequency
-        bt_figure('braintime_per');
-        subplot(1,10,1:3)
+    subplot(1,10,1:3);
+    bt_figure('braintime_per');
         
         % Plot the warped freq
         wfreq_emp = pspec_emp(:,wfreq_i); % Empirical data at warped freq
-        wfreq_perm = pspec_perm(:,wfreq_i); % Permuted data at warped freq
+
         plot(2,wfreq_emp,'o','MarkerSize',6,'MarkerEdgeColor',bt_colorscheme('per_ps_emp'),'MarkerFaceColor',bt_colorscheme('per_ps_emp'));hold on; %Plot marker of empirical power
         
         if exist('wfreq_half_i','var') == 1 %Plot half the warped freq?
             half_wfreq_emp = pspec_emp(:,wfreq_half_i);
-            half_wfreq_perm = pspec_perm(:,wfreq_half_i);
-            plot(1,half_wfreq_emp,'o','MarkerSize',6,'MarkerEdgeColor',bt_colorscheme('per_ps_emp'),'MarkerFaceColor',bt_colorscheme('per_ps_emp'));hold on; %Plot marker of empirical power
+            plot(3,half_wfreq_emp,'o','MarkerSize',6,'MarkerEdgeColor',bt_colorscheme('per_ps_emp'),'MarkerFaceColor',bt_colorscheme('per_ps_emp'));hold on; %Plot marker of empirical power
         else
             half_wfreq_emp = zeros(size(wfreq_emp));
-            half_wfreq_perm = zeros(size(wfreq_perm));
         end
         
         if exist('wfreq_double_i','var') == 1 %Plot double the warped freq?
             double_wfreq_emp = pspec_emp(:,wfreq_double_i);
-            double_wfreq_perm = pspec_perm(:,wfreq_double_i);
-            plot(3,double_wfreq_emp,'o','MarkerSize',6,'MarkerEdgeColor',bt_colorscheme('per_ps_emp'),'MarkerFaceColor',bt_colorscheme('per_ps_emp'));hold on; %Plot marker of empirical power
+            plot(1,double_wfreq_emp,'o','MarkerSize',6,'MarkerEdgeColor',bt_colorscheme('per_ps_emp'),'MarkerFaceColor',bt_colorscheme('per_ps_emp'));hold on; %Plot marker of empirical power
         else
             double_wfreq_emp = zeros(size(wfreq_emp));
-            double_wfreq_perm = zeros(size(wfreq_perm));
         end
         
-        % Put all the three frequencies in one matrix
-        allPerm = [half_wfreq_perm,wfreq_perm,double_wfreq_perm];
-        allEmp = [half_wfreq_emp,wfreq_emp,double_wfreq_emp];
-        
-        % Create a Violin plot. If this does not work because of an older MATLAB version, make a boxplot instead
-        try
-            violinplot(allPerm,'test','ShowData',false,'ViolinColor',bt_colorscheme('confidenceinterval'),'MedianColor',bt_colorscheme('per_ps_perm'),'BoxColor',[0.7 0.7 0.7],'EdgeColor',[1 1 1],'ViolinAlpha',0.15);
-            % Set legend
-            h = get(gca,'Children');
-            l2 = legend(h([numel(h) 3]),'Empirical power','Permuted power');
-            set(l2,'Location','best');
-        catch
-            boxplot(allPerm)
-            % Set up y-axis
-            maxy = max([allPerm(:);allEmp(:)]);
-            miny = min([allPerm(:);allEmp(:)]);
-            ylim([miny*0.9,maxy*1.1]); % slightly below min and max
-            % Set legend
-            toMark = findobj('Color','red','LineStyle','-');
-            h = get(gca,'Children');
-            l2 = legend([h(2),toMark(1)],'Empirical power','Permuted power');
-            set(l2,'Location','best');
-        end
         
         % Set up labels
-        ylabel('Periodicity power');
+        ylabel('Power');
         title('1st level periodicity')
+        l2 = legend('Empirical');
+        xlim([0.5 3.5]);
+        xticks([1 2 3]);
         
         % Adapt xticklabels depending on which freqs are in range
         if sum(half_wfreq_emp) == 0 && sum(double_wfreq_emp) == 0
