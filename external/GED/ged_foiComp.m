@@ -21,6 +21,8 @@ function [warpsigGED] = ged_foiComp(data,warpfreq)
 % These functions were written by Mike X Cohen (see Cohen 2017, eLife;
 % doi: 10.7554/eLife.21792), and modified by Luca Kolibius and
 % Sander van Bree.
+% For a more elaborate description of GED, see Parra et al. (2005,
+% NeuroImage, https://doi.org/10.1016/j.neuroimage.2005.05.032).
 
 %% Parameters
 settings.trials  = 1:size(data.trial,1);                     % number of trials
