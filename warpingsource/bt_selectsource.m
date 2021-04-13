@@ -86,6 +86,12 @@ f1 = figure;hold on;
 % Adapt figure
 bt_figure;
 
+if isfield(config,'quickselect') && config.quickselect == 1
+    finish = 1;
+    src_oi=src_ind;
+    close(f1);
+end
+
 % Create loop to browse through warping sources
 while finish==0
     if src_ind < 1 % make sure source number cannot go out of bounds
@@ -192,15 +198,18 @@ while finish==0
     asymm_prc = prctile(abs(asymmidx(:)),95);
     asymm_lim = [-asymm_prc asymm_prc];
     
-    sp2 = subplot(11,11,[7 53]);hold on; % Plot asymmetry across all cycles
-    bt_rainplot(asymmidx(src_ind,:),[],16,30,asymm_lim);
-    tval = mean(asymmidx_t(src_ind,:));
-    title(['Asymmetry: ',num2str(round(tval,3)),' (t)']);
+    try  % This code only makes sense if waveshape and asymmetry have been calculated
+        sp2 = subplot(11,11,[7 53]);hold on; % Plot asymmetry across all cycles
+        bt_rainplot(asymmidx(src_ind,:),[],16,30,asymm_lim);
+        tval = mean(asymmidx_t(src_ind,:));
+        title(['Asymmetry: ',num2str(round(tval,3)),' (t)']);
+        
+        sp3 = subplot(11,11,[10,55]);hold on; % Plot waveshape
+        bt_wavplot(wavshap(src_ind,:),2);
+        title('Average waveshape');
+    catch
+    end
     
-    sp3 = subplot(11,11,[10,55]);hold on; % Plot waveshape
-    bt_wavplot(wavshap(src_ind,:),2);
-    title('Average waveshape');
-           
     % Adapt figure based on keypress
     keydown = waitforbuttonpress;
     value = double(get(gcf,'CurrentCharacter'));

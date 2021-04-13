@@ -83,7 +83,6 @@ mintime = config.time(1);                               % Minimum time of intere
 maxtime = config.time(end);                             % Maximum time of interest
 cfgFT = configFT;                                       % FieldTrip config structure
 correct1f = config.correct1f;                           % Correct for 1/f in visualization of FFT option
-nwarpsources = config.nwarpsources;                     % Number of top sources to be considered
 
 try % For ICA components, this should work
 sampledur = (warpsources.time{1}(2)-warpsources.time{1}(1));  % Duration of each sample
@@ -132,7 +131,7 @@ powtf = zeros(size(fspec.powspctrm,3),maxtime_ind+1-mintime_ind,numsrc);
 pspec = zeros(size(fspec.powspctrm,3),numsrc);
 oscmaxfreq = zeros(numsrc,1);
 foi_ind = zeros(numsrc,1);
-FFT_phs = cell(numsrc,1);
+fft_phs = cell(numsrc,1);
 
 % For each source, obtain time frequency information
 for src = 1:numsrc
@@ -143,7 +142,7 @@ for src = 1:numsrc
     [~, freqidx]= find(abs(oscmaxfreq(src)-fspec.freq)==min(abs(oscmaxfreq(src)-fspec.freq)));  % what is the index of the highest power oscillation?
     foi_ind(src) = freqidx;
     oscmax(src,:) = [src,oscmaxfreq(src), foi_ind(src),maxpow];                                 % matrix with warping source number, freq, its index, and its power
-    FFT_phs{src}=squeeze(angle(fspec_old.fourierspctrm(:,src,foi_ind(src),:)));                 % fetch phase of warping signal
+    fft_phs{src}=squeeze(angle(fspec_old.fourierspctrm(:,src,foi_ind(src),:)));                 % fetch phase of warping signal
 end
 
 %% rank warping sources by one of two methods
@@ -199,15 +198,22 @@ end
     
 %% Take the best sources (default: 30)
 if isfield(config,'nwarpsources')
-    nwarpsources = min(nwarpsources,numsrc);
+    nwarpsources = min(config.nwarpsources,numsrc);
 else
     nwarpsources = min(numsrc,30);
 end
 srcrank = srcrank(1:nwarpsources,:); % take the best sources
 
 %% Calculate asymmetry indices and waveshape for each warping source
-ncycles = 2; % Number of cycles to extract
+ ncycles = 2; % Number of cycles to extract
+try
 [asymmidx,asymmidx_t,wavshap] = bt_calcwaveshape(warpsources,ncycles,srcrank);
+catch
+warning('Could not estimate waveshape, perhaps because the data is too noisy. Proceeding without...');
+asymmidx   = 1;
+asymmidx_t = 1;
+wavshap    = 1;
+end
 
 %% Save information
 % Filter relevant frequency spectrum information
@@ -220,7 +226,7 @@ fft_sources{3}  = [minfoi maxfoi];                          % Lowest and highest
 fft_sources{4}  = fspecinfo;                                % FFT time and frequency vector
 fft_sources{5}  = powtf(:,:,srcrank(:,1));                  % Power spectrum of warping sources
 fft_sources{6}  = pspec(:,srcrank(:,1));                    % Power spectrum averaged across trials
-fft_sources{7}  = FFT_phs(srcrank(:,1));                    % Phase of all warping sources for all trials
+fft_sources{7}  = fft_phs(srcrank(:,1));                    % Phase of all warping sources for all trials
 fft_sources{8}  = config.cutmethod;                         % Applied cutting method
 fft_sources{9}  = config.rankmethod;                        % Applied ranking method
 fft_sources{10} = asymmidx;                                 % Asymmetry index per warping source
