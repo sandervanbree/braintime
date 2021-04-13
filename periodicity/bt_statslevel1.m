@@ -203,7 +203,7 @@ if strcmp(figopt,'yes')
     else
         l2 = legend([p1 p2 p3],{'Empirical','Permuted','Warped frequency'});
     end
-    set(l2,'Location','best')
+    set(l2,'Location','NorthEast')
     
     % add title
     title('Periodicity power spectra (1st level stats)');

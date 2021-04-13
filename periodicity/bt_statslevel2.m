@@ -270,7 +270,7 @@ if strcmp(refdimension.dim,'braintime') % Only for brain time, separate warped f
         violinplot(allEmp,'test','ShowData',false,'ViolinColor',bt_colorscheme('confidenceinterval'),'MedianColor',bt_colorscheme('per_ps_emp'),'BoxColor',[0.7 0.7 0.7],'EdgeColor',[1 1 1],'ViolinAlpha',0.15);
         h = get(gca,'Children');
         l2 = legend(h(3),'Empirical median');
-        set(l2,'Location','best');
+        set(l2,'Location','NorthEast')
     catch
         boxplot(allEmp)
         % Set up y-axis
@@ -281,7 +281,7 @@ if strcmp(refdimension.dim,'braintime') % Only for brain time, separate warped f
         toMark = findobj('Color','red','LineStyle','-');
         h = get(gca,'Children');
         l2 = legend(toMark(1),'Empirical median');
-        set(l2,'Location','best');
+        set(l2,'Location','NorthEast')
     end
     
     % Set up axes
@@ -353,7 +353,7 @@ if isempty(sigind) ~= 1
 else
     l2 = legend([p1 p2],{'Empirical','-log10 p-value'});
 end
-set(l2,'Location','best')
+set(l2,'Location','NorthEast')
 
 
 % add title
@@ -388,8 +388,8 @@ config_clus.design = 'within';
 
 try clus_level2 = mv_statistics(config_clus, mv_clus);         % Run cluster statistics
 catch
-    clus_level2.p = ['No clusters reached statistical significance '...
-        'cfg_clus.clustercritval may be set too conservatively.'];
+    clus_level2.p = ['No clusters reached statistical significance; '...
+        'cfg_clus.clustercritval or other parameters may be set too conservatively.'];
     clus_level2.mask = [];
 end
 
