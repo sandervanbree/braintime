@@ -178,7 +178,7 @@ if strcmp(figopt,'yes')
         hold on
     end
     
-    p1 = plot(f,pspec_emp,'LineStyle','-','LineWidth',3,'Color',bt_colorscheme('per_ps_emp')); %Mean across 1st level perms
+    p1 = plot(f,pspec_emp,'LineStyle','-','LineWidth',5,'Color',bt_colorscheme('per_ps_emp')); %Mean across 1st level perms
     p2 = plot(f,mean(pspec_perm,1),'LineStyle','-','LineWidth',2,'Color',bt_colorscheme('per_ps_perm')); %Mean across 1st level perms
     xlim([f(1) f(end)]);
     xlabel('Periodicity frequency')
