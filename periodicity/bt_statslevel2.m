@@ -75,19 +75,21 @@ if numperms2 <10^5
 end
 
 %% STEP 1: Z-SCORE EMPIRICAL AND PERMUTED PERIODICITY POWER SPECTRA
+mn_perm = zeros(size(stats1{1}.permspec,1),1);
+sd_perm = zeros(size(stats1{1}.permspec,1),1);
+
 for i = 1:numel(stats1)                              % For each participant...
     
-    % Empirical
-    mn_emp = mean(stats1{i}.empspec);
-    sd_emp = std(stats1{i}.empspec);
-    stats1{i}.empspec = (stats1{i}.empspec-mn_emp)./sd_emp;
-    
-    % Permuted
+    % Extract mean and std from all permutations and normalize perm distribution
     for p = 1:size(stats1{i}.permspec,1)             % Loop through permutations
-    mn_perm = mean(stats1{i}.permspec(p,:));
-    sd_perm = std(stats1{i}.permspec(p,:));
-    stats1{i}.permspec(p,:) = (stats1{i}.permspec(p,:)-mn_perm)./sd_perm;
+    mn_perm(p,:) = mean(stats1{i}.permspec(p,:));
+    sd_perm(p,:) = std(stats1{i}.permspec(p,:));
+    stats1{i}.permspec(p,:) = (stats1{i}.permspec(p,:)-mn_perm(p,:))./sd_perm(p,:);
     end
+    
+    % Subtract mean and std from perm distribution from emp distribution
+    stats1{i}.empspec = (stats1{i}.empspec-mean(mn_perm))./mean(sd_perm);
+    
 end
 
 %% STEP 2: SECOND LEVEL STATISTICS OF PERIODICITY POWER SPECTRA
