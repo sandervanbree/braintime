@@ -30,10 +30,10 @@ settings.visopt  = 0;                                        % visualize results
 
 % Full width at half maximum around the warping frequency (higher fwhm will include a more frequencies)
 % Use exponential function to determine FWHM
-k = 0.15;                                % Exponent
-Tc = 0.5;                                % Horizontal asymptote
-T0 = 3.5;                                % Vertical asymptote
-fwhm = Tc+(T0-Tc).*exp(-k.*warpfreq);    % Scale FWHM with frequency
+k = 0.15;                                     % Exponent
+Tc = 0.5;                                     % Horizontal asymptote
+T0 = 3.5;                                     % Vertical asymptote
+fwhm = (Tc+(T0-Tc).*exp(-k.*warpfreq))^-1;    % Scale FWHM with frequency
 settings.fwhm   = fwhm;                                        
 
 GEDinput = data.trial;                                       % Rename
