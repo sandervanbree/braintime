@@ -57,6 +57,12 @@ clabel = config.bt_warpeddata.clabel;                 % Classification labels
 mv_perf = mv_results.perf;                            % Temporal generalization matrix
 refdimension.dim = config.refdimension;               % Extract reference dimension (clock or brain time)
 
+% Check clabel vector
+if sum(unique(clabel))~=3 || isvector(clabel)~= 1
+    error(['bt_warpeddata.clabel does not contain a vector of 1''s and 2''s. '...
+        'Please overwrite it with a correct classification label vector.']);
+end
+
 % Figure out map type
 if strcmp(mv_results.function,'mv_classify_across_time')       
     maptype = 'diag';
