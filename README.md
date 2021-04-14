@@ -51,7 +51,7 @@ Warp electrophysiological data from clock time to brain time and analyze the per
 ## Installation
 **Option 1:** Download files
 
-1. Download ZIP on the top right of this page (green "code" button)
+1. [Download ZIP](https://github.com/sandervanbree/braintime/archive/refs/heads/master.zip)
 2. Unzip to preferred folder
 3. Run the function [setup_braintime](setup).
 
