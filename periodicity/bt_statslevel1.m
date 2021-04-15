@@ -110,13 +110,13 @@ if strcmp(figopt,'yes')
         if f(1) - 0.5 < 0.1 % Is half the warped frequency in the tested range?
             wfreq_half_i = nearest(f,0.5); %Find half the warped frequency (0.5 Hz)
         else
-            warning("Periodicity may appear at 0.5x the warped frequency, but this is outside the tested range.");
+            warning('Periodicity may appear at 0.5x the warped frequency, but this is outside the tested range.');
         end
         
         if f(end) - 2 > -0.1 % Is double the warped frequency in the tested range?
             wfreq_double_i = nearest(f,2); %Find double the warped frequency (2 Hz)
         else
-            warning("Periodicity may appear at 2x the warped frequency, but this is outside the tested range.");
+            warning('Periodicity may appear at 2x the warped frequency, but this is outside the tested range.');
         end
     else
         wfreq_i = nearest(f,warpfreq);
