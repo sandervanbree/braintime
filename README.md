@@ -4,6 +4,7 @@
 ### Current to do list (for devs) | Official documentation starts below
 
 TO DO:
+- Does comp removal only make sense with FFT but not GED?
 - in bt_analyzesources, nudge toward centering the specified frequencies exactly on warping frequency
 - random gaussian field theory to perform multiple testing correction over power spectra and TGMs?
 
