@@ -213,19 +213,21 @@ srcrank = srcrank(1:nwarpsources,:); % take the best sources
 %% Calculate asymmetry indices and waveshape for each warping source
 % Set default to no skipping
 calc_asymm = bt_defaultval(config,'calc_asymm','yes');
-    
-ncycles = 2; % Number of cycles to extract (hardcoded for now)
-try
-[asymmidx,asymmidx_t,wavshap] = bt_calcwaveshape(warpsources,ncycles,srcrank);
-catch
-warning('Could not estimate waveshape, perhaps because the data is too noisy. Proceeding without...');
-calc_asymm = 'no';
-end
 
-if strcmp(calc_asymm,'no')
-asymmidx   = 0;
-asymmidx_t = 0;
-wavshap    = 0;
+if strcmp(calc_asymm,'yes')
+    ncycles = 2; % Number of cycles to extract (hardcoded for now)
+    try
+        [asymmidx,asymmidx_t,wavshap] = bt_calcwaveshape(warpsources,ncycles,srcrank);
+    catch
+        warning('Could not estimate waveshape, perhaps because the data is too noisy. Proceeding without...');
+        asymmidx   = 0;
+        asymmidx_t = 0;
+        wavshap    = 0;
+    end
+else
+    asymmidx   = 0;
+    asymmidx_t = 0;
+    wavshap    = 0;
 end
 
 %% Save information
