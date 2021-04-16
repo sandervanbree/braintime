@@ -212,7 +212,7 @@ srcrank = srcrank(1:nwarpsources,:); % take the best sources
 
 %% Calculate asymmetry indices and waveshape for each warping source
 % Set default to no skipping
-bt_defaultval(config,'calc_asymm','yes');
+calc_asymm = bt_defaultval(config,'calc_asymm','yes');
     
 ncycles = 2; % Number of cycles to extract (hardcoded for now)
 try
