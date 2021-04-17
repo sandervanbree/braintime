@@ -220,14 +220,14 @@ if strcmp(calc_asymm,'yes')
         [asymmidx,asymmidx_t,wavshap] = bt_calcwaveshape(warpsources,ncycles,srcrank);
     catch
         warning('Could not estimate waveshape, perhaps because the data is too noisy. Proceeding without...');
-        asymmidx   = 0;
-        asymmidx_t = 0;
-        wavshap    = 0;
+        asymmidx   = zeros(nwarpsources,0);
+        asymmidx_t = zeros(nwarpsources,0);
+        wavshap    = zeros(nwarpsources,0);
     end
 else
-    asymmidx   = 0;
-    asymmidx_t = 0;
-    wavshap    = 0;
+    asymmidx   = zeros(nwarpsources,0);
+    asymmidx_t = zeros(nwarpsources,0);
+    wavshap    = zeros(nwarpsources,0);
 end
 
 %% Save information
