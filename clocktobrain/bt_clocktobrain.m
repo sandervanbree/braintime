@@ -250,7 +250,7 @@ for nt=1:size(phs,1)
     tmptrl(:,1:cycledur)=tmpcy;
     
     % A loop for the remaining cycles
-    for cy=2:Ncycles_pre
+    for cy=2:round(Ncycles_pre)
         cyl=bt_data.trial{1,nt}(:,ix(c(cy-1)+1:c(cy)));
         tmpcy=imresize(cyl,[size(bt_data.label,1) cycledur]);
         tmptrl(:,(cy-1)*cycledur+1:cy*cycledur)=tmpcy;
