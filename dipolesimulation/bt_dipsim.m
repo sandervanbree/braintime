@@ -12,11 +12,11 @@ figure;imshow('bt_dipsim.png');
 % establish parameters
 settings.saveopt    = 1;          % Save the results?
 settings.dur        = 3;          % Duration of simulated trials
-settings.sr         = 200;        % Sampling rate of simulated data
+settings.sr         = 1000;        % Sampling rate of simulated data
 settings.numtrials  = 60;         % Number of trial per condition
 settings.mainfreq   = 10;         % Simulated frequency of interest
 settings.freqdrift  = 0.05;       % Frequency walk per timepoint (random value between -n to +n)
-settings.pinkns_amp = 0.5;        % Amplitude of 1/f pink noise
+settings.pinkns_amp = 1;        % Amplitude of 1/f pink noise
 settings.savedir    = '\\its-rds.bham.ac.uk\rdsprojects\w\wimberm-ieeg-compute\Sander\TGM\BrainTimeToolbox-github\dipolesimulation';
 
 % load relevant EEG files
@@ -26,7 +26,8 @@ load dip_vol
 
 %% Generate signal parameters
 t = linspace(0,settings.dur,settings.dur*settings.sr); % time vector
-pinkns = pinknoise(numel(t),settings.pinkns_amp); % 1/f noise
+pinkns = pinknoise(numel(t),1); % 1/f noise
+pinkns = pinkns.*settings.pinkns_amp; % Change 1/f amplitude
 
 % This simulation contains 11 dipoles - hardcoded so please don't change
 num_active_dips = 11;
