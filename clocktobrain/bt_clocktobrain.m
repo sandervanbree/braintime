@@ -222,7 +222,7 @@ for nt=1:size(phs,1)
         dtw(tmpphstrl,tempphs);     % warping path plot
         
         title(['Alignment after warping (trial ',num2str(nt), ')']);
-        legend('Clock time phase',['Template [warped-to] phase (method: ',warpmethod,')'],'Location','northwest');
+        legend('Brain time phase',['Clock time phase (method: ',warpmethod,')'],'Location','northwest');
         xlabel('Data sample');
         ylabel('Unwrapped phase');
         
