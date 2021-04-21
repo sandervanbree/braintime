@@ -150,15 +150,15 @@ elseif length(data.time{1}) > size(phs,2)
 end
 
 %% Warp the phase of the warping signal to the phase of a stationary oscillation
-bt_data=data;
-nsec=bt_data.time{1}(end)-bt_data.time{1}(1);                 % number of seconds in the data
-Ncycles_pre=warpfreq*nsec;                                    % number of cycles * seconds
-cycledur=round(phs_sr*nsec/Ncycles_pre);                      % samples for cycle
-tempsr=Ncycles_pre*cycledur/nsec;
-timephs=linspace(0,Ncycles_pre,phs_sr*nsec);                  % time vector of the unwrapper phase
+bt_data     = data;
+nsec        = bt_data.time{1}(end)-bt_data.time{1}(1);        % number of seconds in the data
+Ncycles     = warpfreq*nsec;                                  % number of cycles
+cycledur    = round(phs_sr*nsec/Ncycles);                     % samples for cycle
+tempsr      = Ncycles*cycledur/nsec;
+timephs     = linspace(0,Ncycles,phs_sr*nsec);                % time vector of the unwrapper phase
 
 if strcmp(warpmethod,'stationary')                            % warp using stationary sinusoid
-    tempphs=linspace(-pi,(2*pi*Ncycles_pre)-pi,tempsr*nsec);  % set up phase bins for unwrapped phase (angular frequency)
+    ct_phs = linspace(-pi,(2*pi*Ncycles)-pi,tempsr*nsec);     % set up phase bins for unwrapped phase (angular frequency)
     
 elseif strcmp(warpmethod,'waveshape')                         % warp using average waveshape
     wvshape_sm = smoothdata(wvshape,'gaussian',25);           % smooth substantially - 25 bins seems the sweetspot for 201 bins
@@ -170,9 +170,9 @@ elseif strcmp(warpmethod,'waveshape')                         % warp using avera
             ' ''stationary'' and try again.']);
     end
     
-    waveshape_cut = wvshape_sm(trgh(1)+1:trgh(2));             % cut waveshape to one cycle (-cos)
-    tempsig = repmat(waveshape_cut,[1 floor(Ncycles_pre)]);   % repeat wave Ncycles_pre times (round down)
-    misscycs = Ncycles_pre-floor(Ncycles_pre);                % check if rounding down lost us anything
+    waveshape_cut = wvshape_sm(trgh(1)+1:trgh(2));            % cut waveshape to one cycle (-cos)
+    tempsig = repmat(waveshape_cut,[1 floor(Ncycles)]);       % repeat wave Ncycles times (round down)
+    misscycs = Ncycles-floor(Ncycles);                        % check if rounding down lost us anything
     extrasamps = round(numel(waveshape_cut)*misscycs);        % how many samples of the cut cycle were lost
     
     if misscycs~=0                                            % append those to the template signal
@@ -180,10 +180,10 @@ elseif strcmp(warpmethod,'waveshape')                         % warp using avera
     end
     
     tempsig_hb = angle(hilbert(tempsig));                     % get the phase using Hilbert transform
-    tempphs = unwrap(tempsig_hb);                             % unwrap the phase
-    tempphs = imresize(tempphs,[1 tempsr*nsec]);              % resize to the desired length
+    ct_phs = unwrap(tempsig_hb);                              % unwrap the phase
+    ct_phs = imresize(ct_phs,[1 tempsr*nsec]);                % resize to the desired length
     
-    if strcmp(visualcheck,'on')                               % perform visual check
+    if strcmp(visualcheck,'on') || strcmp(visualcheck,'yes')  % perform visual check
         figure; hold on; bt_figure('halflong');
         
         subplot(3,1,1);
@@ -199,7 +199,7 @@ elseif strcmp(warpmethod,'waveshape')                         % warp using avera
         ylabel('Phase (-2*pi to 2*pi)');
         
         subplot(3,1,3);
-        tempphs_check = imresize(tempphs,[1 numel(timephs)]); 
+        tempphs_check = imresize(ct_phs,[1 numel(timephs)]); 
         plot(timephs,tempphs_check,'LineWidth',3,'Color',[0.8 0.1 0.1]);     % Unwrapped phase
         title('Unwrapped phase');
         xlabel('Time (cycles or seconds)');
@@ -211,15 +211,42 @@ elseif strcmp(warpmethod,'waveshape')                         % warp using avera
 end
 
 for nt=1:size(phs,1)
-    tmpphstrl=unwrap((phs(nt,:)));
+    bt_phs = unwrap((phs(nt,:)));
     % Warp phase of single trial onto template phase
-    [~,ix,iy] = dtw(tmpphstrl,tempphs);
+    [~,ix,iy] = dtw(bt_phs,ct_phs);
     
-    % Perform visual check on warping path and phase (first three trials)
-    if strcmp(visualcheck,'on') && nt <= 3
-        figure; hold on; bt_figure('half');
-        
-        dtw(tmpphstrl,tempphs);     % warping path plot
+    % Find the start of each cycle in the clock to brain time path
+    cycles        = false(1,length(iy));
+    cycles(1,end) = true;
+    for p = 1:length(iy)-1            % Loop through path
+        if rem(iy(p),cycledur) == 0   % If we have reached cycledur
+            if iy(p) ~= iy(p+1)       % And the next bin is not a repetition
+                cycles(p) = true;     % Label the start of the cycle
+            end
+        end
+    end
+   [~, c]=find(cycles == true);      % Find the indices of cycle starts
+    
+    % Resample the first cycle's data based on the warping path from brain
+    % to clock time
+    % First cycle:
+    cyl   = bt_data.trial{1,nt}(:,ix(1:c(1)));
+    tmpcy = imresize(cyl,[size(bt_data.label,1) cycledur]);  % Resize to cycle duration
+    tmptrl(:,1:cycledur) = tmpcy;                            % Replace data
+    
+    % Remaining cycles:
+    for cy    = 2:round(Ncycles)
+        cyl   = bt_data.trial{1,nt}(:,ix(c(cy-1)+1:c(cy)));
+        tmpcy = imresize(cyl,[size(bt_data.label,1) cycledur]);
+        tmptrl(:,(cy-1)*cycledur+1:cy*cycledur) = tmpcy;
+    end
+    
+    warpedtrial = imresize(tmptrl,[size(tmptrl,1) numel(timephs)]);
+    
+    % Perform visual check on warping path, phase, and warped data (first two trials)
+    if (strcmp(visualcheck,'on') || strcmp(visualcheck,'yes')) && nt <= 2
+        figure; hold on; bt_figure(0);
+        dtw(bt_phs,ct_phs);     % warping path plot
         
         title(['Alignment after warping (trial ',num2str(nt), ')']);
         legend('Brain time phase',['Clock time phase (method: ',warpmethod,')'],'Location','northwest');
@@ -229,36 +256,30 @@ for nt=1:size(phs,1)
         % Adapt font
         set(findobj(gcf,'type','axes'),'FontName',bt_plotparams('FontName'),'FontSize',bt_plotparams('FontSize'));
         set(findobj(gcf,'type','line'),'LineWidth',1.5);
-    end
-    
-    % How long is each cycle?
-    cycles=zeros(1,length(iy));
-    cycles(1,end)=500;
-    for tp=1:length(iy)-1
-        if rem(iy(tp),cycledur)==0
-            if iy(tp)~=iy(tp+1)
-                cycles(tp)=500; % Label the start of each cycle with an arbitrary '500'
-            end
+
+        figure; hold on; bt_figure(0);
+        plot_prewarp = squeeze(mean(bt_data.trial{1,nt},1));  % Data before warping
+        plot_postwarp = squeeze(mean(warpedtrial,1));         % Data after warping
+        
+        if size(plot_prewarp,2) > size(plot_postwarp,2)       % Crop to same length
+            plot_prewarp = plot_prewarp(1:size(plot_postwarp,1),1:size(plot_postwarp,2));
+        elseif size(plot_prewarp,2) < size(plot_postwarp,2)
+            plot_postwarp = plot_postwarp(1:size(plot_prewarp,1),1:size(plot_prewarp,2));
         end
+        
+        plot(plot_prewarp,'LineWidth',3,'Color',[0.8 0.1 0.8]);
+        plot(plot_postwarp,'LineWidth',3,'Color',[0.1 0.8 0.8]);
+        
+        title(['Average across channels (trial ',num2str(nt), ')']);
+        legend('Pre-warp data','Post-warp data','Location','best');
+        xlabel('Data sample');
+        ylabel('Amplitude');
     end
-    [~, c]=find(cycles==500); % Ffind the indices of the starts
     
-    % Create an equal number of samples per cycle
-    % Code for the first cycle
-    cyl=bt_data.trial{1,nt}(:,ix(1:c(1)));
-    tmpcy=imresize(cyl,[size(bt_data.label,1) cycledur]);
-    tmptrl(:,1:cycledur)=tmpcy;
-    
-    % A loop for the remaining cycles
-    for cy=2:round(Ncycles_pre)
-        cyl=bt_data.trial{1,nt}(:,ix(c(cy-1)+1:c(cy)));
-        tmpcy=imresize(cyl,[size(bt_data.label,1) cycledur]);
-        tmptrl(:,(cy-1)*cycledur+1:cy*cycledur)=tmpcy;
-    end
     
     % Create brain time warped trials by resizing to original length
-    bt_data.trial{1,nt}=imresize(tmptrl,[size(tmptrl,1) numel(timephs)]);
-    bt_data.time{1,nt}=timephs;
+    bt_data.trial{1,nt} = warpedtrial;
+    bt_data.time{1,nt}  = timephs;
 end
 
 % If cutmethod is cutartefact, slice out the right time window and adjust time vector
