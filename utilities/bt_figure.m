@@ -19,6 +19,8 @@ switch size
         catch
             set(gcf,'units','normalized','outerposition',[0 0 1 1]);
         end
+    case 'nearfull'
+        set(gcf,'units','normalized','outerposition',[0.05 0.05 0.9 0.9]);
     case 'halflong'
         set(gcf,'units','normalized','outerposition',[0.3 0.15 0.4 0.75]);
     case 'halfwide'
