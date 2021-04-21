@@ -73,7 +73,7 @@ cfgFT.foi        = 2:30;             % frequency range for FFT
 % Select a warping source with high power at 10 Hz, and parietal sources
 load layout_tutorial
 cfg              = [];
-cfg.layout       = layout;           % load template for topography plotting (not always needed)
+% cfg.layout       = layout;           % load template for topography plotting (not always needed)
 [bt_source]      = bt_selectsource(cfg,fft_sources,warpsources);
 
 %% Step 5: Warp clock time to brain time
@@ -93,14 +93,18 @@ cfg.phasemethod  = 'FFT';            % 'FFT': the phase dynamics of the warping 
 cfg.visualcheck  = 'on';             % Visualize several steps to check for errors
 [bt_warpeddata]  = bt_clocktobrain(cfg,ct_data,bt_source);
 
-% Let's take a look at the output of visualcheck. The toolbox prints the warping path
-% for three example trials. At the top, you see (1) the unwrapped phase of the chosen warping
-% signal (blue; "brain time"), and (2) the unwrapped phase of a stationary sinusoid
-% (orange; "clock time"). In the bottom, you see what happens after applying warping: 
-% the algorithm attempts to minimize the difference of the two signals. The main premise of the
-% toolbox is that the warping path between the signals reveals moments in each trial when the warping
-% signal - which orchestrates the studied cognitive process - falls out of tune with clock time.
-% The toolbox uses this information to dynamically rescale the data at such moments.
+% Let's take a look at the output of visualcheck, which illustrates the toolbox's core workings.
+% Figure 1: dynamic time warping for two example trials. At the top, you see (1) the unwrapped
+% phase of the chosen warping signal (blue; "brain time"), and (2) the unwrapped phase of a
+% stationary sinusoid (orange; "clock time"). In the bottom, you see what happens after applying warping: 
+% the algorithm attempts to minimize the difference between the two signals.
+%
+% Figure 2: The main premise of the toolbox is that the warping path between the signals reveals moments
+% in each trial when the warping signal - which orchestrates the studied cognitive process - falls out
+% of tune with clock time. The toolbox employs the warping path to dynamically resample the data,
+% repeating datapoints where brain time slows down relative to clock time, then squeezing
+% everything back to the same length. Here you see roughly what the transformation entails on
+% a single-trial basis.
 
 % cut ct_data to the same time window
 cfg        = [];
