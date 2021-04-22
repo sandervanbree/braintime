@@ -257,7 +257,7 @@ warpfreq                = srcrank(src_oi,2);
 % Call Mike X Cohen's GED functions
 [warpsigGED] = ged_foiComp(GEDdata,warpfreq);
 
-% Find FFT time window used previously, to match the duration of FFT_phs
+% Find time bins of the FFT's start and end time
 [~,mintime_fft_ind] = min(abs(fspecinfo.time(1)-warpsources.time{1}));
 [~,maxtime_fft_ind] = min(abs(fspecinfo.time(end)-warpsources.time{1}));
 

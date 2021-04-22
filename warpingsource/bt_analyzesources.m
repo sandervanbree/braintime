@@ -90,13 +90,15 @@ maxtime = config.time(end);                             % Maximum time of intere
 cfgFT = configFT;                                       % FieldTrip config structure
 correct1f = config.correct1f;                           % Correct for 1/f in visualization of FFT option
 
-try % For ICA components, this should work
-sampledur = (warpsources.time{1}(2)-warpsources.time{1}(1));  % Duration of each sample
-numsrc = size(warpsources.trial{1},1);                  % Number of warping sources
-catch % For virtual channels, this should work
-sampledur = (warpsources.time(2)-warpsources.time(1));  % Duration of each sample
-numsrc = size(warpsources.trial,2);                     % Number of warping sources  
+% Transform timelocked warpsource structure to raw
+if isstruct(warpsources.trial) == 0
+warpsources = ft_checkdata(warpsources,'datatype','raw');
+warning('Timelocked warpsource structure detected, so it was converted to raw');
 end
+
+% Set up basic parameters
+sampledur = (warpsources.time{1}(2)-warpsources.time{1}(1));  
+numsrc = size(warpsources.trial{1},1);                  
 
 % Amount of time dependent on cut method
 if strcmp(config.cutmethod,'consistenttime')
@@ -107,7 +109,7 @@ elseif strcmp(config.cutmethod,'cutartefact')
     maxtime_fft = maxtime+0.5;
 end
 
-% Sanity check
+% Frequency check
 if minfoi<cfgFT.foi(1) || maxfoi>cfgFT.foi(end)
 error('Warping frequencies of interest detected outside specified FFT frequency range');    
 end
