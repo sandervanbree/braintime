@@ -73,7 +73,7 @@ cfgFT.foi        = 2:30;             % frequency range for FFT
 % Select a warping source with high power at 10 Hz, and parietal sources
 load layout_tutorial
 cfg              = [];
-% cfg.layout       = layout;           % load template for topography plotting (not always needed)
+cfg.layout       = layout;           % load template for topography plotting (not always needed)
 [bt_source]      = bt_selectsource(cfg,fft_sources,warpsources);
 
 %% Step 5: Warp clock time to brain time
