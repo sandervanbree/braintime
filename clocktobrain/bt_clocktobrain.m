@@ -59,7 +59,7 @@ wvshape = bt_source{7};                                % Average waveshape of th
 
 warpmethod = bt_defaultval(config,'warpmethod','stationary');  % Set method for warping (default: stationary)
 phasemethod = bt_defaultval(config,'phasemethod','FFT');       % Set phase estimation method used for warping (default: FFT)
-visualcheck = bt_defaultval(config,'visualcheck','off');           % Show warping path and phases for three example trials
+visualcheck = bt_defaultval(config,'visualcheck','off');       % Show warping path and phases for three example trials
 
 if strcmp(cutmethod,'cutartefact')                     % Depending on cutmethod, specify original time window of interest
     mintime = mintime_fft+0.5;
@@ -72,8 +72,15 @@ end
 mintime_ind = nearest(bt_source{5}.time,mintime);    % Index of start time of interest (differs for cutartefact)
 maxtime_ind = nearest(bt_source{5}.time,maxtime);    % Index of end time of interest
 
+% Transform data structure to raw
+if isstruct(data.trial) == 0
+data = ft_checkdata(data,'datatype','raw');
+warning('Timelocked data structure detected, so it was converted to raw');
+end
+
 % Set sampling rate of brain time to clock time sampling rate
-phs_sr = round(1/(data.time{1}(2)-data.time{1}(1)));
+time   = data.time{1};
+phs_sr = round(1/(time(2)-time(1)));
 
 %% Remove the component from original data if desired (default = yes)
 circwarning   = 1;        % Warn the user for potential circularity by default
@@ -132,20 +139,20 @@ elseif strcmp(phasemethod,'GED')
 end
 
 % Check whether phase and data are of the same length
-if abs(length(data.time{1})-size(phs,2))>1
+if abs(length(time)-size(phs,2))>1
     warning(['The phase and data length in length by more than 1 samples. This'...
-        'may mean the wrong parameters were used during bt_analyzesources.']);
-elseif abs(length(data.time{1})-size(phs,2))>10
+        ' may mean the wrong parameters were used during bt_analyzesources.']);
+elseif abs(length(time)-size(phs,2))>10
     error(['The phase and data length in length by more than 10 samples. This'...
-        'may mean the wrong parameters were used during bt_analyzesources.']);
+        ' may mean the wrong parameters were used during bt_analyzesources.']);
 end
 
 % Do some additional slicing to fix slight differences
-if size(phs,2) > length(data.time{1})
-    phs=phs(:,1:length(data.time{1}));
-elseif length(data.time{1}) > size(phs,2)
+if size(phs,2) > length(time)
+    phs=phs(:,1:length(time));
+elseif length(time) > size(phs,2)
     cfg       = [];
-    cfg.toilim = [data.time{1}(1,1) data.time{1}(1,size(phs,2))];
+    cfg.toilim = [time(1) time(end)];
     data      = ft_redefinetrial(cfg, data);
 end
 
@@ -270,10 +277,18 @@ for nt=1:size(phs,1)
         plot(plot_prewarp,'LineWidth',3,'Color',[0.8 0.1 0.8]);
         plot(plot_postwarp,'LineWidth',3,'Color',[0.1 0.8 0.8]);
         
+        if strcmp(cutmethod,'cutartefact')
+        txt1 = '\leftarrow data cut from here';
+        txt2 = 'and cut to here \rightarrow';
+        text(cycledur,max(plot_postwarp),txt1,'FontSize',14,'HorizontalAlignment','left','FontWeight','bold');
+        text(length(plot_postwarp)-cycledur,max(plot_postwarp),txt2,'FontSize',14,'HorizontalAlignment','right','FontWeight','bold');
+        end
+        
         title(['Average across channels (trial ',num2str(nt), ')']);
         legend('Pre-warp data','Post-warp data','Location','best');
         xlabel('Data sample');
         ylabel('Amplitude');
+        
     end
     
     
