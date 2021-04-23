@@ -49,7 +49,19 @@ wavshap = fft_sources{12};                             % Waveshape per warping s
 
 mintime_ind = nearest(fspecinfo.time,mintime);         % Index of start time of interest (differs for cutartefact)
 maxtime_ind = nearest(fspecinfo.time,maxtime);         % Index of end time of interest
-    
+
+% Transform timelocked warpsource structure to raw
+if isstruct(warpsources.trial) == 0
+    temp           = ft_checkdata(warpsources,'datatype','raw');
+    if isfield(warpsources,'unmixing')        % If warpsources are ICA components, add ICA structs
+        temp.unmixing  = warpsources.unmixing;
+        temp.topo      = warpsources.topo;
+        temp.topolabel = warpsources.topolabel;
+    end
+    warpsources    = temp;
+    warning('Timelocked warpsource structure detected, so it was converted to raw');
+end
+
 %% Plot ranked warping sources
 % Find out ranking type
 if strcmp(rankmethod,'maxpow')
