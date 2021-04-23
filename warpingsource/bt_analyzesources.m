@@ -92,8 +92,14 @@ correct1f = config.correct1f;                           % Correct for 1/f in vis
 
 % Transform timelocked warpsource structure to raw
 if isstruct(warpsources.trial) == 0
-warpsources = ft_checkdata(warpsources,'datatype','raw');
-warning('Timelocked warpsource structure detected, so it was converted to raw');
+    temp           = ft_checkdata(warpsources,'datatype','raw');
+    if isfield(warpsources,'unmixing')        % If warpsources are ICA components, add ICA fields
+        temp.unmixing  = warpsources.unmixing;
+        temp.topo      = warpsources.topo;
+        temp.topolabel = warpsources.topolabel;
+    end
+    warpsources    = temp;
+    warning('Timelocked warpsource structure detected, so it was converted to raw');
 end
 
 % Set up basic parameters

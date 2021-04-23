@@ -53,7 +53,7 @@ maxtime_ind = nearest(fspecinfo.time,maxtime);         % Index of end time of in
 % Transform timelocked warpsource structure to raw
 if isstruct(warpsources.trial) == 0
     temp           = ft_checkdata(warpsources,'datatype','raw');
-    if isfield(warpsources,'unmixing')        % If warpsources are ICA components, add ICA structs
+    if isfield(warpsources,'unmixing')        % If warpsources are ICA components, add ICA fields
         temp.unmixing  = warpsources.unmixing;
         temp.topo      = warpsources.topo;
         temp.topolabel = warpsources.topolabel;
