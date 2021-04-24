@@ -21,8 +21,6 @@ if isempty(smooth)
     smooth=100;
 end
 
-
-
 x = linspace(0-0.6,0+0.6);
 y = linspace(0,0);
 plot(y,x,'linewidth',1,'color',[0.5 0.5 0.5],'linestyle', '--');
@@ -30,14 +28,19 @@ ylabel('Hz');
 xlabel('Asymmetry index');
 hold on
 
+
+currseed = rng;              
+currseed = currseed.Seed;    % Save current seed
+rng(40);                     % Temporarily change it for consistent dot locations
+
     tmp=dat;
     jitt=(rand(1,length(tmp))+0.1).*0.1;
     scatter(tmp',jitt,dotsize,col,'filled','MarkerFaceAlpha',.5);
     hold on
 
+rng(currseed);              % Change it back
 
 ylim([0-0.6 max(x)]);
-
 
 % Plot Boxes and means ...
 xb=[0-0.1350 0-0.02];
