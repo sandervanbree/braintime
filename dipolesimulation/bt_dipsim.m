@@ -10,14 +10,15 @@
 figure;imshow('bt_dipsim.png');
 
 % establish parameters
-settings.saveopt    = 1;          % Save the results?
-settings.dur        = 3;          % Duration of simulated trials
-settings.sr         = 1000;        % Sampling rate of simulated data
-settings.numtrials  = 60;         % Number of trial per condition
-settings.mainfreq   = 10;         % Simulated frequency of interest
-settings.freqdrift  = 0.05;       % Frequency walk per timepoint (random value between -n to +n)
-settings.pinkns_amp = 1;        % Amplitude of 1/f pink noise
-settings.savedir    = '\\its-rds.bham.ac.uk\rdsprojects\w\wimberm-ieeg-compute\Sander\TGM\BrainTimeToolbox-github\dipolesimulation';
+settings.saveopt    = 1;         % Save the results?
+settings.dur        = 3;         % Duration of simulated trials
+settings.sr         = 200;       % Sampling rate of simulated data
+settings.numtrials  = 60;        % Number of trial per condition
+settings.mainfreq   = 10;        % Simulated frequency of interest
+settings.freqdrift  = 0.05;      % Frequency walk per timepoint (random value between -n to +n)
+settings.pinkns_amp = 0.5;       % Amplitude of 1/f pink noise
+settings.randphase  = 1;         % Randomise starting phase of primary dipoles per trial?     
+settings.savedir    = '\\analyse4\project0318\Sander\software\braintime-master\dipolesimulation';
 
 % load relevant EEG files
 load dip_elec
@@ -58,8 +59,13 @@ randfreq = randfreq(randperm(length(randfreq)));
 % Generate random PHASE for 1/f dipoles
 rand_phs=rand(settings.numtrials,num_active_dips)*2*pi;
 
+if settings.randphase == 1
 % Generate random TRIAL START PHASE for conductor and follower dipoles
 rand_phi=rand(settings.numtrials,num_active_dips)*2*pi;
+else
+% Generate stable TRIAL START PHASE for conductor and follower dipoles
+rand_phi=ones(settings.numtrials,num_active_dips)*2*pi;
+end
 
 % Generate FREQUENCY DRIFT for conductor and follower dipoles
 % Employs a "random walk" type of approach
