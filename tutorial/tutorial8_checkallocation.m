@@ -5,48 +5,63 @@
 %%% artefact in the TGM. While cutartefact cuts this artefact out, the
 %%% longer time window implemented may destroy the data-to-cycle allocation
 %%% that the toolbox applied in consistenttime.
-%%%
-%%% TO DEVS: bt_checkallocation is not working yet as intended, help
-%%% needed. Until then, ignore this tutorial.
 
-% Load two classes of data (see tutorial folder)
-load c1_data
-load c2_data
+%% Step 1: Load and structure data
+load dipolesim_tutorial;
 
-% Combine classes and add condition labels
 cfg               = [];
-ct_data           = ft_appenddata(cfg,c1_data,c2_data);
-clabel            = [ones(size(c1_data.trial,1),1);2*ones(size(c2_data.trial,1),1)];
+ct_data           = ft_appenddata(cfg,ct_left,ct_right);
+clabel            = [ones(size(ct_left.trial,1),1);2*ones(size(ct_right.trial,1),1)];
 ct_data.trialinfo = clabel;
 
-%% Run ICA to extract components, one of which will contain our carrier oscillation
+%% Step 2: Extract warping sources, which contain warping signals
 cfg              = [];
 cfg.method       = 'runica';
-cfg.runica.pca   = 30;               % Optional: obtain N component to reduce time
-channels         = ft_componentanalysis(cfg ,ct_data);
+cfg.runica.pca   = 30;               % Let's get 30 to save time
+warpsources      = ft_componentanalysis(cfg ,ct_data);
 
-%% Perform FFT over channels (components) to enable sorting by time frequency characteristics of interest
-cfg = [];
-cfg.time         = [0 1];            % time window of interest
-cfg.fft          = [2 30];           % frequency range for the FFT
-cfg.foi          = [6 10];           % frequency range of interest for brain time
-cfg.waveletwidth = 5;                % wavelet width in number of cycles
-cfg.Ntop         = 10;               % consider only the 10 best components
-cfg.cutmethod    = 'consistenttime'; % cutmethod 1
-cfg.sortmethod   = 'maxpow';         % sort by power in frequency range of interest. Alternative: 'templatetopo' (see tutorial 4)
-[fft_channels_1]    = bt_analyzechannels(cfg,channels);
 
-cfg.cutmethod    = 'cutartefact';    % cutmethod 2
-[fft_channels_2]    = bt_analyzechannels(cfg,channels);
+%% Step 3: Time frequency analysis of warping components
+% Toolbox configuration
+cfg              = [];               % toolbox configuration structure
+cfg.time         = [1 2];            % time window of interest (1 to 2s)
+cfg.warpfreqs    = [10 10];          % frequency range of interest for brain time (10 to 10 Hz; usually a band)
+cfg.correct1f    = 'yes';            % apply 1/f correction after FFT, for plotting purposes only
+cfg.nwarpsources  = 10;              % consider only the 10 best warping sources
+cfg.rankmethod   = 'maxpow';         % sort warping sources by power in frequency range of interest.
+                                     % Alternative: 'templatetopo' (see tutorial 4)
+cfg.cutmethod    = 'consistenttime'; % 'cutartefact' or 'consistenttime' See "help bt_analyzecarriers"
+                                     % or our paper for details
 
-%% Choose a carrier
-% Choose the first component's carrier (8 Hz)
+% Fieldtrip configuration
+cfgFT            = [];               % FieldTrip configuration structure, input to ft_freqanalysis
+cfgFT.method     = 'wavelet';        % frequency analysis method (see help ft_freqanalysis for options)
+cfgFT.width      = 5;                % number of wavelet cycles
+cfgFT.foi        = 2:30;             % frequency range for FFT
+% cfgFT.time       = cfg.time        % the time variable is automatically fetched from cfg.time
+
+[fft_source_constime]   = bt_analyzesources(cfg,cfgFT,warpsources);
+
+cfg.cutmethod   = 'cutartefact';
+
+[fft_source_cutarte]   = bt_analyzesources(cfg,cfgFT,warpsources);
+
 load layout_tutorial
-cfg              = [];
-cfg.layout       = layout;           % load template for topography plotting
-[bt_carrier_1]     = bt_choosecarrier(cfg,fft_channels_1,channels);
-[bt_carrier_2]     = bt_choosecarrier(cfg,fft_channels_2,channels);
+cfg                      = [];
+cfg.layout               = layout;           % load template for topography plotting (not always needed)
+[bt_source_constime]     = bt_selectsource(cfg,fft_source_constime,warpsources);
+[bt_source_cutarte]      = bt_selectsource(cfg,fft_source_cutarte,warpsources);
+
 
 %% Check data-to-cycle allocation
-cfg              = [];
-bt_checkallocation(cfg, ct_data, bt_carrier_1, bt_carrier_2);
+cfg.warpmethod   = 'stationary';     % 'stationary': the toolbox warps the data using a stationary
+                                     % sinusoid at the warping frequency (default).
+                                     % 'waveshape': the toolbox warps to the average waveshape for
+                                     % the warping frequency.
+
+cfg.phasemethod  = 'FFT';            % 'FFT': the phase dynamics of the warping signal
+                                     % as estimated by ft_freqanalysis (default).
+                                     % 'GED': the phase dynamics of the warping signal 
+                                     % as estimated by Generalized Eigendecomposition
+
+bt_checkallocation(cfg, ct_data, bt_source_constime, bt_source_cutarte);
