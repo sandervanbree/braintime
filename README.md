@@ -64,4 +64,5 @@ Below, we demonstrate how `braintime` achieves both operations step-by-step.
 
 - Warping sources: the data structure used to warp, containing the to-be-selected warping signal.
 
+Warping sources may be obtained from the clock time data. For example, by applying independent component analysis (ICA), or, for intracranial data, it may be the extracellular channels recording local field potentials.
 
