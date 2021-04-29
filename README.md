@@ -84,7 +84,7 @@ This is where the magic happens. [bt_clocktobrain](bt_clocktobrain/bt_clocktobra
 
 There are two parameters you can change in [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m). You can choose to set the clock time signal as a basic stationary sinusoid (warpmethod = 'sinusoid') or a smoothed version of the warping signal's waveshape (warpmethod = 'waveshape').
 
-> :bulb: For asymmetric data, such as theta oscillations in intracranial rodent data, using waveshape as a warpmethod is the natural choice
+> :bulb: For asymmetric data, such as theta oscillations in intracranial rodent data, using waveshape as a warpmethod is the natural choice.
 
 After [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m), your data has completed its transformation from clock to brain time. The time axis is now formatted as sequences of cycles, instead of seconds. You may opt to continue analyses outside of the toolbox, or test for periodic patterns in the data using `braintime`'s second operation described next. In case of the former, please read the previously linked circularity information.
 
