@@ -57,18 +57,22 @@ Below, we demonstrate how `braintime` achieves both operations step-by-step.
 ## Operation 1: Brain time warping
 
 **1.1 Loading clock time data**
+
 `braintime` works with FieldTrip formatted electrophysiological data. This can be electroencephalography (EEG), magnetoencephalography (MEG), or intracranial data. The starting data is called clock time data—this will be warped.
 
 **1.2 Loading warping sources data**
+
 Warping sources are the data structure containing the to-be-selected warping signal, which is used to warp clock time data. Warping sources may be obtained separately from clock time data, or extracted from it (using independent component analysis, or the selection of a few channels). Please ensure that your warping source data has 0.5s of additional time extra, before the start and after of your time window of interest, to facilitate step 1.3.
 
 When clock time data and warping sources are dependent, please read "[is it circular to warp to warping sources obtained from my clock time data?](#is-it-circular-to-warp-to-warping-sources-obtained-from-my-clock-time-data?)".
 
 **1.3 Time frequency analysis of warping sources**
+
 Each warping source contains potential warping signals. [bt_analyzesources](warpingsource/bt_analyzesources.m) performs a time frequency analysis on all warping sources, detecting potential warping signals based on your preferences. These preferences include the frequency range of interest assumed to clock your cognitive process (e.g., 8 to 12 Hz for attention), and the time window of interest that you wish to analyze (e.g. 0 to 1 second, this should match the window you wish to warp). In addition, you can choose one of two methods to cut the data, 'consistenttime', or 'cutartefact'. For details on their relative merit, see "[which cutmethod to choose?](#which-cutmethod-to-choose)".
 
 
 **1.4 Selecting a warping source and signal
+
 
 
 ## Operation 2: Periodicity analysis
