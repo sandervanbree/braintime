@@ -82,7 +82,11 @@ Now that the toolbox has collected all the relevant time frequency details of wa
 
 This is where the magic happens. [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m) takes the phase of the chosen warping signal and [dynamically time warps](https://en.wikipedia.org/wiki/Dynamic_time_warping) (DTW) it to the phase of a stationary sinusoid of the same frequency. Thereby, DTW enables a readout of where clock time (stationary sinusoid) falls out of tune with brain time (phase of warping signal) by attempting to minimize their difference. That minimization process yields a warping path, which tells `braintime` the samples that need to be repeated for clock and brain time to better align. [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m) repeats those samples in the original data, cycle-by-cycle and trial-by-trial, before squeezing things back down to the original data length.
 
-After [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m), your data has completed its transformation from clock to brain time. The time axis is now transformed from sequences of seconds to sequences of cycles.
+There are two parameters you can change in [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m). You can choose to set the clock time signal as a basic stationary sinusoid (warpmethod = 'sinusoid') or a smoothed version of the warping signal's waveshape (warpmethod = 'waveshape').
+
+> :bulb: For asymmetric data, like theta oscillations in intracranial rodent data, using waveshape as a warpmethod is the natural choice
+
+After [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m), your data has completed its transformation from clock to brain time. The time axis is now formatted as sequences of cycles, instead of seconds.
 
 
 ## Operation 2: Periodicity analysis
