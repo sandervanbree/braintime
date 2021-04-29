@@ -78,9 +78,9 @@ Each warping source contains potential warping signals. [bt_analyzesources](warp
 
 Now that the toolbox has collected all the relevant time frequency details of warping sources, it's time to make a selection using [bt_selectsource](warpingsource/bt_selectsource.m). If desired, you can input a layout structure to plot each warping source's topography. For each warping source, [bt_selectsource](warpingsource/bt_selectsource.m) plots a time frequency spectrum, a power spectrum, the topography of the warping source, and waveshape details. For each warping source, a warping signal is highlighted, set at the highest power oscillation in the frequency range of interest. Factoring in its characteristics, you can select a warping signal. `braintime` uses the phase of dynamics of this warping signal to brain time warp the clock time data.
 
-**1.5 Warping clock to brain time
+**1.5 Warping clock to brain time**
 
-This is where the magic happens.
+This is where the magic happens. [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m) takes the phase of the chosen warping signal and [dynamically time warps](https://en.wikipedia.org/wiki/Dynamic_time_warping) (DTW) it to the phase of a stationary sinusoid of the same frequency. DTW enables a readout of where clock time falls out of tune with brain time by attempting to minimize the difference between the signals. That minimization process yields a warping path, which tells `braintime` the samples that need to be repeated for clock and brain time to realign. [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m) repeats those samples in the original data, cycle-by-cycle and trial-by-trial, before squeezing things back down to the original data length.
 
 
 ## Operation 2: Periodicity analysis
