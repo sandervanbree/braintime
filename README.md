@@ -74,7 +74,7 @@ Warping sources are the data structure containing the to-be-selected warping sig
 
 Each warping source contains potential warping signals. [bt_analyzesources](warpingsource/bt_analyzesources.m) performs a time frequency analysis on all warping sources, detecting potential warping signals based on your preferences. These preferences include methods of time frequency analysis, the frequency range of interest assumed to clock your cognitive process (e.g., 8 to 12 Hz for attention), and the time window of interest that you wish to analyze (e.g. 0 to 1 second, this should match the window you wish to warp). In addition, you can choose one of two methods to cut the data, 'consistenttime', or 'cutartefact', both with their own relative merits (see "[which cutmethod to choose?](#which-cutmethod-to-choose)").
 
-[bt_analyzesources](warpingsource/bt_analyzesources.m) collects a whole bunch of information about the warping sources. The phase of the underlying warping signals (using two methods, described in 1.5), its average waveshape and its asymmetry, and a ranking of all warping sources based on your preferences.
+[bt_analyzesources](warpingsource/bt_analyzesources.m) collects a whole bunch of information about the warping sources. The phase of the underlying warping signals (obtained using two methods, described in 1.5), its average waveshape and its asymmetry, and a ranking of all warping sources based on your preferences.
 
 > :bulb: You can adjust the ranking of warping sources by their topography by creating a topography using [bt_templatetopo](topography/bt_templatetopo.m) and changing cfg.rankmethod to 'temptopo'.
 
