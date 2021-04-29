@@ -23,6 +23,8 @@ Warp electrophysiological data from clock time to brain time and analyze the per
 
 [Operation 2: Periodicity analysis](#operation-2-periodicity-analysis)
 
+[Toolbox considerations](#toolbox-considerations)
+
 ## Installation
 **Option 1:** Download files
 
