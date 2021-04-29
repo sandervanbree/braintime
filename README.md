@@ -55,6 +55,6 @@ What is the premise behind the *Brain Time Toolbox* (`braintime`)? Insofar a cog
 What are the main steps of the toolbox?
 
 ### 1: Loading data
-
+`braintime` works with FieldTrip formatted data. 
 
 
