@@ -66,7 +66,7 @@ Warping sources are the data structure that containing the to-be-selected warpin
 
 **1.3 Time frequency analysis of warping sources**
 
-[bt_analyzesources](warpingsource/bt_analyzesources). Each warping source contains potential warping signals. To help selection, 
+Each warping source contains potential warping signals.  [bt_analyzesources](warpingsource/bt_analyzesources.m).
 
 
 ## Operation 2: Periodicity analysis
