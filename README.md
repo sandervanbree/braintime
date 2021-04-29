@@ -97,7 +97,9 @@ Before getting started, ensure the original clock time data as well as the brain
 
 **2.1 Multivariate pattern analysis**
 
-The first step is to use `MVPA-Light` to classify the data. You may opt to classify across time [mv_classify_across_time.m](https://github.com/treder/MVPA-Light/blob/master/mv_classify_across_time.m), or apply temporal generalization by classifying using [mv_classify_timextime.m](https://github.com/treder/MVPA-Light/blob/master/mv_classify_timextime.m)
+The first step is to use `MVPA-Light` to classify the data. You may opt to classify across time [mv_classify_across_time.m](https://github.com/treder/MVPA-Light/blob/master/mv_classify_across_time.m), or apply temporal generalization by classifying using [mv_classify_timextime.m](https://github.com/treder/MVPA-Light/blob/master/mv_classify_timextime.m). You can change a variety of parameters, described briefly in [tutorial 2](tutorial/tutorial2_periodicity.m).
+
+> :bulb: For more information on `MVPA-Light` and its parameters, see its awesome [tutorials](https://github.com/treder/MVPA-Light/tree/master/examples).
 
 ## Toolbox considerations
 
