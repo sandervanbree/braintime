@@ -75,4 +75,9 @@ Each warping source contains potential warping signals. [bt_analyzesources](warp
 
 Be sure to label your two classes of trials in a field called "clabel" (a vector of 1's and 2's lining up with your trial field).
 
-### Circularity considerations
+## Toolbox considerations
+
+### Which cutmethod to choose?
+
+### Is it circular to warp to warping sources obtained from my clock time data?
+
