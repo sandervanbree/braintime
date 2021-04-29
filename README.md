@@ -7,7 +7,7 @@
 # Brain Time Toolbox
 <img src="https://i.imgur.com/OAEVqgM.png" width="200">
 
-Warp electrophysiological data from clock time to brain time and analyze the periodicity of cognitive processes. By *Sander van Bree, María Melcón, Luca Kolibius, Casper Kerrén, Maria Wimber & Simon Hanslmayr*.
+Warp electrophysiological data from clock time to brain time and analyze the periodicity of cognitive processes. By *Sander van Bree, María Melcón, Luca Kolibius, Casper Kérren, Maria Wimber, Simon Hanslmayr*.
 
 ### Dependencies
 - [MATLAB Signal Processing Toolbox](https://uk.mathworks.com/help/signal/getting-started-with-signal-processing-toolbox.html)
@@ -50,4 +50,4 @@ then run the function [setup_braintime](setup).
 
 
 ## Introduction
-Summary of the toolbox here
+The idea behind the Brain Time Toolbox is that, insofar a cognitive process is clocked by oscillations, analyses of its dynamics require a factoring in of its oscillations' dynamics. To this end, the toolbox transforms electrophysiological data based on relevant oscillations selected by the user (warping signal). This makes the data format go from clock time, closer to the brain's own time.
