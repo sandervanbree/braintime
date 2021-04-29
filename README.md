@@ -117,7 +117,7 @@ For TGMs, you may opt to perform the periodicity analysis over either the 2 dime
 
 You also need to specify a range of periodicity frequencies. At which rate do you expect periodic patterns in classifier performance to arise? Finally, you can choose a reference dimension. If you choose ```cfg.refdimension = clocktime```, periodicity in classifier performance will be displayed as a function of cycles per seconds (Hz). Alternatively, if you are quantifying brain time warped data, ```cfg.refdimension = clocktime``` is more appropriate. This references the peroidicity as a function of cycles per second, *normalized* to that participants' warping frequency.
 
-> :bulb: Let's say you warp a participant's data to 11 Hz. Then with ```cfg.refdimension = clocktime```, a peak at the warping frequency will be at 11 Hz, but with ```cfg.refdimension = clocktime``` it will show up at 1 Hz, as the frequencies are normalized to the warped frequency (11/11 = 1).
+> :bulb: Let's say you warp a participant's data to an 11 Hz warping signal. In that case, with ```cfg.refdimension = clocktime```, a peak at the warping frequency will be at 11 Hz, but with ```cfg.refdimension = clocktime``` it will show up at 1 Hz, as the frequencies are normalized to the warped frequency (11/11 = 1).
 
 **2.3 First level statistics**
 
