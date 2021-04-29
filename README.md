@@ -72,11 +72,11 @@ Each warping source contains potential warping signals. [bt_analyzesources](warp
 
 [bt_analyzesources](warpingsource/bt_analyzesources.m) collects a whole bunch of information about the warping sources. The phase of the underlying warping signals (using two methods, described in 1.5), its average waveshape and its asymmetry, and a ranking of all warping sources based on your preferences.
 
-> :tip: You can adjust the ranking of warping sources by their topography by creating a topography using [bt_templatetopo](topography/bt_templatetopo.m) and changing cfg.rankmethod to 'temptopo'.
+> :bulb: You can adjust the ranking of warping sources by their topography by creating a topography using [bt_templatetopo](topography/bt_templatetopo.m) and changing cfg.rankmethod to 'temptopo'.
 
 **1.4 Selecting a warping source and signal**
 
-Now that the toolbox has collected all 
+Now that the toolbox has collected all the relevant time frequency details of warping sources, it's time to make a selection using [bt_selectsource](warpingsource/bt_selectsource.m). If desired, you can input a layout structure to plot each warping source's topography. For each warping source, [bt_selectsource](warpingsource/bt_selectsource.m) plots a time frequency spectrum, a power spectrum, the topography of the warping source, and waveshape details. For each warping source, a warping signal is highlighted, set at the highest power oscillation in the frequency range of interest. You can select a component by factoring in the signal's characteristics, the phase of which will be used to brain time warp the clock time data.
 
 
 
