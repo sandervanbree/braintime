@@ -107,6 +107,8 @@ If the warping signal orchestrates the dynamics of your cognitive function, oper
 
 For TGMs, you may opt to perform the periodicity analysis over either the 2 dimensional matrix itself, or its autocorrelation map. Not sure what is better? Check out "[should I perform bt_quantify over the TGM itself, or its autocorrelation map?](#should-i-perform-bt_quantify-over-the-tgm-itself-or-its-autocorrelation-map)".
 
+You also need to specify a range of periodicity frequencies. At which rate do you expect periodic patterns in classifier performance to arise? Finally, you can choose a reference dimension. If you choose > refdimension = clocktime;
+
 ## Toolbox considerations
 
 ### Which cutmethod to choose?
