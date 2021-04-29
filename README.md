@@ -1,9 +1,6 @@
 [![HitCount](http://hits.dwyl.com/sandervanbree/braintime.svg)](http://hits.dwyl.com/sandervanbree/braintime)
 [![Github All Releases](https://img.shields.io/github/downloads/sandervanbree/braintime/total.svg)]()
 
-### Start documentation:
-
-
 # Brain Time Toolbox
 <img src="https://i.imgur.com/OAEVqgM.png" width="200">
 
