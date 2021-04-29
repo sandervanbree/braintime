@@ -90,6 +90,8 @@ There are two parameters you can change in [bt_clocktobrain](bt_clocktobrain/bt_
 
 > :bulb: For asymmetric data, such as theta oscillations in intracranial rodent data, using waveshape as a warpmethod is the natural choice.
 
+There are also two "phase methods", which are separate phase estimations of the warping signal both sneakily obtained by [bt_analyzesources](warpingsource/bt_analyzesources.m). One is a regular method of phase estimation (using the Fast Fourier Transform of the warping frequency, selected with ```cfg.phasemethod = 'FFT'```, and a special method called [General Eigenvalue Decomposition](http://mikexcohen.com/data/Cohen_STfilter.pdf) (GED), selected with ```cfg.phasemethod = 'FFT'```. The latter estimates the phase of the warping signal by estimating that frequency's phase in a weighted combination of **all** warping sources. The former is classical and specific to the warping source, the latter is novel and more holistically estimates phase.
+
 After [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m), your data has completed its transformation from clock to brain time. The time axis is now formatted as sequences of cycles, instead of seconds. You may opt to continue analyses outside of the toolbox, or test for periodic patterns in the data using `braintime`'s second operation described next. In case of the former, please read the previously linked circularity information.
 
 
