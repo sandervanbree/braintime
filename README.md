@@ -80,7 +80,9 @@ Now that the toolbox has collected all the relevant time frequency details of wa
 
 **1.5 Warping clock to brain time**
 
-This is where the magic happens. [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m) takes the phase of the chosen warping signal and [dynamically time warps](https://en.wikipedia.org/wiki/Dynamic_time_warping) (DTW) it to the phase of a stationary sinusoid of the same frequency. DTW enables a readout of where clock time falls out of tune with brain time by attempting to minimize the difference between the signals. That minimization process yields a warping path, which tells `braintime` the samples that need to be repeated for clock and brain time to realign. [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m) repeats those samples in the original data, cycle-by-cycle and trial-by-trial, before squeezing things back down to the original data length.
+This is where the magic happens. [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m) takes the phase of the chosen warping signal and [dynamically time warps](https://en.wikipedia.org/wiki/Dynamic_time_warping) (DTW) it to the phase of a stationary sinusoid of the same frequency. Thereby, DTW enables a readout of where clock time (stationary sinusoid) falls out of tune with brain time (phase of warping signal) by attempting to minimize their difference. That minimization process yields a warping path, which tells `braintime` the samples that need to be repeated for clock and brain time to better align. [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m) repeats those samples in the original data, cycle-by-cycle and trial-by-trial, before squeezing things back down to the original data length.
+
+After [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m), your data has completed its transformation from clock to brain time. The time axis is now transformed from sequences of seconds to sequences of cycles.
 
 
 ## Operation 2: Periodicity analysis
