@@ -105,7 +105,7 @@ The first step is to use `MVPA-Light` to classify the data. You may opt to class
 
 If the warping signal orchestrates the dynamics of your cognitive function, operationalized by your two classes of data, then the classifier's performance may tap into these dynamics. Thus, [bt_quantify](periodicity/bt_quantify.m) tests and quantifies periodic patterns in the classifier performance, whether that is in the classifier output obtained from [mv_classify_across_time.m](https://github.com/treder/MVPA-Light/blob/master/mv_classify_across_time.m) (1 dimensional; "diagonal"), or [mv_classify_timextime.m](https://github.com/treder/MVPA-Light/blob/master/mv_classify_timextime.m) (2 dimensional; "temporal generalization matrix" (TGM)).
 
-For TGMs, you may opt to perform the periodicity analysis over either the 2 dimensional matrix itself, or its autocorrelation map. Not sure what is better? Check out see "[Should I perform bt_quantify over the TGM itself, or its autocorellation map?](#should-i-perform-bt_quantify-over-the-tgm-itself-or-its-autocorellation-map)").
+For TGMs, you may opt to perform the periodicity analysis over either the 2 dimensional matrix itself, or its autocorrelation map. Not sure what is better? Check out see "[should I perform bt_quantify over the TGM itself, or its autocorrelation map?](#should-i-perform-bt_quantify-over-the-tgm-itself-or-its-autocorrelation-map)".
 
 ## Toolbox considerations
 
@@ -113,5 +113,5 @@ For TGMs, you may opt to perform the periodicity analysis over either the 2 dime
 
 ### Is it circular to warp to warping sources obtained from my clock time data?
 
-### Should I perform bt_quantify over the TGM itself, or its autocorellation map?
+### Should I perform bt_quantify over the TGM itself, or its autocorrelation map?
 
