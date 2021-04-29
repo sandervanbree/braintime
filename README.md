@@ -101,7 +101,7 @@ You may wish to use `braintime` to test whether brain time warping has accentuat
 
 Before getting started, ensure the original clock time data as well as the brain time warped data have their classes labeled. Specifically, create a field called "clabel", with a vector of 1's and 2's corresponding to the condition of each trial. If your trial sequence is 'left left right', the clabel field should contain '1 1 2'.
 
-The pipeline is that each participant's data needs to undergo step 2.1 to 2.3, separately for both clock and brain time data. Then, each participant's first level result for clock time must be added as a field to a large group structure, and the same for brain time results. These two group structures (e.g. ```ct_stats1``` and ```bt_stats1```) can separately be used as input for step 2.4 to obtain clock time and brain time group level results, allowing you to compare periodicity in clock time and brain time data.
+The pipeline is that each participant's data needs to undergo step 2.1 to 2.3, separately for both clock and brain time data. Then, each participant's 2.3 result for clock time must be added as a field to a large group structure, and the same for brain time results. These two group structures (e.g. ```ct_stats1``` and ```bt_stats1```) can separately be used as input for step 2.4 to obtain clock time and brain time group level results, allowing you to compare periodicity in clock time and brain time data.
 
 **2.1 Multivariate pattern analysis**
 
