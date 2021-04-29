@@ -91,7 +91,7 @@ After [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m), your data has comple
 
 ## Operation 2: Periodicity analysis
 
-You may wish to test whether brain time warping has accentuated dynamic patterns in the data. This is appropriate if your data comprises two underlying conditions which are predicted to yield fluctuating classification evidence. For example, we report a spatial attention dataset where we predict that evidence for motion direction rapidly alternates from low to high as a function of alpha phase (the warping signal). Thus, the secod operation requires your brain time warped data to consist of such classes.
+You may wish to use `braintime` to test whether brain time warping has accentuated dynamic patterns in the data. This is appropriate if your data comprises two underlying conditions which are predicted to yield fluctuating classification evidence. For example, we report a spatial attention dataset where we predict that evidence for motion direction rapidly alternates from low to high as a function of alpha phase (the warping signal). Thus, the secod operation requires your brain time warped data to consist of such classes.
 
 Before getting started, ensure the original clock time data as well as the brain time warped data have their classes labeled. Specifically, create a field called "clabel", with a vector of 1's and 2's corresponding to the condition of each trial. If your trial sequence is 'left left right', the clabel field should contain '1 1 2'.
 
