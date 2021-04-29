@@ -91,15 +91,16 @@ After [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m), your data has comple
 
 ## Operation 2: Periodicity analysis
 
-You may wish to use `braintime` to test whether brain time warping has accentuated dynamic patterns in the data. This is appropriate if your data comprises two underlying conditions which are predicted to yield fluctuating classification evidence. For example, we report a spatial attention dataset where we predict that evidence for motion direction rapidly alternates from low to high as a function of alpha phase (the warping signal). Thus, the secod operation requires your brain time warped data to consist of such classes.
+You may wish to use `braintime` to test whether brain time warping has accentuated dynamic patterns in the data. This is appropriate if your data comprises two underlying conditions which are predicted to yield fluctuating classification evidence. For example, we report a spatial attention dataset where we predict that evidence for motion direction rapidly alternates from low to high as a function of alpha phase (the warping signal). Thus, the second operation requires your brain time warped data to consist of such classes.
 
 Before getting started, ensure the original clock time data as well as the brain time warped data have their classes labeled. Specifically, create a field called "clabel", with a vector of 1's and 2's corresponding to the condition of each trial. If your trial sequence is 'left left right', the clabel field should contain '1 1 2'.
 
 **2.1 Multivariate pattern analysis**
 
-The first step is to use `MVPA-Light` to classify the data. You may opt to classify across time [mv_classify_across_time.m](https://github.com/treder/MVPA-Light/blob/master/mv_classify_across_time.m), or apply temporal generalization by classifying using [mv_classify_timextime.m](https://github.com/treder/MVPA-Light/blob/master/mv_classify_timextime.m). You can change a variety of parameters, described briefly in [tutorial 2](tutorial/tutorial2_periodicity.m).
+The first step is to use `MVPA-Light` to classify the data. You may opt to classify across time [mv_classify_across_time.m](https://github.com/treder/MVPA-Light/blob/master/mv_classify_across_time.m). This method tests whether a classifier can separate both classes of data across time in the trials. Alternatively, you can apply temporal generalization by classifying using [mv_classify_timextime.m](https://github.com/treder/MVPA-Light/blob/master/mv_classify_timextime.m). This method tests for temporal generalization of classification. That is, it tests to what extent a classifier trained on one timepoint generalizes its performance to other timepoints.
 
-> :bulb: For more information on `MVPA-Light` and its parameters, see its awesome [tutorials](https://github.com/treder/MVPA-Light/tree/master/examples).
+> :bulb: You can change a variety of parameters when calling `MVPA-Light`, described briefly in [tutorial 2](tutorial/tutorial2_periodicity.m). For more information, check `MVPA-Light`'s awesome [tutorials](https://github.com/treder/MVPA-Light/tree/master/examples).
+
 
 ## Toolbox considerations
 
