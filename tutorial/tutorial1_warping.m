@@ -80,7 +80,7 @@ cfg.layout       = layout;           % load template for topography plotting (no
 cfg              = [];
 cfg.removecomp   = 'no';             % remove component when using brain time warped data outside
                                      % the toolbox to avoid circularity
-cfg.warpmethod   = 'stationary';     % 'stationary': the toolbox warps the data using a stationary
+cfg.warpmethod   = 'sinusoid';       % 'sinusoid': the toolbox warps the data using a stationary
                                      % sinusoid at the warping frequency (default).
                                      % 'waveshape': the toolbox warps to the average waveshape for
                                      % the warping frequency.
