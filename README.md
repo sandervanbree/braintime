@@ -137,7 +137,7 @@ We now have an idea of the periodicity in single participants. But what about th
 
 > :bulb: `braintime` z-scores participants' spectra to enable second level statistics. For details on how it does this, check out "[How does the toolbox z-score periodicity spectra?](#how-does-the-toolbox-z-score-periodicity-spectra)".
 
-This determines whether periodicity in classification performance is significant for clock and brain time. However, a separate question is whether classification performance *in itself* is significant, without any question of periodic patterns. [bt_statslevel2](periodicity/bt_statslevel2.m) also tests for this, by calling `MVPA-Light`. The function requires a separate structure called ```cfg_clus```, where you can enter a range of parameters for cluster correction. As output, aside from aforementioned periodicity results, you also get a display of significant classification performance.
+This determines whether periodicity in classification performance is significant for clock and brain time. However, a separate question is whether classification performance *in itself* is significant, without any question of periodic patterns. [bt_statslevel2](periodicity/bt_statslevel2.m) also tests for this, by calling `MVPA-Light`. For this, the function requires a separate structure called ```cfg_clus```, where you can enter a range of parameters for cluster correction. As output, aside from aforementioned periodicity results, you also get a display of which datapoints show above chance classification performance.
 
 ## Toolbox considerations
 
