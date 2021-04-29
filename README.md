@@ -109,7 +109,7 @@ The first step is to use `MVPA-Light` to classify the data. You may opt to class
 
 **2.2 Quantify periodicity in classifier performance**
 
-If the warping signal orchestrates the dynamics of your cognitive function, operationalized by your two classes of data, then the classifier's performance may tap into these dynamics. Thus, [bt_quantify](periodicity/bt_quantify.m) tests and quantifies periodic patterns in the classifier performance, whether that is in the classifier output obtained from [mv_classify_across_time.m](https://github.com/treder/MVPA-Light/blob/master/mv_classify_across_time.m) (1 dimensional; "diagonal"), or [mv_classify_timextime.m](https://github.com/treder/MVPA-Light/blob/master/mv_classify_timextime.m) (2 dimensional; "temporal generalization matrix" (TGM)).
+If the warping signal orchestrates the dynamics of your cognitive function, operationalized by your two classes of data, then the classifier's performance may tap into these dynamics. Thus, [bt_quantify](periodicity/bt_quantify.m) tests and quantifies periodic patterns in the classifier performance, whether that is in the classifier output obtained from [mv_classify_across_time.m](https://github.com/treder/MVPA-Light/blob/master/mv_classify_across_time.m) (1 dimensional; "diagonal"), or [mv_classify_timextime.m](https://github.com/treder/MVPA-Light/blob/master/mv_classify_timextime.m) (2 dimensional; "temporal generalization matrix" (TGM)). In both cases, you get a "periodicity spectrum" which is just a power spectrum of your 1D or 2D classifier performance.
 
 For TGMs, you may opt to perform the periodicity analysis over either the 2 dimensional matrix itself, or its autocorrelation map. Not sure what is better? Check out "[should I perform bt_quantify over the TGM itself, or its autocorrelation map?](#should-i-perform-bt_quantify-over-the-tgm-itself-or-its-autocorrelation-map)".
 
@@ -119,15 +119,21 @@ You also need to specify a range of periodicity frequencies. At which rate do yo
 
 **2.3 First level statistics**
 
-How does the participant's quantified periodicity compare against the null distribution? [bt_statslevel1](periodicity/bt_statslevel1.m) takes the output from [bt_quantify](periodicity/bt_quantify.m) and performs classification ```cfg.numperms1 = x``` times over, each time randomly shuffling the classification labels. This provides a null distribution that quantifies how much periodicity is in the data when the class structure is destroyed, setting things up for p-value estimation on the group level.
+How does the participant's quantified periodicity compare against the null distribution? [bt_statslevel1](periodicity/bt_statslevel1.m) takes the output from [bt_quantify](periodicity/bt_quantify.m) and performs classification ```cfg.numperms1 = n1``` times over, each time randomly shuffling the classification labels and obtaining x "permuted" periodicity spectra. This provides a null distribution that quantifies how much periodicity is in the data when the class structure is destroyed, setting things up for p-value estimation on the group level.
 
 Now, repeat [bt_statslevel1](periodicity/bt_statslevel1.m), and send its output to a separate field in a group structure (e.g. ```[ct_stats1{subj}] = bt_statslevel1(cfg,data,quant)```). The next step requires this format to perform 2nd level statistics.
 
 **2.4 Second level statistics**
 
-To compare overall periodicity in 
+We now have an idea of the periodicity in single participants. But what about the group level? [bt_statslevel2](periodicity/bt_statslevel2.m) employs the following algorithm to generate second level statistics:
 
-> :bulb: p-values at 0.5 Hz, 1 Hz, and 2 Hz are exempted from multiple testing correction, as periodicity is predicted at one or multiple of these rates depending on the underlying structure'.
+1) ```cfg.numperms2 = n2``` times, do the following: randomly grab one of each participants' n1 permuted spectra and average those spectra into one spectrum. This yields n2 spectra.
+2) For each frequency, compare the empirical periodicity with the distribution of permuted periodicity to derive a p-value.
+3) Plot the average empirical periodicity spectrum and display the p-value for each frequency.
+
+> :bulb: In brain time results, p-values at 0.5 Hz, 1 Hz, and 2 Hz are exempted from multiple testing correction, as periodicity is predicted at one or multiple of these rates depending on the underlying structure'.
+
+> :bulb: `braintime` z-score participants' spectra to enable second level statistics. For details on how it does so, check out "[How does the toolbox z-score periodicity spectra?](#how-does-the-toolbox-z-score-periodicity-spectra)".
 
 ## Toolbox considerations
 
@@ -136,4 +142,6 @@ To compare overall periodicity in
 ### Is it circular to warp to warping sources obtained from my clock time data?
 
 ### Should I perform bt_quantify over the TGM itself, or its autocorrelation map?
+
+### How does the toolbox z-score periodicity spectra?
 
