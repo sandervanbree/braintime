@@ -68,7 +68,7 @@ When clock time data and warping sources are dependent, take note of [circularit
 
 **1.3 Time frequency analysis of warping sources**
 
-Each warping source contains potential warping signals. [bt_analyzesources](warpingsource/bt_analyzesources.m) performs a time frequency analysis on all warping sources, detecting warping signals based on user specified preferences. This includes the frequency range of interest assumed to clock your cognitive process (e.g., 8 to 12 Hz for attention), and the time window of interest (e.g. 0 to 1 second, the window should align with your clock time data). You can choose one of two methods to cut the data.
+Each warping source contains potential warping signals. [bt_analyzesources](warpingsource/bt_analyzesources.m) performs a time frequency analysis on all warping sources, detecting potential warping signals based on user specified preferences. These preferences include the frequency range of interest assumed to clock your cognitive process (e.g., 8 to 12 Hz for attention), and the time window of interest that you wish to analyze (e.g. 0 to 1 second, this should match the window you wish to warp). You can choose one of two methods to cut the data.
 
 
 ## Operation 2: Periodicity analysis
