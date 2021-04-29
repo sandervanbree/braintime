@@ -64,7 +64,7 @@ Below, we demonstrate how `braintime` achieves both operations step-by-step.
 
 Warping sources are the data structure that containing the to-be-selected warping signal, used to warp clock time data. Warping sources may be independent of the clock time data, but can also be obtained from the clock time data. For example, the warping sources can be independent component analysis (ICA) components of the data. Or, for intracranial data, the warping source may be a set of local field potential channels. When clock time data and warping sources are dependent, take note of [circularity considerations](#Circularity-considerations).
 
-**Warping source time frequency analysis**
+**Time frequency analysis of warping sources**
 
 ## Operation 2: Periodicity analysis
 
