@@ -54,7 +54,7 @@ What is the premise behind the *Brain Time Toolbox* (`braintime`)? Insofar a cog
 
 The second operation is periodicity analysis. Here, `braintime` uses multivariate pattern analysis (MVPA) to detect the effects of the applied data transformation. Has evidence of the rhythmicity of the cognitive patterns increased?
 
-Now, we demonstrate how `braintime` achieves both operations step-by-step.
+Below, we demonstrate how `braintime` achieves both operations step-by-step.
 
 ### 1: Loading data
 `braintime` works with FieldTrip formatted electrophysiological data. 
