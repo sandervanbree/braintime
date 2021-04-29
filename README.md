@@ -58,6 +58,10 @@ Below, we demonstrate how `braintime` achieves both operations step-by-step.
 
 **Loading data**
 
-`braintime` works with FieldTrip formatted electrophysiological data. This can be electroencephalography (EEG), magnetoencephalography (MEG), or intracranial data. 
+`braintime` works with FieldTrip formatted electrophysiological data. This can be electroencephalography (EEG), magnetoencephalography (MEG), or intracranial data. Two data structures are needed: 
+
+- Clock time data: the to-be-warped data structure.
+
+- Warping sources: the data structure used to warp, containing the to-be-selected warping signal.
 
 
