@@ -56,15 +56,15 @@ Below, we demonstrate how `braintime` achieves both operations step-by-step.
 
 ## Operation 1: Brain time warping
 
-**Loading clock time data**
+**1.1 Loading clock time data**
 
 `braintime` works with FieldTrip formatted electrophysiological data. This can be electroencephalography (EEG), magnetoencephalography (MEG), or intracranial data. The starting data is called clock time data—this will be warped. If you intend to use the second operation upon completion of brain time warping, be sure to label both classes of trials in a field called "clabel".
 
-**Loading warping sources data**
+**1.2 Loading warping sources data**
 
 Warping sources are the data structure that containing the to-be-selected warping signal, used to warp clock time data. Warping sources may be independent of the clock time data, but can also be obtained from the clock time data. For example, the warping sources can be independent component analysis (ICA) components of the data. Or, for intracranial data, the warping source may be a set of local field potential channels. When clock time data and warping sources are dependent, take note of [circularity considerations](#Circularity-considerations).
 
-**Time frequency analysis of warping sources**
+**1.3 Time frequency analysis of warping sources**
 
 ## Operation 2: Periodicity analysis
 
