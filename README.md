@@ -82,7 +82,7 @@ Now that the toolbox has collected all the relevant time frequency details of wa
 
 This is where the magic happens. [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m) takes the phase of the chosen warping signal and [dynamically time warps](https://en.wikipedia.org/wiki/Dynamic_time_warping) (DTW) it to the phase of a stationary sinusoid of the same frequency. Thereby, DTW enables a readout of where clock time (stationary sinusoid) falls out of tune with brain time (phase of warping signal) by attempting to minimize their difference. That minimization process yields a warping path, which tells `braintime` the samples that need to be repeated for clock and brain time to better align. [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m) repeats those samples in the original data, cycle-by-cycle and trial-by-trial, before squeezing things back down to the original data length.
 
-There are two parameters you can change in [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m). You can choose to set the clock time signal as a basic stationary sinusoid (warpmethod = 'sinusoid') or a smoothed version of the warping signal's waveshape (warpmethod = 'waveshape').
+There are two parameters you can change in [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m). You can choose to set the clock time signal as a basic stationary sinusoid (``` cfg.warpmethod = 'sinusoid'``` ) or a smoothed version of the warping signal's waveshape (``` cfg.warpmethod = 'waveshape'``` ).
 
 > :bulb: For asymmetric data, such as theta oscillations in intracranial rodent data, using waveshape as a warpmethod is the natural choice.
 
@@ -107,7 +107,10 @@ If the warping signal orchestrates the dynamics of your cognitive function, oper
 
 For TGMs, you may opt to perform the periodicity analysis over either the 2 dimensional matrix itself, or its autocorrelation map. Not sure what is better? Check out "[should I perform bt_quantify over the TGM itself, or its autocorrelation map?](#should-i-perform-bt_quantify-over-the-tgm-itself-or-its-autocorrelation-map)".
 
-You also need to specify a range of periodicity frequencies. At which rate do you expect periodic patterns in classifier performance to arise? Finally, you can choose a reference dimension. If you choose ```Matlab refdimension = clocktime``` 
+You also need to specify a range of periodicity frequencies. At which rate do you expect periodic patterns in classifier performance to arise? Finally, you can choose a reference dimension. If you choose ```cfg.refdimension = clocktime```, periodicity in classifier performance will be displayed as a function of cycles per seconds (Hz). Alternatively, if you are quantifying brain time warped data, ```cfg.refdimension = clocktime``` is more appropriate. This references the peroidicity as a function of cycles per second, *normalized* to that participants' warping frequency.
+
+> :bulb: Let's say you warp a participant's data to 11 Hz. Then with ```cfg.refdimension = clocktime```, a peak at the warping frequency will be at 11 Hz, but with ```cfg.refdimension = clocktime``` it will show up at 1 Hz, as the frequencies are normalized to the warped frequency (11/11 = 1).
+
 
 ## Toolbox considerations
 
