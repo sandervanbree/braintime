@@ -62,13 +62,13 @@ Below, we demonstrate how `braintime` achieves both operations step-by-step.
 
 **1.2 Loading warping sources data**
 
-Warping sources are the data structure that containing the to-be-selected warping signal, used to warp clock time data. Warping sources may be independent of the clock time data, but can also be obtained from the clock time data. For example, the warping sources can be independent component analysis (ICA) components of the data. Or, for intracranial data, the warping source may be a set of local field potential channels. Please ensure that your warping source data has 0.5s of additional data before the start, and after the end of your time window of interest to enable phase estimation (in step 1.3).
+Warping sources are the data structure containing the to-be-selected warping signal, which is used to warp clock time data. Warping sources may be obtained separately from clock time data, or extracted from it (using independent component analysis, or the selection of a few channels). Please ensure that your warping source data has 0.5s of additional time extra, before the start and after of your time window of interest, to facilitate step 1.3.
 
 When clock time data and warping sources are dependent, take note of [circularity considerations](#Circularity-considerations).
 
 **1.3 Time frequency analysis of warping sources**
 
-Each warping source contains potential warping signals. [bt_analyzesources](warpingsource/bt_analyzesources.m) performs a time frequency analysis on all warping sources, detecting warping signals based on user specified input. This input includes the frequency range of interest assumed to clock your cognitive process (e.g., 8 to 12 Hz for attention), the time window of interest (e.g. 0 to 1 second, aligning to your clock time data), and the method to cut the data.
+Each warping source contains potential warping signals. [bt_analyzesources](warpingsource/bt_analyzesources.m) performs a time frequency analysis on all warping sources, detecting warping signals based on user specified preferences. This includes the frequency range of interest assumed to clock your cognitive process (e.g., 8 to 12 Hz for attention), and the time window of interest (e.g. 0 to 1 second, the window should align with your clock time data). You can choose one of two methods to cut the data.
 
 
 ## Operation 2: Periodicity analysis
