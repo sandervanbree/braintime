@@ -19,7 +19,9 @@ Warp electrophysiological data from clock time to brain time and analyze the per
 
 [Introduction](#introduction)
 
-[Brain time warping](#operation-1-brain-time-warping)
+[Operation 1: Brain time warping](#operation-1-brain-time-warping)
+
+[Operation 2: Periodicity analysis](#operation-2-periodicity-analysis)
 
 ## Installation
 **Option 1:** Download files
