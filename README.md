@@ -41,11 +41,11 @@ then run the function [setup_braintime](setup).
 ## Glossary
 | **Toolbox term** | **description** |
 | --- | --- |
-| Clock time (CT) | data ordered by sequences of seconds |
-| Brain time (BT) | data transformed according to the dynamics of a warping signal |
+| Brain time warping | a transformation of clock time data based on the phase dynamics of the warping signal |
+| Clock time (CT) | time as sequences of seconds
+| Brain time (BT) | time as sequences of cycles of an oscillation of interest
 | Warping signal | an oscillatory signal that is assumed to clock the cognitive process of interest |
 | Warping source | a data structure that contains potential warping signals (e.g., local field potentials, independent component analysis components, virtual channels) |
-| Brain time warping | a transformation of clock time data that employs the phase dynamics of the warping signal |
 | Periodicity | rhythmic patterns of classification performance |
 
 
