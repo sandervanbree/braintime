@@ -141,6 +141,10 @@ This determines whether periodicity in classification performance is significant
 
 ## Toolbox considerations
 
+### How do I know all this even works?
+We have added a simulation... (add text)
+
+
 ### Which cutmethod to choose?
 
 ### Is it circular to warp to warping sources obtained from my clock time data?
