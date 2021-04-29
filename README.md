@@ -52,9 +52,9 @@ then run the function [setup_braintime](setup).
 ## Introduction
 The premise behind the *Brain Time Toolbox* is that insofar a cognitive process is clocked by oscillations, analyses of the process's dynamics require a factoring in of the oscillations' dynamics. To this end, the toolbox implements **brain time warping**, an algorithm to transform electrophysiological data based on relevant oscillations selected by the user—the **warping signal**. This changes the data from clock time (seconds), closer to brain time (cycles). A secondary function of the toolbox is to use multivariate pattern analysis (MVPA) to detect the effects of the applied data transformation.
 
-What is the pipeline of the toolbox? Below, you will see each of the main steps.
+What are the main steps the toolbox pipeline?
 
-# Loading data
+# 1: Loading data
 
 
 
