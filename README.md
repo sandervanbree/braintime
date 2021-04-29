@@ -58,7 +58,7 @@ Below, we demonstrate how `braintime` achieves both operations step-by-step.
 
 **1.1 Loading clock time data**
 
-`braintime` works with FieldTrip formatted electrophysiological data. This can be electroencephalography (EEG), magnetoencephalography (MEG), or intracranial data. The starting data is called clock time data—this will be warped. If you intend to use the second operation upon completion of brain time warping, be sure to label your two classes of trials in a field called "clabel" (a vector of 1's and 2's lining up with your trial field).
+`braintime` works with FieldTrip formatted electrophysiological data. This can be electroencephalography (EEG), magnetoencephalography (MEG), or intracranial data. The starting data is called clock time data—this will be warped. 
 
 **1.2 Loading warping sources data**
 
@@ -67,5 +67,7 @@ Warping sources are the data structure that containing the to-be-selected warpin
 **1.3 Time frequency analysis of warping sources**
 
 ## Operation 2: Periodicity analysis
+
+Be sure to label your two classes of trials in a field called "clabel" (a vector of 1's and 2's lining up with your trial field).
 
 ### Circularity considerations
