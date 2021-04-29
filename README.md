@@ -58,6 +58,6 @@ Below, we demonstrate how `braintime` achieves both operations step-by-step.
 
 **Loading data**
 
-`braintime` works with FieldTrip formatted electrophysiological data. 
+`braintime` works with FieldTrip formatted electrophysiological data. This can be electroencephalography (EEG), magnetoencephalography (MEG), intracranial data. 
 
 
