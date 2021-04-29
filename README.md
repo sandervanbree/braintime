@@ -66,7 +66,7 @@ Below, we explain how to perform both operations step by step.
 
 **1.2 Loading warping sources data**
 
-Warping sources are the data structure containing the to-be-selected warping signal, which is used to warp clock time data. Warping sources may be obtained separately from clock time data, or extracted from it (using independent component analysis, or the selection of a few channels). Please ensure that your warping source data has 0.5s of additional time extra, before the start and after of your time window of interest, to facilitate step 1.3.
+Warping sources are the data structure containing the to-be-selected warping signal, which is used to warp clock time data. Warping sources may be obtained separately from clock time data, or extracted from it (using independent component analysis, or the selection of a few channels). Please ensure that your warping source data has 0.5s of additional time extra (before and after your time window of interest) to facilitate step 1.3.
 
 > :warning: If your clock time data and warping sources are not independent, please read "[is it circular to warp to warping sources obtained from my clock time data?](#is-it-circular-to-warp-to-warping-sources-obtained-from-my-clock-time-data?)".
 
