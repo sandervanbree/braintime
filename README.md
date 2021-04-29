@@ -113,13 +113,13 @@ You also need to specify a range of periodicity frequencies. At which rate do yo
 
 > :bulb: Let's say you warp a participant's data to 11 Hz. Then with ```cfg.refdimension = clocktime```, a peak at the warping frequency will be at 11 Hz, but with ```cfg.refdimension = clocktime``` it will show up at 1 Hz, as the frequencies are normalized to the warped frequency (11/11 = 1).
 
-**1st level statistics**
+**2.3 1st level statistics**
 
 How does the participant's quantified periodicity compare against the null distribution? [bt_statslevel1](periodicity/bt_statslevel1.m) takes the output from [bt_quantify](periodicity/bt_quantify.m) and performs classification ```cfg.numperms1 = x``` times over, each time randomly shuffling the classification labels. This provides a null distribution that quantifies how much periodicity is in the data when the class structure is destroyed, setting things up for p-value estimation on the group level.
 
 Now, repeat [bt_statslevel1](periodicity/bt_statslevel1.m), and send its output to a separate field in a group structure (e.g. ```[ct_stats1{subj}] = bt_statslevel1(cfg,data,quant)```). The next step requires this format to perform 2nd level statistics.
 
-**2nd level statistics**
+**2.4 2nd level statistics**
 
 
 
