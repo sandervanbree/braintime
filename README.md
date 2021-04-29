@@ -152,4 +152,4 @@ This determines whether periodicity in classification performance is significant
 ### How does the toolbox z-score periodicity spectra?
 
 ### I have another question that I can't find an answer to
-Please contact me at sandervanbree@gmail.com and I'll try my best to have some time to answer.
+Feel free to contact me at sandervanbree@gmail.com and I'll try my best to have some time to answer.
