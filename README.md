@@ -58,7 +58,8 @@ Below, we demonstrate how `braintime` achieves both operations step-by-step.
 
 ### Operation 1: Brain time warping
 
-**(1) Loading data**
+**Loading data**
+
 `braintime` works with FieldTrip formatted electrophysiological data. 
 
 
