@@ -24,7 +24,7 @@ function [bt_warpeddata] = bt_clocktobrain(config, data, bt_source)
 %   - method         % warping method: the desired template oscillation
 %                    % for warping.
 %                    %
-%                    % 'stationary': warp to a stationary sinusoid at the
+%                    % 'sinusoid': warp to a statonary sinusoid at the
 %                    % warping frequency (default).
 %                    %
 %                    % 'waveshape': warp to the average waveshape of the
@@ -57,7 +57,7 @@ cutmethod = bt_source{6};                              % Applied cutting method
 warpfreq = srcrank(2);                                 % Warped frequency (frequency of the warping signal)
 wvshape = bt_source{7};                                % Average waveshape of the data
 
-warpmethod = bt_defaultval(config,'warpmethod','stationary');  % Set method for warping (default: stationary)
+warpmethod = bt_defaultval(config,'warpmethod','sinusoid');    % Set method for warping (default: sinusoid)
 phasemethod = bt_defaultval(config,'phasemethod','FFT');       % Set phase estimation method used for warping (default: FFT)
 visualcheck = bt_defaultval(config,'visualcheck','off');       % Show warping path and phases for three example trials
 
