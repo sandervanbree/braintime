@@ -68,10 +68,14 @@ When clock time data and warping sources are dependent, please read "[is it circ
 
 **1.3 Time frequency analysis of warping sources**
 
-Each warping source contains potential warping signals. [bt_analyzesources](warpingsource/bt_analyzesources.m) performs a time frequency analysis on all warping sources, detecting potential warping signals based on your preferences. These preferences include the frequency range of interest assumed to clock your cognitive process (e.g., 8 to 12 Hz for attention), and the time window of interest that you wish to analyze (e.g. 0 to 1 second, this should match the window you wish to warp). In addition, you can choose one of two methods to cut the data, 'consistenttime', or 'cutartefact'. For details on their relative merit, see "[which cutmethod to choose?](#which-cutmethod-to-choose)".
+Each warping source contains potential warping signals. [bt_analyzesources](warpingsource/bt_analyzesources.m) performs a time frequency analysis on all warping sources, detecting potential warping signals based on your preferences. These preferences include methods of time frequency analysis, the frequency range of interest assumed to clock your cognitive process (e.g., 8 to 12 Hz for attention), and the time window of interest that you wish to analyze (e.g. 0 to 1 second, this should match the window you wish to warp). In addition, you can choose one of two methods to cut the data, 'consistenttime', or 'cutartefact'. For details on their relative merit, see "[which cutmethod to choose?](#which-cutmethod-to-choose)".
+
+[bt_analyzesources](warpingsource/bt_analyzesources.m) collects a whole bunch of information about the warping sources. The phase of the underlying warping signals (using two methods, described in 1.5), its average waveshape and its asymmetry, and a ranking of all warping sources based on your preferences.
 
 
-**1.4 Selecting a warping source and signal
+**1.4 Selecting a warping source and signal**
+
+Now that the toolbox has collected all 
 
 
 
