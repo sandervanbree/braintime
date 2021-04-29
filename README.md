@@ -57,7 +57,7 @@ The second operation is *periodicity analysis*. Here, `braintime` uses multivari
 
 Below, we demonstrate how `braintime` achieves both operations step-by-step.
 
-### Operation 1: Brain time warping
+## Operation 1: Brain time warping
 
 **Loading data**
 
