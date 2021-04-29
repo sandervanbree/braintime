@@ -54,7 +54,7 @@ The premise behind the *Brain Time Toolbox* is that insofar a cognitive process 
 
 What are the main steps the toolbox pipeline?
 
-# 1: Loading data
+### 1: Loading data
 
 
 
