@@ -88,7 +88,7 @@ This is where the magic happens. [bt_clocktobrain](bt_clocktobrain/bt_clocktobra
 
 There are two parameters you can change in [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m). You can choose to set the clock time signal as a basic stationary sinusoid (``` cfg.warpmethod = 'sinusoid'``` ) or a smoothed version of the warping signal's waveshape (``` cfg.warpmethod = 'waveshape'``` ).
 
-> :bulb: For asymmetric data, such as theta oscillations in intracranial rodent data, using waveshape as a warpmethod is the natural choice.
+> :bulb: For data with asymmetric waves such as theta oscillations in intracranial rodent data, using waveshape as a warpmethod is the natural choice.
 
 There are also two "phase methods", which are separate phase estimations of the warping signal both sneakily obtained by [bt_analyzesources](warpingsource/bt_analyzesources.m). One is a regular method of phase estimation (using the Fast Fourier Transform of the warping frequency, selected with ```cfg.phasemethod = 'FFT'```, and a special method called [General Eigenvalue Decomposition](http://mikexcohen.com/data/Cohen_STfilter.pdf) (GED), selected with ```cfg.phasemethod = 'GED'```. The former is classical and specific to the warping source, the latter is novel and more holistically estimates phase. The latter estimates the phase of the warping signal by estimating that frequency's phase in a weighted combination of **all** warping sources. More details on when to use which? Check out "[which phase should I warp to, FFT or GED?](#which-phase-should-i-warp-to--FFT-or-GED)").
 
