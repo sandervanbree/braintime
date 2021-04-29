@@ -8,7 +8,7 @@ Warp electrophysiological data from clock time to brain time and analyze the per
 
 ### Dependencies
 - [MATLAB Signal Processing Toolbox](https://uk.mathworks.com/help/signal/getting-started-with-signal-processing-toolbox.html)
-- [FieldTrip](http://www.fieldtriptoolbox.org/download/)
+- [FieldTrip](https://github.com/fieldtrip/fieldtrip/)
 - [MVPA Light](https://github.com/treder/MVPA-Light)
 - [Several functions](external) included in the toolbox
 
