@@ -164,7 +164,7 @@ cycledur    = round(phs_sr*nsec/Ncycles);                     % samples for cycl
 tempsr      = Ncycles*cycledur/nsec;
 timephs     = linspace(0,Ncycles,phs_sr*nsec);                % time vector of the unwrapper phase
 
-if strcmp(warpmethod,'stationary')                            % warp using stationary sinusoid
+if strcmp(warpmethod,'sinusoid')                              % warp using stationary sinusoid
     ct_phs = linspace(-pi,(2*pi*Ncycles)-pi,tempsr*nsec);     % set up phase bins for unwrapped phase (angular frequency)
     
 elseif strcmp(warpmethod,'waveshape')                         % warp using average waveshape
@@ -174,7 +174,7 @@ elseif strcmp(warpmethod,'waveshape')                         % warp using avera
     if numel(trgh)~=2                                         % if there are not 2 troughs, this likely
         error(['The waveshape of the warping signal is',...   % means the data is too noisy
             ' too noisy. Please select cfg.method =',...
-            ' ''stationary'' and try again.']);
+            ' ''sinusoid'' and try again.']);
     end
     
     waveshape_cut = wvshape_sm(trgh(1)+1:trgh(2));            % cut waveshape to one cycle (-cos)
