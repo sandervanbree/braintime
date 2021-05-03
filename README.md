@@ -42,7 +42,7 @@ then run the function [setup_braintime](setup).
 
 ## Glossary
 | **Toolbox term** | **description** |
-| --- | --- |
+| :-- | :-- |
 | Brain time warping | a transformation of clock time data based on the phase dynamics of the warping signal |
 | Clock time (CT) | time as sequences of seconds
 | Brain time (BT) | time as sequences of cycles of an oscillation of interest
