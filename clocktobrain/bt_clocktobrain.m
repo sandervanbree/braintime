@@ -46,8 +46,8 @@ function [bt_warpeddata] = bt_clocktobrain(config, data, bt_source)
 
 %% Get basic info
 src_oi = bt_source{1};                                 % Warping source which contains the warping signal
-FFT_phs = cell2mat(bt_source{2});                      % Phase of all frequencies in this warping source
-GED_phs = bt_source{9};                                % Phase of warping signal as estimated using GED
+fft_phs = cell2mat(bt_source{2});                      % Phase of all frequencies in this warping source
+ged_phs = bt_source{9};                                % Phase of warping signal as estimated using GED
 warpsources = bt_source{3};                            % Warping source data
 srcrank = bt_source{4};                                % Time freq data of selected warping signal
 mintime_fft = bt_source{5}.time(1);                    % Start time of interest
@@ -57,8 +57,13 @@ cutmethod = bt_source{6};                              % Applied cutting method
 warpfreq = srcrank(2);                                 % Warped frequency (frequency of the warping signal)
 wvshape = bt_source{7};                                % Average waveshape of the data
 
+% Lowercase method input
+if isfield(config,'phasemethod')
+    config.method = lower(config.phasemethod);
+end
+
 warpmethod = bt_defaultval(config,'warpmethod','sinusoid');    % Set method for warping (default: sinusoid)
-phasemethod = bt_defaultval(config,'phasemethod','FFT');       % Set phase estimation method used for warping (default: FFT)
+phasemethod = bt_defaultval(config,'phasemethod','fft');       % Set phase estimation method used for warping (default: fft)
 visualcheck = bt_defaultval(config,'visualcheck','off');       % Show warping path and phases for three example trials
 
 if strcmp(cutmethod,'cutartefact')                     % Depending on cutmethod, specify original time window of interest
@@ -115,8 +120,8 @@ cfg        = [];
 if strcmp(cutmethod,'cutartefact')
     cyclesample = round((1/warpfreq)*1/sr); % Calculate how many samples one cycle consists of
     cfg.toilim = [mintime_fft+0.5-(1/warpfreq) maxtime_fft-0.5+(1/warpfreq)]; % Cut to the time window of interest, plus one cycle
-    FFT_phs = FFT_phs(:,mintime_ind-cyclesample:maxtime_ind+cyclesample); % Cut to the time window of interest, plus one cycle
-    GED_phs = GED_phs(:,mintime_ind-cyclesample:maxtime_ind+cyclesample); % Do the same for GED phase
+    fft_phs = fft_phs(:,mintime_ind-cyclesample:maxtime_ind+cyclesample); % Cut to the time window of interest, plus one cycle
+    ged_phs = ged_phs(:,mintime_ind-cyclesample:maxtime_ind+cyclesample); % Do the same for GED phase
 elseif strcmp(cutmethod,'consistenttime')
     cfg.toilim = [mintime_fft maxtime_fft];
 end
@@ -124,17 +129,17 @@ data       = ft_redefinetrial(cfg, data);
 
 
 %% Opt for FFT or GED phase and adapt data
-if strcmp(phasemethod,'FFT')
-    phs = FFT_phs;
-elseif strcmp(phasemethod,'GED')
+if strcmp(phasemethod,'fft')
+    phs = fft_phs;
+elseif strcmp(phasemethod,'ged')
     
     % Sanity check whether the two phase vectors are within 5% of each other's length
-    if abs(size(FFT_phs,2)-size(GED_phs,2)) > 0.05*max(size(FFT_phs,2),size(GED_phs,2))
-        error(['The length of the GED estimated phase substantially differs from '...
+    if abs(size(fft_phs,2)-size(ged_phs,2)) > 0.05*max(size(fft_phs,2),size(ged_phs,2))
+        error(['The length of the ged estimated phase substantially differs from '...
             'the length of the FFT estimated phase. Please change to config.phasemethod '...
-            '= ''FFT'' or change the time window tested during bt_analyzechannels.'])
+            '= ''fft'' or change the time window tested during bt_analyzechannels.'])
     else
-        phs = GED_phs;
+        phs = ged_phs;
     end
 end
 
@@ -168,6 +173,12 @@ if strcmp(warpmethod,'sinusoid')                              % warp using stati
     ct_phs = linspace(-pi,(2*pi*Ncycles)-pi,tempsr*nsec);     % set up phase bins for unwrapped phase (angular frequency)
     
 elseif strcmp(warpmethod,'waveshape')                         % warp using average waveshape
+    
+    if isempty(wvshape) == 1
+        error(['Waveshape failed to be estimated during bt_analyzesources.'...
+            ' Please change to cfg.warpmethod = ''sinusoid''.']);
+    end
+    
     wvshape_sm = smoothdata(wvshape,'gaussian',25);           % smooth substantially - 25 bins seems the sweetspot for 201 bins
     [~,trgh] = findpeaks(-wvshape_sm);                        % find troughs
     
