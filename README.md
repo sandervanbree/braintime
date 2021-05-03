@@ -113,7 +113,7 @@ The first step is to use `MVPA-Light` to classify the data. You may opt to class
 
 If the warping signal orchestrates the dynamics of your cognitive function, operationalized by your two classes of data, then the classifier's performance may tap into these dynamics. Thus, [bt_quantify](periodicity/bt_quantify.m) tests and quantifies periodic patterns in the classifier performance, whether that is in the classifier output obtained from [mv_classify_across_time.m](https://github.com/treder/MVPA-Light/blob/master/mv_classify_across_time.m) (1 dimensional; "diagonal"), or [mv_classify_timextime.m](https://github.com/treder/MVPA-Light/blob/master/mv_classify_timextime.m) (2 dimensional; "temporal generalization matrix" (TGM)). In both cases, you get a "periodicity spectrum" which is an average power spectrum of all the data in your 1D or 2D classifier performance.
 
-For TGMs, you may opt to perform the periodicity analysis over either the 2 dimensional matrix itself, or its autocorrelation map. Not sure what is better? Check out "[should I perform bt_quantify over the TGM itself, or its autocorrelation map?](#should-i-perform-bt_quantify-over-the-tgm-itself-or-its-autocorrelation-map)".
+For TGMs, you may opt to perform the periodicity analysis over either the 2 dimensional matrix itself (```cfg.method = 'tgm'```) or its autocorrelation map (```cfg.method = 'ac'```). Not sure what is better? Check out "[should I perform bt_quantify over the TGM itself, or its autocorrelation map?](#should-i-perform-bt_quantify-over-the-tgm-itself-or-its-autocorrelation-map)".
 
 You also need to specify a range of periodicity frequencies. In which range of rates do you expect periodic patterns in classifier performance to arise? Finally, you can choose a reference dimension. If you choose ```cfg.refdimension = clocktime```, periodicity in classifier performance will be displayed as a function of cycles per seconds (Hz). Alternatively, if you are quantifying brain time warped data, ```cfg.refdimension = clocktime``` is more appropriate. This references the peroidicity as a function of cycles per second, *normalized* to that participants' warping frequency.
 
@@ -149,7 +149,7 @@ At the start of trials, `braintime` repeats original data samples until the phas
 
 To the extent the first cycle artefact is predicted to be an issue for further analyses, you may decide to remove it by selecting ```cfg.cutmethod = 'cutartefact'``` under [bt_analyzesources](warpingsource/bt_analyzesources.m). With this parameter, `brainime` warps a little bit of time before and after the specified time window of interest before it is removed in later steps. This makes it so the data reptition segment is removed from the final data. The downside to this method is that the warped data will comprise more (or less) than the specified time window of interest.
 
-Finally, there's one more thing to consider here. `braintime` allocates data samples to cycles depending on the warping path. As the two cutmehods comprise warping to a different length of data, there may be variations in which data sample is considered part of which cycle. To check how each method allocates data to cycles, check out [tutorial 8](tutorial/tutorial8_checkallocation.m)
+Finally, there's one more thing to consider here. `braintime` allocates data samples to cycles depending on the warping path. As the two cutmehods comprise warping to a different length of data, there may be variations in which data sample is considered part of which cycle. To check how each method allocates data to cycles, check out [tutorial 8](tutorial/tutorial8_checkallocation.m).
 
 In short, the upside of ```cfg.cutmethod = 'consistenttime'``` is that the warped data will exactly of the specified time window, but its downside is a first cycle artefact. In contrast, the upside of ```cfg.cutmethod = 'curartefact'``` is that the warped data will not contain a first cycle artefact, but its downside is that the data's time may not exactly match the specified window. The methods may vary in which data they allocate to which cycle.
 
@@ -164,7 +164,13 @@ Critically however, if you intend to only use `braintime`'s first function, brai
 
 ### Which phase should I warp to, FFT or GED?
 
+FFT (```cfg.phasemethod = 'fft'```) is more constricted to the warping source of interest, while GED (```cfg.phasemethod = 'ged'```) takes a weighted approach across all warping sources. So the best choice depends on whether you expect the oscillations of interest to be isolated or spread out across the data. To illustrate the best choice depending on circumstance let's look at some examples. If we are studying attention in the parietal cortex, or motor processes in the motor cortex, it may be better to take FFT on the warping source that shows topographies specific to our process of interest. Here, you don't want oscillations from other regions, so GED should be avoided. In contrast, if your warping sources are already restricted to a region, like the local field potential of hippocmapal regions or source localized parietal data, then a holistic estimation using GED is more appropriate as all warping sources are assumed to contain relevant phase dynamics.
+
 ### Should I perform bt_quantify over the TGM itself, or its autocorrelation map?
+
+It depends on the uniformity of the periodic patterns of your 2D classifier performance (TGM). In principle, the autocorrelation map (```cfg.method = 'ac'```) is a more powerful approach, as it is known to accentuate periodic patterns in the data. However, when multiple periodicity rates are present in the TGM, the autocorrelation tends to pick up the strongest rate and drown out the weaker one. Similarly, when periodicity is present in only a small part of the TGM, autocorrelation map may not be able to accentuate its pattern. In these cases, it's better to analyze the TGM itself (```cfg.method = 'tgm'```).
+
+Thus, when you expect uniform periodicity patterns in the data, analyzing the autocorrelation map of TGMs is a powerful approach. When the pattern is expected to only be present partially, or when multiple rates are predicted, it is better to analyze the TGM itself.
 
 ### How does the toolbox z-score periodicity spectra?
 
