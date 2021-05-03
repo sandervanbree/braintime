@@ -72,11 +72,11 @@ Warping sources are the data structure containing the to-be-selected warping sig
 
 **1.3 Time frequency analysis of warping sources**
 
-Each warping source contains potential warping signals. [bt_analyzesources](warpingsource/bt_analyzesources.m) performs a time frequency analysis on all warping sources, detecting potential warping signals based on your preferences. These preferences include methods of time frequency analysis, the frequency range of interest assumed to clock your cognitive process (e.g., 8 to 12 Hz for attention), and the time window of interest that you wish to analyze (e.g. 0 to 1 second, this should match the window you wish to warp). In addition, you can choose one of two methods to cut the data, 'consistenttime', or 'cutartefact', both with their own relative merits (see "[which cutmethod to choose?](#which-cutmethod-to-choose)").
+Each warping source contains potential warping signals. [bt_analyzesources](warpingsource/bt_analyzesources.m) performs a time frequency analysis on all warping sources, detecting potential warping signals based on your preferences. These preferences include methods of time frequency analysis, the frequency range of interest assumed to clock your cognitive process (e.g., 8 to 12 Hz for attention), and the time window of interest that you wish to analyze (e.g. 0 to 1 second, this should match the window you wish to warp). In addition, you can choose one of two methods to cut the data, ```cfg.warpmethod = 'consistenttime'``` or ```'cutartefact'```, both with their own relative merits (see "[which cutmethod to choose?](#which-cutmethod-to-choose)").
 
 [bt_analyzesources](warpingsource/bt_analyzesources.m) collects a whole bunch of information about the warping sources. The phase of the underlying warping signals (obtained using two methods, described in 1.5), its average waveshape and its asymmetry, and a ranking of all warping sources based on your preferences.
 
-> :bulb: You can adjust the ranking of warping sources by their topography by creating a topography using [bt_templatetopo](topography/bt_templatetopo.m) and changing cfg.rankmethod to 'temptopo'.
+> :bulb: You can adjust the ranking of warping sources by their topography by creating a topography using [bt_templatetopo](topography/bt_templatetopo.m) and changing to ```cfg.rankmethod = 'temptopo'```.
 
 **1.4 Selecting a warping source and signal**
 
@@ -86,7 +86,7 @@ Now that the toolbox has collected all the relevant time frequency details of wa
 
 This is where the magic happens. [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m) takes the phase of the chosen warping signal and [dynamically time warps](https://en.wikipedia.org/wiki/Dynamic_time_warping) (DTW) it to the phase of a stationary signal of the same frequency. DTW enables a readout of where clock time (stationary signal) falls out of tune with brain time (phase of warping signal) by attempting to minimize their difference. That minimization process yields a warping path, which tells `braintime` the samples that need to be repeated for clock and brain time to better align. [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m) repeats those samples in the original data, cycle-by-cycle and trial-by-trial, before squeezing things back down to the original data length.
 
-There are two parameters you can change in [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m). You can choose to set the clock time signal as a basic stationary sinusoid (``` cfg.warpmethod = 'sinusoid'``` ) or a smoothed version of the warping signal's waveshape (``` cfg.warpmethod = 'waveshape'``` ).
+There are two parameters you can change in [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m). You can choose to set the clock time signal as a basic stationary sinusoid (``` cfg.warpmethod = 'sinusoid'``` ) or a smoothed version of the warping signal's waveshape (```cfg.warpmethod = 'waveshape'```).
 
 > :bulb: For data with asymmetric waves such as theta oscillations in intracranial rodent data, using waveshape as a warpmethod is the natural choice.
 
@@ -145,7 +145,13 @@ At this point we have tested whether periodicity in classification performance i
 We provide three sources of evidence for the toolbox. A simulated dataset, a rodent intracranial dataset, and a human EEG dataset. `braintime` includes the script used to generate the simulated dataset. Toying around with it is a great way to both get a feel for the toolbox, and see its effects. Check out [bt_dipsim](dipolesimulation/bt_dipsim.m), change some parameters to your liking, and run it through the `braintime` pipeline to see that the toolbox accounts for clock and brain time disharmony. Details on the rodent and human evidence will be addd to our manuscript.
 
 ### Which cutmethod to choose?
+At the start of trials, `braintime` repeats original data samples until the phase of the warping signal aligns with the stationary signal (see paragraph 1.5). This takes a while, depending on their disharmony. This data repetition may cause an artefact in further analyses, called a "first cycle artefact". In `braintime`'s _periodicity analysis_ operation for example, you can sometimes see a stretched out pattern of low or high classification with no periodicity. Most often, this artefact is very small, and unlikely to alter subsequent analyses. Hence, `braintime`'s default option under [bt_analyzesources](warpingsource/bt_analyzesources.m) is ```cfg.cutmethod = 'consistenttime'```. This default method is called ```consistenttime``` because the toolbox warps exactly to the specified time window of interest.
 
+To the extent the first cycle artefact is predicted to be an issue for further analyses, you may decide to remove it by selecting ```cfg.cutmethod = 'cutartefact'``` under [bt_analyzesources](warpingsource/bt_analyzesources.m). With this parameter, `brainime` warps a little bit of time before and after the specified time window of interest before it is removed in later steps. This makes it so the data reptition segment is removed from the final data. The downside to this method is that the warped data will comprise more (or less) than the specified time window of interest.
+
+Finally, there's one more thing to consider here. `braintime` allocates data samples to cycles depending on the warping path. As the two cutmehods comprise warping to a different length of data, there may be variations in which data sample is considered part of which cycle. To check how each method allocates data to cycles, check out [tutorial 8](tutorial/tutorial8_checkallocation.m)
+
+In short, the upside of ```cfg.cutmethod = 'consistenttime'``` is that the warped data will exactly of the specified time window, but its downside is a first cycle artefact. In contrast, the upside of ```cfg.cutmethod = 'curartefact'``` is that the warped data will not contain a first cycle artefact, but its downside is that the data's time may not exactly match the specified window. The methods may vary in which data they allocate to which cycle.
 
 ### Is it circular to warp to warping sources obtained from my clock time data?
 
