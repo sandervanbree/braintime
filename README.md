@@ -178,15 +178,15 @@ Thus, when you expect uniform periodicity patterns in the data, analyzing the au
 
 We want to prevent that arbitrary differences in the periodicity power spectra between participants drive a group effect. To this end, `braintime` z-scores each participant's empirical and permuted periodicity spectrum in the following way:
 
-| Step  | *First level* stats ([bt_statslevel1](periodicity/bt_statslevel1.m)) z-scoring algorithm |
+| Step  | *first level* stats ([bt_statslevel1](periodicity/bt_statslevel1.m)) z-scoring algorithm |
 | --- | :-- |
 | 1 | Z-score each of ```n1``` permuted periodicity spectra by the mean and standard deviation of that spectrum. |
 | 2 | Z-score the single empirical dsitribution by the mean and standard deviation of all ```n1``` permutations. |
 
-| Step  | *Second level* stats ([bt_statslevel2](periodicity/bt_statslevel2.m)) z-scoring algorithm |
+| Step  | *second level* stats ([bt_statslevel2](periodicity/bt_statslevel2.m)) z-scoring algorithm |
 | --- | :-- |
-| 1  | For each second level permutation ```n2```: Grab one (random) permuted spectrum of each participant's ```n1``` permuted spectra and average them into one. This yields ```n2``` permuted averages. |
-| 2  | For each frequency, make a p-value from the percentile at which your empirical power lands in the distribution of ```n2``` permuted power values. |
+| 1  | for each second level permutation ```n2```: Grab one (random) permuted spectrum of each participant's ```n1``` permuted spectra and average them into one. This yields ```n2``` permuted averages. |
+| 2  | for each frequency, make a p-value from the percentile at which your empirical power lands in the distribution of ```n2``` permuted power values. |
 
 ### I have another question
 Feel free to contact me at sandervanbree@gmail.com and I hope to have some time to answer.
