@@ -180,7 +180,7 @@ We want to prevent that arbitrary differences in the periodicity power spectra b
 
 _First level stats_ ([bt_statslevel1](periodicity/bt_statslevel1.m))
 
-1: Z-score each of ```n1``` permuted periodicity spectra by the mean and standard deviation of that spectrum. 
+| 1: | Z-score each of ```n1``` permuted periodicity spectra by the mean and standard deviation of that spectrum. |
 
 2: Z-score the single empirical dsitribution by the mean and standard deviation of all ```n1``` permutations.
 
