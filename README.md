@@ -175,4 +175,4 @@ Thus, when you expect uniform periodicity patterns in the data, analyzing the au
 ### How does the toolbox z-score periodicity spectra?
 
 ### I have another question
-Feel free to contact me at sandervanbree@gmail.com and I'll try my best to save some time to answer.
+Feel free to contact me at sandervanbree@gmail.com and I hope to have some time to answer.
