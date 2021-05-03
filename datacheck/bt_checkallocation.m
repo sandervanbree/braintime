@@ -1,4 +1,4 @@
-function bt_checkallocation(cfg, data, fft_source_constime, fft_source_cutarte)
+function bt_checkallocation(config, data, fft_source_constime, fft_source_cutarte)
 % This function tests how the two cutmethods (in bt_analyzesources) differ
 % in which data they allocate to which cycle. The brain time toolbox
 % compresses data cycle-by-cycle after brain time warping, so an important
@@ -27,12 +27,23 @@ function bt_checkallocation(cfg, data, fft_source_constime, fft_source_cutarte)
 %                    % bt_analyzesources).
 %                    %
 % Output:            %
-%                    % Figure that demonstrates which cycles
+%                    % Figure that demonstrates which data are allocated to 
+%                    % which cycle, for both cutmethods.
+%                    % Interpretation:
+%                    % - Yellow    = both methods assign the same cycle
+%                    % - Blue      = each method assigns a different cycle
+%                    % - Turquoise = cut artifact does not use these data
+%                    % (warping starts before 0 sec).
 %                    %
 
 %% Obtain warp and phase method
-warpmethod = bt_defaultval(config,'warpmethod','stationary');  % Set method for warping (default: stationary)
-phasemethod = bt_defaultval(config,'phasemethod','FFT');       % Set phase estimation method used for warping (default: FFT)
+% Lowercase method input
+if isfield(config,'phasemethod')
+    config.method = lower(config.phasemethod);
+end
+
+warpmethod = bt_defaultval(config,'warpmethod','sinusoid');    % Set method for warping (default: sinusoid)
+phasemethod = bt_defaultval(config,'phasemethod','fft');       % Set phase estimation method used for warping (default: FFT)
 
 %% Check whether input format is correct
 if strcmp(fft_source_constime{6},'consistenttime') == 0
@@ -66,8 +77,8 @@ for method = 1:2
     
     % Fetch bt_source information for this particular method
     src_oi = bt_source{1};                                 % Warping source which contains the warping signal
-    FFT_phs = cell2mat(bt_source{2});                      % Phase of all frequencies in this warping source
-    GED_phs = bt_source{9};                                % Phase of warping signal as estimated using GED
+    fft_phs = cell2mat(bt_source{2});                      % Phase of all frequencies in this warping source
+    ged_phs = bt_source{9};                                % Phase of warping signal as estimated using GED
     warpsources = bt_source{3};                            % Warping source data
     srcrank = bt_source{4};                                % Time freq data of selected warping signal
     mintime_fft = bt_source{5}.time(1);                    % Start time of interest
@@ -127,25 +138,25 @@ for method = 1:2
     if strcmp(cutmethod,'cutartefact')
         cyclesample = round((1/warpfreq)*1/sr); % Calculate how many samples one cycle consists of
         cfg.toilim = [mintime_fft+0.5-(1/warpfreq) maxtime_fft-0.5+(1/warpfreq)]; % Cut to the time window of interest, plus one cycle
-        FFT_phs = FFT_phs(:,mintime_ind-cyclesample:maxtime_ind+cyclesample); % Cut to the time window of interest, plus one cycle
-        GED_phs = GED_phs(:,mintime_ind-cyclesample:maxtime_ind+cyclesample); % Do the same for GED phase
+        fft_phs = fft_phs(:,mintime_ind-cyclesample:maxtime_ind+cyclesample); % Cut to the time window of interest, plus one cycle
+        ged_phs = ged_phs(:,mintime_ind-cyclesample:maxtime_ind+cyclesample); % Do the same for GED phase
     elseif strcmp(cutmethod,'consistenttime')
         cfg.toilim = [mintime_fft maxtime_fft];
     end
     data_temp       = ft_redefinetrial(cfg, data_temp);
     
     %% Opt for FFT or GED phase and adapt data
-    if strcmp(phasemethod,'FFT')
-        phs = FFT_phs;
-    elseif strcmp(phasemethod,'GED')
+    if strcmp(phasemethod,'fft')
+        phs = fft_phs;
+    elseif strcmp(phasemethod,'ged')
         
         % Sanity check whether the two phase vectors are within 5% of each other's length
-        if abs(size(FFT_phs,2)-size(GED_phs,2)) > 0.05*max(size(FFT_phs,2),size(GED_phs,2))
+        if abs(size(fft_phs,2)-size(ged_phs,2)) > 0.05*max(size(fft_phs,2),size(ged_phs,2))
             error(['The length of the GED estimated phase substantially differs from '...
                 'the length of the FFT estimated phase. Please change to config.phasemethod '...
-                '= ''FFT'' or change the time window tested during bt_analyzechannels.'])
+                '= ''fft'' or change the time window tested during bt_analyzechannels.'])
         else
-            phs = GED_phs;
+            phs = ged_phs;
         end
     end
     
@@ -167,7 +178,7 @@ for method = 1:2
         data_temp      = ft_redefinetrial(cfg, data_temp);
     end
     
-    %% Warp the phase of the warping signal to the phase of a stationary oscillation
+    %% Warp the phase of the warping signal to the phase of a stationary signal
     bt_data     = data_temp;
     nsec        = bt_data.time{1}(end)-bt_data.time{1}(1);        % number of seconds in the data
     Ncycles     = warpfreq*nsec;                                  % number of cycles
@@ -175,7 +186,7 @@ for method = 1:2
     tempsr      = Ncycles*cycledur/nsec;
     timephs     = linspace(0,Ncycles,phs_sr*nsec);                % time vector of the unwrapper phase
     
-    if strcmp(warpmethod,'stationary')                            % warp using stationary sinusoid
+    if strcmp(warpmethod,'sinusoid')                              % warp using stationary sinusoid
         ct_phs = linspace(-pi,(2*pi*Ncycles)-pi,tempsr*nsec);     % set up phase bins for unwrapped phase (angular frequency)
         
     elseif strcmp(warpmethod,'waveshape')                         % warp using average waveshape
@@ -185,7 +196,7 @@ for method = 1:2
         if numel(trgh)~=2                                         % if there are not 2 troughs, this likely
             error(['The waveshape of the warping signal is',...   % means the data is too noisy
                 ' too noisy. Please select cfg.method =',...
-                ' ''stationary'' and try again.']);
+                ' ''sinusoid'' and try again.']);
         end
         
         waveshape_cut = wvshape_sm(trgh(1)+1:trgh(2));            % cut waveshape to one cycle (-cos)
@@ -259,7 +270,7 @@ for method = 1:2
 end
 
 %% Check data-to-cycle allocation between the two methods
-figure; hold on;
+figure; bt_figure('halfwide');
 
 ntr = length(cutartefact); %number of trials
 ncyc = cutartefact{1}(4,end); % number of cycles
@@ -342,18 +353,28 @@ end
 % script to achieve that?
 
 imagesc(coinc)
-ylabel('Trials')
-xlabel('Time')
+ylabel('Trial number')
+xlabel('Data sample')
+title('How do cutartefact and consisstenttime allocate data to cycles?')
 % plot interpretation:
 % -yellow    = both methods assign the same cycle;
 % -blue      = each method assigns a different cycle;
-% -turquoise = cut artifact doesnt use these data (warping starts before 0 sec)
+% -turquoise = cut artifact does not use these data (warping starts before 0 sec)
 
 % plot start/end trials
-figure,
 
-subplot(3,7,1)
-plot(longitude{1},'.')
-ylabel('Clock Time')
-xlabel('Trials')
-ylim([-.5 1.5])
+% figure,
+% subplot(3,7,1)
+% plot(longitude{1},'.')
+% ylabel('Clock Time')
+% xlabel('Trials')
+% ylim([-.5 1.5])
+
+    % Adapt font
+    set(gca,'FontName',bt_plotparams('FontName'));
+    set(gca,'FontSize',bt_plotparams('FontSize'));
+
+    % Print plot interpretation
+    disp('- Yellow    = both methods assign data to the same cycle')
+    disp('- Blue      = each method assigns data to a different cycle')
+    disp('- Turquoise = cut artifact does not use these data (because warping starts before 0 seconds)')
