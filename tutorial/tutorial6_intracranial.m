@@ -6,6 +6,8 @@
 %%% formatted datastructure with the to-be-warped data (clock time data),
 %%% and a FieldTrip structure with warping sources. Thus, EEG, MEG, and
 %%% intracranial data all work.
+%%% 
+%%% The data were generously provided by Ehren Newman
 
 % Load an example rat's classes of data and carrier LFP (see tutorial folder)
 load gridcell_tutorial.mat rat2
