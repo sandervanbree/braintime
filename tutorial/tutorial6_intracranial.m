@@ -1,6 +1,3 @@
-%% NOTE TO DEVS: This tutorial requires some patching up. Note to self:
-%%% Ask simon to repeat methodological details of the rodent data
-%%%
 %%% In tutorial 6 we will brain time warp intracranial data. The data
 %%% consists of spike series and LFP obtained from the rat hippocampus.
 %%%
@@ -10,10 +7,13 @@
 %%% and a FieldTrip structure with warping sources. Thus, EEG, MEG, and
 %%% intracranial data all work.
 
-% Load two classes of data and carrier LFP (see tutorial folder)
-load gridcell_tutorial.mat
+% Load an example rat's classes of data and carrier LFP (see tutorial folder)
+load gridcell_tutorial.mat rat2
 
-% NOTE TO DEVS: Include information about channels
+c1_data = rat2.c1_data;
+c2_data = rat2.c2_data;
+
+% We have local field potential channels and cell spike channels
 disp(c1_data.label)
 disp(c2_data.label)
 
@@ -23,13 +23,16 @@ ct_data           = ft_appenddata(cfg,c1_data,c2_data);
 clabel            = [ones(size(c1_data.trial,2),1);2*ones(size(c2_data.trial,2),1)];
 ct_data.trialinfo = clabel;
 
-% The clock time data also serves as the warping source
-warpsources      = ct_data;
-
-% But only the first two channels
+% The first two channels (LFP data) serve as the warping sources that
+% contain theta
 cfg = [];
 cfg.channel = 1:2;
-warpsources = ft_selectdata(cfg,warpsources);
+warpsources = ft_selectdata(cfg,ct_data);
+
+% The last two channels (cell spikes) serve as the clock time data which
+% will be warped
+cfg.channel = 3:4;
+ct_data = ft_selectdata(cfg,ct_data);
 
 % Toolbox configuration
 cfg              = [];               
