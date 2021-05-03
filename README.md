@@ -52,7 +52,7 @@ then run the function [setup_braintime](setup).
 
 
 ## Introduction
-What's the premise behind the Brain Time Toolbox (`braintime`)? Insofar a cognitive process is clocked by oscillations, analyses of the process's dynamics require a factoring in of the oscillations' dynamics. To this end, the toolbox implements **brain time warping**, an algorithm to transform electrophysiological data based on relevant oscillations selected by the user—the **warping signal**. This changes the data from **clock time** (seconds), closer to **brain time** (cycles). This completes the first operation of `braintime`: *brain time warping*. 
+What's the premise behind the Brain Time Toolbox (`braintime`)? Insofar a cognitive process is clocked by oscillations, analyses of the process's dynamics require a factoring in of the oscillations' dynamics. To this end, the toolbox implements **brain time warping**, an algorithm to transform electrophysiological data based on relevant oscillations selected by the user — the **warping signal**. This changes the data from **clock time** (seconds), closer to **brain time** (cycles). This completes the first operation of `braintime`: *brain time warping*. 
 
 The second operation is *periodicity analysis*. Here, `braintime` uses multivariate pattern analysis (MVPA) to detect the effects of the applied data transformation. Has evidence of the rhythmicity of the cognitive patterns increased?
 
@@ -62,7 +62,7 @@ Below, we explain how to perform both operations step by step. To see the steps 
 
 **1.1 Loading clock time data**
 
-`braintime` works with FieldTrip formatted electrophysiological data. This can be electroencephalography (EEG), magnetoencephalography (MEG), or intracranial data. The starting data is called clock time data—this will be warped.
+`braintime` works with FieldTrip formatted electrophysiological data. This can be electroencephalography (EEG), magnetoencephalography (MEG), or intracranial data. The starting data is called clock time data — this will be warped.
 
 **1.2 Loading warping sources data**
 
@@ -123,7 +123,7 @@ You also need to specify a range of periodicity frequencies. In which range of r
 
 How does the participant's quantified periodicity compare against the null distribution? [bt_statslevel1](periodicity/bt_statslevel1.m) takes the output from [bt_quantify](periodicity/bt_quantify.m) and performs classification ```cfg.numperms1 = n1``` times over, each time randomly shuffling the classification labels and obtaining ```n1``` "permuted" periodicity spectra. This provides a null distribution that quantifies how much periodicity is in the data when the class structure is destroyed, setting things up for p-value estimation on the group level.
 
-Now, repeat [bt_statslevel1](periodicity/bt_statslevel1.m) for every participant, and send its output to a separate field in a group structure (e.g. ```[ct_stats1{subj}] = bt_statslevel1(cfg,data,quant)```). The next step requires this format to perform 2nd level statistics—it loops over the fields.
+Now, repeat [bt_statslevel1](periodicity/bt_statslevel1.m) for every participant, and send its output to a separate field in a group structure (e.g. ```[ct_stats1{subj}] = bt_statslevel1(cfg,data,quant)```). The next step requires this format to perform 2nd level statistics — it loops over the fields.
 
 **2.4 Second level statistics**
 
@@ -154,6 +154,13 @@ Finally, there's one more thing to consider here. `braintime` allocates data sam
 In short, the upside of ```cfg.cutmethod = 'consistenttime'``` is that the warped data will exactly of the specified time window, but its downside is a first cycle artefact. In contrast, the upside of ```cfg.cutmethod = 'curartefact'``` is that the warped data will not contain a first cycle artefact, but its downside is that the data's time may not exactly match the specified window. The methods may vary in which data they allocate to which cycle.
 
 ### Is it circular to warp to warping sources obtained from my clock time data?
+
+It depends on subsequent analyses. First, let's consider the concern. The concern is that warping data to the phase dynamics of a warping oscillation trivially introduces patterns in the data oscillating at the warping oscillation's frequency, as you've changed the data according to it.
+
+First, this is only a concern for warping sources obtained from clock time data — if the phase dynamics used for warping are not in the data on which subsequent analyses are done, there's no methodological circularity. Second, even if clock time data and warping sources are dependent, subsequent periodicity analyses _within_ `braintime` are safe, as the analysis inherently accounts for cicularity. Namely, periodicity in classification performance is tested by shuffling class labels, which tests for the relevance of the class structure to the classifier. If the warping trivially introduces periodicity in the classifier, it should do so equally for shuffled results (permuted periodicity spectra) and correctly labeled results (empirical periodicity spectra).
+
+Critically however, if you intend to only use `braintime`'s first function, brain time warping, and continue analyses on the warped data outside the toolbox, it is strongly recommended to remove the warping source from the original clock time data (for example, by removing the independent component or by removing the channel).
+
 
 ### Which phase should I warp to, FFT or GED?
 
