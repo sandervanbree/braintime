@@ -1,13 +1,12 @@
 %%% In tutorial 6 we will brain time warp intracranial data. The data
-%%% consists of spike series and LFP obtained from the rat hippocampus.
+%%% consists of spike series and LFP obtained from the rat hippocampus -
+%%% the data were provided generously by Ehren Newman.
 %%%
 %%% There are no limitations to the type of electrophysiological data that 
 %%% can be used in the toolbox. All that is required is a FieldTrip
 %%% formatted datastructure with the to-be-warped data (clock time data),
 %%% and a FieldTrip structure with warping sources. Thus, EEG, MEG, and
 %%% intracranial data all work.
-%%% 
-%%% The data were generously provided by Ehren Newman
 
 % Load an example rat's classes of data and carrier LFP (see tutorial folder)
 load gridcell_tutorial.mat rat2
