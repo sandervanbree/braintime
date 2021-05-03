@@ -142,10 +142,10 @@ At this point we have tested whether periodicity in classification performance i
 ## Toolbox considerations
 
 ### How do I know all this even works?
-We have added a simulation... (add text)
-
+We provide three sources of evidence for the toolbox. A simulated dataset, a rodent intracranial dataset, and a human EEG dataset. `braintime` includes the script used to generate the simulated dataset. Toying around with it is a great way to both get a feel for the toolbox, and see its effects. Check out [bt_dipsim](dipolesimulation/bt_dipsim.m), change some parameters to your liking, and run it through the `braintime` pipeline to see that the toolbox accounts for clock and brain time disharmony. Details on the rodent and human evidence will be addd to our manuscript.
 
 ### Which cutmethod to choose?
+
 
 ### Is it circular to warp to warping sources obtained from my clock time data?
 
