@@ -1,4 +1,4 @@
-[![HitCount](http://hits.dwyl.com/sandervanbree/braintime.svg)](http://hits.dwyl.com/sandervanbree/braintime)
+[![HitCount](http://hits.dwyl.io/sandervanbree/braintime.svg)](http://hits.dwyl.io/sandervanbree/braintime)
 [![Github All Releases](https://img.shields.io/github/downloads/sandervanbree/braintime/total.svg)]()
 
 # Brain Time Toolbox
