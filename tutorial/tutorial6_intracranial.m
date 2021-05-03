@@ -1,6 +1,7 @@
 %%% In tutorial 6 we will brain time warp intracranial data. The data
-%%% consists of spike series and LFP obtained from the rat hippocampus -
-%%% the data were provided generously by Ehren Newman.
+%%% consists of the local field potentials (LFP) and spike time series
+%%% obtained from the rat hippocampus.
+%%% The data were provided generously by Ehren Newman.
 %%%
 %%% There are no limitations to the type of electrophysiological data that 
 %%% can be used in the toolbox. All that is required is a FieldTrip
