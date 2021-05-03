@@ -121,7 +121,7 @@ You also need to specify a range of periodicity frequencies. In which range of r
 
 **2.3 First level statistics**
 
-How does the participant's quantified periodicity compare against the null distribution? [bt_statslevel1](periodicity/bt_statslevel1.m) takes the output from [bt_quantify](periodicity/bt_quantify.m) and performs classification ```cfg.numperms1 = n1``` times over, each time randomly shuffling the classification labels and obtaining n1 "permuted" periodicity spectra. This provides a null distribution that quantifies how much periodicity is in the data when the class structure is destroyed, setting things up for p-value estimation on the group level.
+How does the participant's quantified periodicity compare against the null distribution? [bt_statslevel1](periodicity/bt_statslevel1.m) takes the output from [bt_quantify](periodicity/bt_quantify.m) and performs classification ```cfg.numperms1 = n1``` times over, each time randomly shuffling the classification labels and obtaining ```n1``` "permuted" periodicity spectra. This provides a null distribution that quantifies how much periodicity is in the data when the class structure is destroyed, setting things up for p-value estimation on the group level.
 
 Now, repeat [bt_statslevel1](periodicity/bt_statslevel1.m) for every participant, and send its output to a separate field in a group structure (e.g. ```[ct_stats1{subj}] = bt_statslevel1(cfg,data,quant)```). The next step requires this format to perform 2nd level statistics—it loops over the fields.
 
@@ -129,7 +129,7 @@ Now, repeat [bt_statslevel1](periodicity/bt_statslevel1.m) for every participant
 
 We just got an idea of the periodicity in single participants. But what about the group level? [bt_statslevel2](periodicity/bt_statslevel2.m) employs the following algorithm to generate second level statistics:
 
-1) ```cfg.numperms2 = n2``` times, do the following: randomly grab one of each participants' n1 permuted periodicity spectra and average those spectra into one spectrum. This yields n2 spectra.
+1) ```cfg.numperms2 = n2``` times, do the following: randomly grab one of each participants' ```n1``` permuted periodicity spectra and average those spectra into one spectrum. This yields ```n2``` spectra.
 2) For each frequency, compare the empirical periodicity with the distribution of permuted periodicity to derive a p-value.
 3) Plot the average empirical periodicity spectrum and display the p-value for each frequency.
 
