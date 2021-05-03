@@ -179,7 +179,8 @@ Thus, when you expect uniform periodicity patterns in the data, analyzing the au
 We want to prevent that arbitrary differences in the periodicity power spectra between participants drive a group effect. To this end, `braintime` z-scores each participant's empirical and permuted periodicity spectrum in the following way:
 
 _First level stats_ ([bt_statslevel1](periodicity/bt_statslevel1.m))
-
+| **Toolbox term** | **description** |
+| --- | --- |
 | 1: | Z-score each of ```n1``` permuted periodicity spectra by the mean and standard deviation of that spectrum. |
 
 2: Z-score the single empirical dsitribution by the mean and standard deviation of all ```n1``` permutations.
