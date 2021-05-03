@@ -86,7 +86,7 @@ cfg.removecomp   = 'no';             % remove component when using brain time wa
 
 cfg.warpmethod   = 'waveshape';      % Let's try warping using the average waveshape in the data
 
-cfg.phasemethod  = 'GED';            % Generalized Eigendecomposition can be used to get a 
+cfg.phasemethod  = 'ged';            % Generalized Eigendecomposition can be used to get a 
                                      % holistic phase estimation of the warping frequency
                                      % across the warping sources
                                      

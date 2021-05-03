@@ -14,20 +14,19 @@
 
 %% Step 1: Load and structure data
 % Ensure your data is longer than your time window of interest,
-% to facilitate time frequency analyses
-load dipolesim_tutorial;
+% to facilitate time frequency analyses.
+load dipolesim_tutorial;  % Load to-be-warped data with two conditions
 
-% The Brain Time Toolbox requires FieldTrip formatted datastructures, which
-% contain both classes of data, labelled 1 and 2 in the trialinfo field
+% The Brain Time Toolbox requires the data to be in a FieldTrip format
 cfg               = [];
 ct_data           = ft_appenddata(cfg,ct_left,ct_right);
+
+% In case the second operation of the toolbox will be used (periodicity
+% analysis; tutorial 2 and 3), please enter the class labels in the data's trialinfo
+% field. If only he first operation of the toolbox will be
+% used (brain time warping), this is not necessary.
 clabel            = [ones(size(ct_left.trial,1),1);2*ones(size(ct_right.trial,1),1)];
 ct_data.trialinfo = clabel;
-
-% It is important that the data is not or minimally high pass
-% filtered, as this can introduce strong artifacts in later steps in the
-% toolbox. See van Driel et al., 2021; https://doi.org/10.1016/j.jneumeth.2021.109080
-% for details and recommendations.
 
 %% Step 2: Extract warping sources, which contain warping signals
 % The toolbox requires two electrophysiology data structures: clock time
@@ -85,9 +84,9 @@ cfg.warpmethod   = 'sinusoid';       % 'sinusoid': the toolbox warps the data us
                                      % 'waveshape': the toolbox warps to the average waveshape for
                                      % the warping frequency.
 
-cfg.phasemethod  = 'FFT';            % 'FFT': the phase dynamics of the warping signal
+cfg.phasemethod  = 'fft';            % 'fft': the phase dynamics of the warping signal
                                      % as estimated by ft_freqanalysis (default).
-                                     % 'GED': the phase dynamics of the warping signal 
+                                     % 'ged': the phase dynamics of the warping signal 
                                      % as estimated by Generalized Eigendecomposition
                                      
 cfg.visualcheck  = 'on';             % Visualize several steps to check for errors

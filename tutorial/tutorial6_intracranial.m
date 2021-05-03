@@ -58,7 +58,7 @@ cfg.warpmethod   = 'waveshape';    % Rodent theta can be quite asymmetric,
                                    % so warping using the average waveshape
                                    % rather than a stationary sinusoid is a
                                    % natural choice.
-cfg.phasemethod  = 'FFT';          
+cfg.phasemethod  = 'fft';          
 cfg.visualcheck  = 'on';
 cfg.removecomp   = 'no';
 [bt_warpeddata]  = bt_clocktobrain(cfg,ct_data,bt_source);

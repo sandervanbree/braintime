@@ -6,6 +6,12 @@
 
 load tutorial1_output
 
+% When testing for periodicity with the toolbox, it is important that the
+% data is not high pass filtered (or done with extreme care), as this can
+% introduce strong artefacts in patterns of classification performance.
+% See van Driel et al., 2021; https://doi.org/10.1016/j.jneumeth.2021.109080
+% We find that these patterns can be highly periodic, flawing the analysis.
+
 % Timelock the data
 cfg = [];
 cfg.keeptrials     = 'yes';
@@ -20,7 +26,7 @@ clabel             = bt_warpeddata.clabel;
 % Use MVPA Light to generate time generalization matrices (TGM)
 cfg_mv.classifier  = 'lda';     % Linear Discriminant Analysis
 cfg_mv.metric      = 'acc';     % Accuracy
-cfg_mv.repeat      = 1;         % Number of repetitions; use higher number for real data
+cfg_mv.repeat      = 3;         % Number of repetitions; use higher number for real data
 cfg_mv.cv          = 'kfold'; 
 cfg_mv.k           = 5;         % Number of folds
 [~, ct_mv]         = mv_classify_timextime(cfg_mv, ct_data.trial, clabel);

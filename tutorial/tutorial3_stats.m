@@ -47,12 +47,13 @@ end
 % just copy pasted datasets. Moreover, since our cfg.numperm1 is so low,
 % significant testing is disabled on the first level. Let's just close 
 % the plots and turn off 1st level plotting for now.
-% close all;
-% cfg.figure = 'no';
+close all;
+cfg.figure = 'no';
 
 % Apply second level statistics (group-level)
 cfg.numperms2      = 100000;                    % Number of second level Monte Carlo permutations
-cfg.multiplecorr   = 'fdr';                     % Multiple correction option
+                                                % We recommend at least 100000, or ideally an order higher
+cfg.multiplecorr   = 'fdr';                     % Multiple correction option ('none', 'fdr', 'bonferroni')
 
 % A plethora of cluster parameters are available that are sent to MVPA
 % Light for cluster correction. For details on each parameter, check out
