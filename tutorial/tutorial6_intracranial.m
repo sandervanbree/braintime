@@ -30,9 +30,9 @@ cfg = [];
 cfg.channel = 1:2;
 warpsources = ft_selectdata(cfg,ct_data);
 
-% The last two channels (cell spikes) serve as the clock time data which
+% The last channels (cell spikes) serve as the clock time data which
 % will be warped
-cfg.channel = 3:4;
+cfg.channel = 3:numel(ct_data.label);
 ct_data = ft_selectdata(cfg,ct_data);
 
 % Toolbox configuration
