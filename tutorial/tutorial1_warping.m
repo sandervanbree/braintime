@@ -47,7 +47,7 @@ warpsources      = ft_componentanalysis(cfg ,ct_data);
 % your results at a later stage:
 % save warpsources
 
-%% Step 3: Time frequency analysis of warping components
+%% Step 3: Time frequency analysis of warping sources
 % Toolbox configuration
 cfg              = [];               % toolbox configuration structure
 cfg.time         = [1 2];            % time window of interest (1 to 2s)
