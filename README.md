@@ -68,7 +68,7 @@ Below, we explain how to perform both operations step by step. To see the steps 
 
 Warping sources are the data structure containing the to-be-selected warping signal, which is used to warp clock time data. Warping sources may be obtained separately from clock time data, or extracted from it (using independent component analysis, or the selection of a few channels). Please ensure that your warping source data has 0.5s of additional time extra (before and after your time window of interest) to facilitate step 1.3.
 
-> :warning: If your clock time data and warping sources are not independent, please read "[is it circular to warp to warping sources obtained from my clock time data?](#is-it circular-to-warp-to-warping-sources-obtained-from-my-clock-time-data)".
+> :warning: If your clock time data and warping sources are not independent, please read [is it circular to warp to warping sources obtained from my clock time data?](#is-it circular-to-warp-to-warping-sources-obtained-from-my-clock-time-data)
 
 **1.3 Time frequency analysis of warping sources**
 
@@ -90,7 +90,7 @@ There are two parameters you can change in [bt_clocktobrain](bt_clocktobrain/bt_
 
 > :bulb: For data with asymmetric waves such as theta oscillations in intracranial rodent data, using waveshape as a warpmethod is the natural choice.
 
-There are also two "phase methods", which are separate phase estimations of the warping signal both sneakily obtained by [bt_analyzesources](warpingsource/bt_analyzesources.m). One is a regular method of phase estimation (using the Fast Fourier Transform of the warping frequency, selected with ```cfg.phasemethod = 'fft'```, and a special method called [General Eigenvalue Decomposition](http://mikexcohen.com/data/Cohen_STfilter.pdf) (GED), selected with ```cfg.phasemethod = 'ged'```. The former is classical and specific to the warping source, the latter is novel and more holistically estimates phase. The latter is holistic as the phase of the warping frequency is estimated by taking a weighted combination of **all** warping sources. More details on when to use which? Check out "[which phase should I warp to, FFT or GED?](#which-phase-should-i-warp-to--FFT-or-GED)").
+There are also two "phase methods", which are separate phase estimations of the warping signal both sneakily obtained by [bt_analyzesources](warpingsource/bt_analyzesources.m). One is a regular method of phase estimation (using the Fast Fourier Transform of the warping frequency, selected with ```cfg.phasemethod = 'fft'```, and a special method called [General Eigenvalue Decomposition](http://mikexcohen.com/data/Cohen_STfilter.pdf) (GED), selected with ```cfg.phasemethod = 'ged'```. The former is classical and specific to the warping source, the latter is novel and more holistically estimates phase. The latter is holistic as the phase of the warping frequency is estimated by taking a weighted combination of **all** warping sources. More details on when to use which? Check out "[which phase should I warp to, FFT or GED?](#which-phase-should-i-warp-to-FFT-or-GED)").
 
 After [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m), your data has completed its transformation from clock to brain time. The time axis is now formatted as sequences of cycles, instead of seconds. You may opt to continue analyses outside of the toolbox, or test for periodic patterns in the data using `braintime`'s second operation described next. In case of the former, please read the previously linked circularity information.
 
