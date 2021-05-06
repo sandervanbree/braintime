@@ -5,6 +5,7 @@ function setup_braintime
 % Add all folders and subfolders to path
 braintime_path = fileparts(fileparts(mfilename('fullpath')));
 try
+    addpath(braintime_path);
     addpath(genpath(fullfile(braintime_path,'setup')));
     addpath(genpath(fullfile(braintime_path,'utilities')));
     addpath(genpath(fullfile(braintime_path,'clocktobrain')));
