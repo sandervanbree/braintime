@@ -8266,11 +8266,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.41713106"
-     inkscape:cx="1473.3389"
-     inkscape:cy="2674.5411"
+     inkscape:zoom="0.2949562"
+     inkscape:cx="1746.0844"
+     inkscape:cy="1797.5947"
      inkscape:document-units="mm"
-     inkscape:current-layer="g38448"
+     inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:window-width="1920"
@@ -14681,34 +14681,34 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.3472px;line-height:1.25;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
        x="583.82068"
-       y="126.30539"
+       y="130.00954"
        id="text8800-5-2-3"><tspan
          sodipodi:role="line"
          x="583.82068"
-         y="126.30539"
+         y="130.00954"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.3472px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
          id="tspan11620">Periodicity spectrum</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.3472px;line-height:1.25;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
        x="366.72827"
-       y="126.78914"
+       y="130.49329"
        id="text8800-5-2"><tspan
          sodipodi:role="line"
          id="tspan8798-2-9"
          x="366.72827"
-         y="126.78914"
+         y="130.49329"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.3472px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583">Autocorrelation map</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.3472px;line-height:1.25;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
        x="121.37864"
-       y="126.48505"
+       y="130.18918"
        id="text8800-5"><tspan
          sodipodi:role="line"
          id="tspan8798-2"
          x="121.37864"
-         y="126.48505"
+         y="130.18918"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.3472px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583">Temporal Generalization Matrix</tspan></text>
     <text
        xml:space="preserve"
