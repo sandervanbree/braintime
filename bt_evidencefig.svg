@@ -8384,11 +8384,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.20856553"
-     inkscape:cx="2321.3561"
-     inkscape:cy="2066.8614"
+     inkscape:zoom="0.2949562"
+     inkscape:cx="2107.9271"
+     inkscape:cy="1166.127"
      inkscape:document-units="mm"
-     inkscape:current-layer="g26935"
+     inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:window-width="1920"
@@ -10686,7 +10686,7 @@
            x="651.35974"
            y="588.90173"
            id="text8800-23-5-1"
-           transform="matrix(0.98096728,0,0,1.019402,-37.411056,-20.688726)"><tspan
+           transform="matrix(0.98096728,0,0,1.019402,-34.355766,-20.688726)"><tspan
              x="651.35974"
              y="588.90173"><tspan
                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.6014px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.259547">Simulation </tspan><tspan
@@ -10697,7 +10697,7 @@
            x="648.34351"
            y="643.83209"
            id="text8800-23-5-1-0"
-           transform="matrix(0.98096728,0,0,1.019402,-31.540213,44.093048)"><tspan
+           transform="matrix(0.98096728,0,0,1.019402,-26.448063,44.093048)"><tspan
              x="648.34351"
              y="643.83209"><tspan
                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.6014px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.259547">Rodent </tspan><tspan
@@ -10708,7 +10708,7 @@
            x="660.35809"
            y="700.93353"
            id="text8800-23-5-1-0-5"
-           transform="matrix(0.98096728,0,0,1.019402,-29.035622,106.27465)"><tspan
+           transform="matrix(0.98096728,0,0,1.019402,-27.507977,106.27465)"><tspan
              x="660.35809"
              y="700.93353"><tspan
                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.6014px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.259547">Human</tspan><tspan
@@ -13859,10 +13859,10 @@
              xml:space="preserve"
              style="font-style:normal;font-variant:normal;font-weight:400;font-size:10.6014px;line-height:125%;font-family:'Times New Roman';text-align:start;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.149644"
              transform="scale(0.98096728,1.019402)"
-             x="594.99438"
+             x="591.87976"
              y="604.97418"
              id="text38150-4"><tspan
-               x="594.99438"
+               x="591.87976"
                y="604.97418"
                id="tspan38148-1"
                style="font-size:10.6014px;stroke-width:0.149644"
@@ -14032,11 +14032,11 @@
              xml:space="preserve"
              style="font-style:normal;font-variant:normal;font-weight:400;font-size:10.6014px;line-height:125%;font-family:'Times New Roman';text-align:start;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.149644"
              transform="scale(0.98096728,1.019402)"
-             x="595.40833"
+             x="591.7746"
              y="723.22107"
              id="text38150-4-2"><tspan
                sodipodi:role="line"
-               x="595.40833"
+               x="591.7746"
                y="723.22107"
                id="tspan38148-1-1"
                style="font-size:10.6014px;stroke-width:0.149644"><tspan
@@ -14048,11 +14048,11 @@
              xml:space="preserve"
              style="font-style:normal;font-variant:normal;font-weight:400;font-size:10.6014px;line-height:125%;font-family:'Times New Roman';text-align:start;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.149644"
              transform="scale(0.98096728,1.019402)"
-             x="594.34039"
+             x="593.82129"
              y="841.90088"
              id="text38150-4-2-8"><tspan
                sodipodi:role="line"
-               x="594.34039"
+               x="593.82129"
                y="841.90088"
                id="tspan38148-1-1-7"
                style="font-size:10.6014px;stroke-width:0.149644"><tspan
@@ -14606,12 +14606,12 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.6389px;line-height:1.25;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
-       x="370.03342"
+       x="358.39157"
        y="67.023033"
        id="text8800-2-8"><tspan
          sodipodi:role="line"
          id="tspan8798-40-5"
-         x="370.03342"
+         x="358.39157"
          y="67.023033"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:17.6389px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583">Simulation</tspan></text>
     <text
