@@ -8384,11 +8384,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.5899124"
-     inkscape:cx="2073.6034"
-     inkscape:cy="1137.7098"
+     inkscape:zoom="0.20856553"
+     inkscape:cx="2321.3561"
+     inkscape:cy="2066.8614"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g26935"
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:window-width="1920"
@@ -11633,21 +11633,21 @@
              sodipodi:nodetypes="cccccccc" />
         </g>
         <rect
-           style="fill:#61b5bd;fill-opacity:0.318548;stroke:none;stroke-width:0.465576;stroke-miterlimit:4;stroke-dasharray:5.58694, 0.465576;stroke-dashoffset:0;stroke-opacity:1"
+           style="fill:#61b5bd;fill-opacity:0.318548;stroke:none;stroke-width:0.450474;stroke-miterlimit:4;stroke-dasharray:5.40572, 0.450474;stroke-dashoffset:0;stroke-opacity:1"
            id="rect27302-3-8-4-7"
-           width="148.77861"
+           width="139.28336"
            height="22.981535"
-           x="578.95172"
-           y="541.45142" />
+           x="579.35175"
+           y="541.50018" />
         <text
            xml:space="preserve"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.1122px;line-height:1.25;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.259547"
-           x="617.47766"
+           x="611.76752"
            y="545.62891"
            id="text8800-5-2-3-4-3-4"
            transform="scale(0.98096728,1.019402)"><tspan
              sodipodi:role="line"
-             x="617.47766"
+             x="611.76752"
              y="545.62891"
              style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.1122px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.259547"
              id="tspan11620-9-6-8">Warping frequency</tspan></text>
@@ -14606,12 +14606,12 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.6389px;line-height:1.25;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
-       x="400.19638"
+       x="370.03342"
        y="67.023033"
        id="text8800-2-8"><tspan
          sodipodi:role="line"
          id="tspan8798-40-5"
-         x="400.19638"
+         x="370.03342"
          y="67.023033"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:17.6389px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583">Simulation</tspan></text>
     <text
