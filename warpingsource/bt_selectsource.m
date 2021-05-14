@@ -194,8 +194,8 @@ while finish==0
         xline(minfoi,'Color',bt_colorscheme('foi_borders'),'LineWidth',1.5);
         xline(maxfoi,'Color',bt_colorscheme('foi_borders'),'LineWidth',1.5);
     catch
-        hline(minfoi);
-        hline(maxfoi);
+        vline(minfoi,'k');
+        vline(maxfoi,'k');
     end
     
     set(gca,'FontSize',14);
