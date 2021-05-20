@@ -180,6 +180,7 @@ elseif strcmp(warpmethod,'waveshape')                         % warp using avera
     end
     
     wvshape_sm = smoothdata(wvshape,'gaussian',25);           % smooth substantially - 25 bins seems the sweetspot for 201 bins
+    wvshape_sm = wvshape_sm - mean(wvshape_sm);               % remove DC
     [~,trgh] = findpeaks(-wvshape_sm);                        % find troughs
     
     if numel(trgh)~=2                                         % if there are not 2 troughs, this likely
