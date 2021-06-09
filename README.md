@@ -175,7 +175,7 @@ It depends on the uniformity of the periodic patterns of your 2D classifier perf
 
 Thus, when you expect uniform periodicity patterns in the data, analyzing the autocorrelation map of TGMs is a powerful approach. When the pattern is expected to only be present partially, or when multiple rates are predicted, it is better to analyze the TGM itself.
 
-### How does the toolbox z-score periodicity spectra?
+### How does the toolbox z-score periodicity spectra and implement statistics?
 
 We want to prevent that arbitrary differences in the periodicity power spectra between participants drive a group effect. To this end, `braintime` z-scores each participant's empirical and permuted periodicity spectrum in the following way:
 
