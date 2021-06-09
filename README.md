@@ -57,7 +57,7 @@ What's the premise behind the Brain Time Toolbox (`braintime`)? Insofar a cognit
 
 The second operation is *periodicity analysis*. Here, `braintime` uses multivariate pattern analysis (MVPA) to detect the effects of the applied data transformation. Has evidence of the rhythmicity of the cognitive patterns increased?
 
-Below, we explain how to perform both operations step by step. To see the steps in practice, check out `braintime`'s [tutorials](/tutorial).
+Below, we explain how to perform both operations step by step. To see the steps in practice, check out `braintime`'s [tutorials](/tutorial). For extensive methodological documentation, check out the main paper's supplementary material.
 
 ## Operation 1: Brain time warping
 
@@ -190,4 +190,4 @@ We want to prevent that arbitrary differences in the periodicity power spectra b
 | 2  | for each frequency, make a p-value from the percentile at which your empirical power lands in the distribution of ```n2``` permuted power values. |
 
 ### I have another question!
-Feel free to contact me at sandervanbree@gmail.com and I hope to have some time to answer.
+If it's a technical question about the toolbox, it's likely explained in the main paper's supplementary material. For other questions, feel free to contact me at sandervanbree@gmail.com and I hope to have some time to answer.
