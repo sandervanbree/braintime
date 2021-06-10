@@ -7,7 +7,7 @@
 
 Warp electrophysiological data from clock time to brain time and analyze the periodicity of cognitive processes. By *Sander van Bree, María Melcón, Luca Kolibius, Casper Kérren, Maria Wimber, Simon Hanslmayr*. 
 
-Check out the brain time paper for context.
+Check out the [brain time paper](https://www.biorxiv.org/content/10.1101/2021.06.09.447763v1) for context.
 
 ### Dependencies
 - [MATLAB Signal Processing Toolbox](https://uk.mathworks.com/help/signal/getting-started-with-signal-processing-toolbox.html)
@@ -192,4 +192,4 @@ We want to prevent that arbitrary differences in the periodicity power spectra b
 | 2  | for each frequency, make a p-value from the percentile at which your empirical power lands in the distribution of ```n2``` permuted power values. |
 
 ### I have another question!
-If it's a technical question about the toolbox, it's likely explained in the main paper's supplementary material. For other questions, feel free to contact me at sandervanbree@gmail.com and I hope to have some time to answer.
+If it's a technical question about the toolbox, it's likely explained in the [main paper](https://www.biorxiv.org/content/10.1101/2021.06.09.447763v1)'s supplementary material. For other questions, feel free to contact me at sandervanbree@gmail.com and I hope to have some time to answer.
