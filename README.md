@@ -61,7 +61,7 @@ The second operation is *periodicity analysis*. Here, `braintime` uses multivari
 
 Below, we explain how to perform both operations step by step. To see the steps in practice, check out `braintime`'s [tutorials](/tutorial). For extensive methodological documentation, check out the main paper's supplementary material. This figure gives a visual rundown of each step:
 
-<img src="https://i.imgur.com/VYOhqGn.png" width="600">
+<img src="https://i.imgur.com/VYOhqGn.png" width="1000">
 
 
 
