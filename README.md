@@ -63,7 +63,7 @@ Below, we explain how to perform both operations step by step. To see the steps 
 
 <img src="https://i.imgur.com/uYfJnCm.png" width="1000">
 
-
+&nbsp;
 
 ## Operation 1: Brain time warping
 
