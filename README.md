@@ -5,7 +5,7 @@
 # Brain Time Toolbox
 <img src="https://i.imgur.com/2QP4cnb.png" width="200">
 
-Warp electrophysiological data from clock time to brain time and analyze the periodicity of cognitive processes. By *Sander van Bree, María Melcón, Luca Kolibius, Casper Kerrén, Maria Wimber, Simon Hanslmayr*. 
+Warp electrophysiological data from clock time to brain time and analyze the periodicity of cognitive processes. A MATLAB toolbox by *Sander van Bree, María Melcón, Luca Kolibius, Casper Kerrén, Maria Wimber, Simon Hanslmayr*. 
 
 Check out the [brain time paper](https://www.biorxiv.org/content/10.1101/2021.06.09.447763v1) for context.
 
