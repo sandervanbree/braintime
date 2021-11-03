@@ -321,6 +321,7 @@ ct_right.trialinfo = 2*(ones(size(ct_right.trial,1),1));
 
 % Save settings to trace back parameters
 dipolesim_params = settings;
+dipolesim_params.dipfreqs = randfreq(1:8); % add simulated frequencies
 
 %% Save results
 if settings.saveopt == 1
