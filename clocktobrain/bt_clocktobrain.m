@@ -52,6 +52,7 @@ warpsources = bt_source{3};                            % Warping source data
 srcrank = bt_source{4};                                % Time freq data of selected warping signal
 mintime_fft = bt_source{5}.time(1);                    % Start time of interest
 maxtime_fft = bt_source{5}.time(end);                  % End time of interest
+orig_trialinfo = data.trialinfo;                       % Save copy of trialinfo
 sr = bt_source{5}.time(2)-bt_source{5}.time(1);        % Sampling rate
 cutmethod = bt_source{6};                              % Applied cutting method
 warpfreq = srcrank(2);                                 % Warped frequency (frequency of the warping signal)
@@ -351,6 +352,6 @@ end
 bt_warpeddata.data = bt_data;                                     % Brain time warped data
 bt_warpeddata.toi = [min_t max_t];                                % Start and end time of interest
 bt_warpeddata.freq = warpfreq;                                    % Warped frequency (frequency of the warping signal)
-bt_warpeddata.clabel = bt_data.trialinfo;                         % Classification labels
+bt_warpeddata.clabel = orig_trialinfo;                            % Classification labels
 bt_warpeddata.warpmethod = warpmethod;                            % Warping method (waveshape or stationary sinusoid)
 bt_warpeddata.phasemethod = phasemethod;                          % Phase estimation method (FFT or GED)
