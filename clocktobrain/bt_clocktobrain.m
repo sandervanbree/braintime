@@ -77,6 +77,8 @@ end
 
 mintime_ind = nearest(bt_source{5}.time,mintime);    % Index of start time of interest (differs for cutartefact)
 maxtime_ind = nearest(bt_source{5}.time,maxtime);    % Index of end time of interest
+mintime_ind_orig = nearest(data.time{1},mintime);    % Index of start time of interest (differs for cutartefact)
+maxtime_ind_orig = nearest(data.time{1},maxtime);    % Index of end time of interest
 
 % Transform data structure to raw
 if isstruct(data.trial) == 0
@@ -86,6 +88,7 @@ end
 
 % Set sampling rate of brain time to clock time sampling rate
 time   = data.time{1};
+time   = time(mintime_ind_orig:maxtime_ind_orig); % Crop to selected window
 phs_sr = round(1/(time(2)-time(1)));
 
 %% Remove the component from original data if desired (default = yes)
@@ -147,10 +150,14 @@ end
 % Check whether phase and data are of the same length
 if abs(length(time)-size(phs,2))>1
     warning(['The phase and data length in length by more than 1 samples. This'...
-        ' may mean the wrong parameters were used during bt_analyzesources.']);
+        ' may mean the wrong parameters were used during bt_analyzesources'...
+        ' OR the warping sources and clock time data differ substantially in'...
+        ' their sampling rate/data duration']);
 elseif abs(length(time)-size(phs,2))>10
-    error(['The phase and data length in length by more than 10 samples. This'...
-        ' may mean the wrong parameters were used during bt_analyzesources.']);
+    warning(['The phase and data length in length by more than 10 samples. This'...
+        ' may mean the wrong parameters were used during bt_analyzesources'...
+        ' OR the warping sources and clock time data differ substantially in'...
+        ' their sampling rate/data duration']);
 end
 
 % Do some additional slicing to fix slight differences
