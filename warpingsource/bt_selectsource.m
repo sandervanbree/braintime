@@ -251,7 +251,7 @@ while finish==0
             src_ind = 1;
         end
     elseif isempty(value)
-        src_ind = src-ind;
+        src_ind = src_ind;
     elseif value == 113 || value == 87  || value == 120 || value == 88 || value == 32 %stop the loop if it is not necessesary to keep visualising
         fprintf('Warping signal will be the %0.2fHz phase in warping source %d.',maxfreq,currsrc)
         src_ind = (numel(srcrank))+1;
