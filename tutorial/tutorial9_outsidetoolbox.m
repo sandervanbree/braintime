@@ -86,7 +86,7 @@ for tr = 1:numel(ct_data.trial) % Loop over trials
     disp([num2str(round(tr./numel(ct_data.trial),2).*100),'% of Clock time power spectrum']);
     for c = 1:numel(ct_data.label) % and over channels
        ct_trial = ct_data.trial{tr}(c,:); 
-       [ct_fft(c,tr,:) , freq] = pwelch(ct_trial,segmentLength,noverlap,fs);
+       [ct_fft(c,tr,:) , freq] = pwelch(ct_trial,segmentLength,noverlap,ct_data.fsample);
     end
 end
 ct_ps = squeeze(mean(squeeze(mean(ct_fft,1)),1)); % Average across trials and channels
@@ -96,7 +96,7 @@ for tr = 1:numel(bt_warpeddata.data.trial)
    disp([num2str(round(tr./numel(bt_warpeddata.data.trial),2).*100),'% of Brain time power spectrum']);
     for c = 1:numel(bt_warpeddata.data.label)
        bt_trial = bt_warpeddata.data.trial{tr}(c,:); 
-       [bt_fft(c,tr,:) , freq] = pwelch(bt_trial,segmentLength,noverlap,fs);
+       [bt_fft(c,tr,:) , freq] = pwelch(bt_trial,segmentLength,noverlap,bt_warpeddata.data.fsample);
     end
 end
 bt_ps = squeeze(mean(squeeze(mean(bt_fft,1)),1));
