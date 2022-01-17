@@ -168,7 +168,7 @@ It depends on subsequent analyses. First, let's consider the concern. The concer
 
 First, this is only a concern for warping sources obtained from clock time data — if the phase dynamics used for warping are not in the data on which subsequent analyses are done, there's no methodological circularity. Second, even if clock time data and warping sources are dependent, subsequent periodicity analyses _within_ `braintime` are safe, as the analysis inherently accounts for cicularity. Namely, periodicity in classification performance is tested by shuffling class labels, which tests for the relevance of the class structure to the classifier. If the warping trivially introduces periodicity in the classifier, it should do so equally for shuffled results (permuted periodicity spectra) and correctly labeled results (empirical periodicity spectra).
 
-Critically however, if you intend to only use `braintime`'s first function, brain time warping, and continue analyses on the warped data outside the toolbox, it is strongly recommended to remove the warping source from the original clock time data (for example, by removing the independent component or by removing the channel).
+Critically however, if you intend to only use `braintime`'s first function, brain time warping, and continue analyses on the warped data outside the toolbox, it is strongly recommended to remove the warping source from the original clock time data (for example, by removing the independent component or by removing the channel used for warping).
 
 
 ### Which phase should I warp to, FFT or GED?
