@@ -79,7 +79,9 @@ legend('Left condition','Right condition');
 % Pwelch parameters
 segmentLength = 100; % number of samples per segment
 noverlap      = 25; % overlapping samples between segments
-fs            = ct_data.fsample; % sampling rate
+
+% Change clock time to raw structure if it is not already
+ct_data = ft_checkdata(ct_data,'datatype','raw');
 
 % Clock time
 for tr = 1:numel(ct_data.trial) % Loop over trials
