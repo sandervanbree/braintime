@@ -164,12 +164,11 @@ In short, the upside of ```cfg.cutmethod = 'consistenttime'``` is that the warpe
 
 ### Is it circular to warp to warping sources obtained from my clock time data?
 
-It depends on subsequent analyses. First, let's consider the concern. The concern is that warping data to the phase dynamics of a warping oscillation trivially introduces patterns in the data oscillating at the warping oscillation's frequency, as you've changed the data according to it.
+It depends on the type of analysis carried out, and the dependence between warping signal and warped data. First, let's consider the concern. The concern is that warping data to the phase dynamics of a warping oscillation trivially introduces patterns in the data oscillating at the warping oscillation's frequency, as you've changed the data according to it.
 
-First, this is only a concern for warping sources obtained from clock time data — if the phase dynamics used for warping are not in the data on which subsequent analyses are done, there's no methodological circularity. Second, even if clock time data and warping sources are dependent, subsequent periodicity analyses _within_ `braintime` are safe, as the analysis inherently accounts for cicularity. Namely, periodicity in classification performance is tested by shuffling class labels, which tests for the relevance of the class structure to the classifier. If the warping trivially introduces periodicity in the classifier, it should do so equally for shuffled results (permuted periodicity spectra) and correctly labeled results (empirical periodicity spectra).
+When carrying out "basic analyses" on warped data outside of the Brain Time Toolbox -- such as time frequency analyses, or event-related potentials -- then most caution is warranted. This is because warping to any frequency in the data will reduce the nonstationarities of those oscillations, and this will have subsequent effects on a large array of basic results. Thus, oscillatory changes induced by brain time warping are not interesting in and of themselves, but set the stage for more "advanced analyses" that are sufficiently independent from raw oscillatory changes and pertain to cognition.
 
-Critically however, if you intend to only use `braintime`'s first function, brain time warping, and continue analyses on the warped data outside the toolbox, it is strongly recommended to remove the warping source from the original clock time data (for example, by removing the independent component or by removing the channel used for warping).
-
+Besides the type of analysis, data dependence is another factor to consider. Data dependence refers to the degree to which the warping signal is present in the warped data. For example, if a warping signal is obtained from an EEG channel that is retained in warped data, there is high data dependence. If the channel is subsequently removed, low data dependence is achieved. Warping-induced changes in highly independent data are less trivial than changes in highly dependent data (except if advanced analyses are carried out).
 
 ### Which phase should I warp to, FFT or GED?
 
@@ -196,4 +195,4 @@ We want to prevent that arbitrary differences in the periodicity power spectra b
 | 2  | for each frequency, make a p-value from the percentile at which your empirical power lands in the distribution of ```n2``` permuted power values. |
 
 ### I have another question!
-If it's a technical question about the toolbox, it's likely explained in the [main paper](https://www.biorxiv.org/content/10.1101/2021.06.09.447763v1)'s supplementary material. For other questions, feel free to contact me at sandervanbree@gmail.com and I hope to have some time to answer.
+If it's a technical question about the toolbox, it's likely explained in the [main paper](https://www.biorxiv.org/content/10.1101/2021.06.09.447763v2)'s supplementary material. For other questions, feel free to contact me at sandervanbree@gmail.com and I hope to have some time to answer.
