@@ -194,5 +194,5 @@ We want to prevent that arbitrary differences in the periodicity power spectra b
 | 1  | for each second level permutation ```n2```: Grab one (random) permuted spectrum of each participant's ```n1``` permuted spectra and average them into one. This yields ```n2``` permuted averages. |
 | 2  | for each frequency, make a p-value from the percentile at which your empirical power lands in the distribution of ```n2``` permuted power values. |
 
-### I have another question!
-If it's a technical question about the toolbox, it's likely explained in the [main paper](https://www.biorxiv.org/content/10.1101/2021.06.09.447763v2)'s supplementary material. For other questions, feel free to contact me at sandervanbree@gmail.com and I hope to have some time to answer.
+### I have a question to ask, or an issue to report!
+If it's a technical question about the toolbox, it's likely explained in the [main preprint](https://www.biorxiv.org/content/10.1101/2021.06.09.447763v3)'s supplementary material. For any issue with the toolbox, or remaining questions, please use the ([issue tracker](issues))
