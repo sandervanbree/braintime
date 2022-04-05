@@ -52,7 +52,7 @@ then run the function [setup_braintime](setup).
 | Warping signal | an oscillatory signal that is assumed to clock the cognitive process of interest |
 | Warping source | data structure containing potential warping signals used for brain time warping (e.g., local field potentials, independent component analysis components, virtual channels) |
 | Periodicity | fluctuating patterns of a neural signature |
-| Neural signature | Brain activity that systematically correlates with, in the present context, a cognitive process |
+| Neural signature | brain activity that systematically correlates with, in the present context, a cognitive process |
 
 
 ## Introduction
