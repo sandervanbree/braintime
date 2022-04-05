@@ -195,4 +195,4 @@ We want to prevent that arbitrary differences in the periodicity power spectra b
 | 2  | for each frequency, make a p-value from the percentile at which your empirical power lands in the distribution of ```n2``` permuted power values. |
 
 ### I have a question to ask, or an issue to report!
-If it's a technical question about the toolbox, it's likely explained in the [paper's](https://www.biorxiv.org/content/10.1101/2021.06.09.447763v3)'s supplementary material. For any issue with the toolbox, or remaining questions, please use the **[issue tracker](https://github.com/sandervanbree/braintime/issues)**.
+The [paper](https://www.biorxiv.org/content/10.1101/2021.06.09.447763v3) has extensive supplementary material covering the toolbox, which may well give the answer to your question. For remaining questions, any issue you have found, or suggestions you would like to offer, please use the **[issue tracker](https://github.com/sandervanbree/braintime/issues)**.
