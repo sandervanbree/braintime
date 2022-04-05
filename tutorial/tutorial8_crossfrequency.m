@@ -11,6 +11,11 @@
 %%% keep it brief. Nothing fundamentally changes from the previous
 %%% tutorials, we just look for a different result.
 
+%% Step 0: Generate dipolesim_cfc data
+% Generate a cross-frequency coupled dataset using the simulation script
+% (file size too big for Github)
+open bt_dipsim_cfc
+
 %% Step 1: Load and structure data
 load dipolesim_cfc;  % Load to-be-warped data with two cross frequency coupling conditions
 
