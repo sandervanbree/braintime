@@ -28,6 +28,8 @@ Check out the [brain time paper](https://www.biorxiv.org/content/10.1101/2021.06
 
 [Toolbox considerations](#toolbox-considerations)
 
+[Report questions and issues](#report-questions-and-issues)
+
 ## Installation
 **Option 1:** Download files
 
@@ -195,5 +197,5 @@ We want to prevent that arbitrary differences in the periodicity power spectra b
 | 1  | for each second level permutation ```n2```: Grab one (random) permuted spectrum of each participant's ```n1``` permuted spectra and average them into one. This yields ```n2``` permuted averages. |
 | 2  | for each frequency, make a p-value from the percentile at which your empirical power lands in the distribution of ```n2``` permuted power values. |
 
-### I have a question to ask, or an issue to report!
+### Report questions and issues
 The [paper](https://www.biorxiv.org/content/10.1101/2021.06.09.447763v3) has extensive supplementary material covering the toolbox, which may well give the answer to your question. For remaining questions, any issue you have found, or suggestions you would like to offer, please use the **[issue tracker](https://github.com/sandervanbree/braintime/issues)**.
