@@ -12,7 +12,7 @@
 %%% For all instructions, please go to the README file in the
 %%% ...\external\fooof_mat\ folder.
 
-% Step 1: Check whether Python is installed and accessible by MALAB
+% Step 1: Check whether Python is installed and accessible by MATLAB
 pyversion
 
 % Load your warping source structure
