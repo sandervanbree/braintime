@@ -3,7 +3,7 @@
 <!--- [![Github All Releases](https://img.shields.io/github/downloads/sandervanbree/braintime/total.svg)]() --->
 
 # Brain Time Toolbox
-<img src="https://i.imgur.com/2QP4cnb.png" width="200">
+<img src="https://i.imgur.com/vydDxlC.png" width="200">
 
 Warp electrophysiological data from clock time to brain time and analyze the periodicity of cognitive processes. A MATLAB toolbox by *Sander van Bree, María Melcón, Luca Kolibius, Casper Kerrén, Maria Wimber, Simon Hanslmayr*. 
 
