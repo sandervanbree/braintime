@@ -8,7 +8,7 @@
 
 Warp electrophysiological data from clock time to brain time and analyze the dynamic neural patterns of cognitive processes. A MATLAB toolbox by *Sander van Bree, María Melcón, Luca Kolibius, Casper Kerrén, Maria Wimber, Simon Hanslmayr*. 
 
-Check out the [brain time paper](https://www.biorxiv.org/content/10.1101/2021.06.09.447763v3) for context.
+Check out the [brain time paper](https://www.biorxiv.org/content/10.1101/2021.06.09.447763) for context.
 
 ### Dependencies
 - [MATLAB Signal Processing Toolbox](https://uk.mathworks.com/help/signal/getting-started-with-signal-processing-toolbox.html)
@@ -155,7 +155,7 @@ At this point we have tested whether periodicity in classification performance i
 ## Toolbox considerations
 
 ### How do I know all this even works?
-We provide three sources of evidence for the toolbox. A simulated dataset, a rodent intracranial dataset, and a human EEG dataset. `braintime` includes the script used to generate the simulated dataset. Toying around with it is a great way to both get a feel for the toolbox, and to see its effects. Check out [bt_dipsim](dipolesimulation/bt_dipsim.m), change some parameters to your liking, and run it through the `braintime` pipeline to see that the toolbox accounts for clock and brain time disharmony. Details on the rodent and human evidence are described in the [main manuscript](https://www.biorxiv.org/content/10.1101/2021.06.09.447763v3).
+We provide three sources of evidence for the toolbox. A simulated dataset, a rodent intracranial dataset, and a human EEG dataset. `braintime` includes the script used to generate the simulated dataset. Toying around with it is a great way to both get a feel for the toolbox, and to see its effects. Check out [bt_dipsim](dipolesimulation/bt_dipsim.m), change some parameters to your liking, and run it through the `braintime` pipeline to see that the toolbox accounts for clock and brain time disharmony. Details on the rodent and human evidence are described in the [main manuscript](https://www.biorxiv.org/content/10.1101/2021.06.09.447763).
 
 ### Which cutmethod to choose?
 At the start of trials, `braintime` repeats original data samples until the phase of the warping signal aligns with the stationary signal (see paragraph 1.5). This takes a while, depending on their disharmony. This data repetition may cause an artefact in further analyses, called a "first cycle artefact". In `braintime`'s _periodicity analysis_ operation for example, you can sometimes see a stretched out pattern of low or high classification. Most often, this artefact is very small, and unlikely to alter subsequent analyses. Hence, `braintime`'s default option under [bt_analyzesources](warpingsource/bt_analyzesources.m) is ```cfg.cutmethod = 'consistenttime'```. This default method is called ```consistenttime``` because the toolbox warps exactly to the specified time window of interest.
@@ -200,4 +200,4 @@ We want to prevent that arbitrary differences in the periodicity power spectra b
 | 3  | apply multiple testing correction across tested frequencies using false discovery rate (FDR; Benjamini & Yekutieli, 2001).
 
 ### Report questions and issues
-The [paper](https://www.biorxiv.org/content/10.1101/2021.06.09.447763v3) has extensive supplementary material covering the toolbox, which may well give the answer to your question. For remaining questions, any issue you have found, or suggestions you would like to offer, please use the **[issue tracker](https://github.com/sandervanbree/braintime/issues)**.
+The [paper](https://www.biorxiv.org/content/10.1101/2021.06.09.447763) has extensive supplementary material covering the toolbox, which may well give the answer to your question. For remaining questions, any issue you have found, or suggestions you would like to offer, please use the **[issue tracker](https://github.com/sandervanbree/braintime/issues)**.
