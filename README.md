@@ -65,7 +65,7 @@ The second operation is *periodicity analysis*. Here, `braintime` uses multivari
 
 Below, we explain how to perform both operations step by step. To see the steps in practice, check out `braintime`'s [tutorials](/tutorial). For extensive methodological documentation, check out the main paper's supplementary material. This figure gives a visual rundown of all steps:
 
-<img src="https://i.imgur.com/aiBn4mn.png" width="600">
+<img src="https://i.imgur.com/aiBn4mn.png" width="1000">
 
 &nbsp;
 
@@ -97,7 +97,7 @@ Now that the toolbox has collected all the relevant time frequency details of wa
 
 This is where the magic happens. [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m) takes the phase of the chosen warping signal and [dynamically time warps](https://en.wikipedia.org/wiki/Dynamic_time_warping) (DTW) it to the phase of a stationary signal of the same frequency. DTW enables a readout of where clock time (stationary signal) falls out of tune with brain time (phase of warping signal) by attempting to minimize their difference. That minimization process yields a warping path, which tells `braintime` the samples that need to be repeated for clock and brain time to better align. [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m) repeats those samples in the original data, cycle-by-cycle and trial-by-trial, before squeezing things back down to the original data length. Here's a schematic:
 
-<img src="https://i.imgur.com/77WXhVy.png" width="1000">
+<img src="https://i.imgur.com/77WXhVy.png" width="600">
 
 There are two parameters you can change in [bt_clocktobrain](bt_clocktobrain/bt_clocktobrain.m). You can choose to set the clock time signal as a basic stationary sinusoid (``` cfg.warpmethod = 'sinusoid'``` ) or a smoothed version of the warping signal's waveshape (```cfg.warpmethod = 'waveshape'```).
 
