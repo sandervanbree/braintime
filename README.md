@@ -8,7 +8,7 @@
 
 Warp electrophysiological data from clock time to brain time and analyze the dynamic neural patterns of cognitive processes. A MATLAB toolbox by *Sander van Bree, María Melcón, Luca Kolibius, Casper Kerrén, Maria Wimber, Simon Hanslmayr*. 
 
-Check out the [brain time paper](https://www.biorxiv.org/content/10.1101/2021.06.09.447763) for context.
+Check out the [brain time paper](https://www.nature.com/articles/s41562-022-01386-8) or the [preprint](https://www.biorxiv.org/content/10.1101/2021.06.09.447763) for context.
 
 ### Dependencies
 - [MATLAB Signal Processing Toolbox](https://uk.mathworks.com/help/signal/getting-started-with-signal-processing-toolbox.html)
@@ -202,4 +202,4 @@ We want to prevent that arbitrary differences in the periodicity power spectra b
 | 3  | apply multiple testing correction across tested frequencies using false discovery rate (FDR; Benjamini & Yekutieli, 2001).
 
 ### Report questions and issues
-The [paper](https://www.biorxiv.org/content/10.1101/2021.06.09.447763) has extensive supplementary material covering the toolbox, which may well give the answer to your question. For remaining questions, any issue you have found, or suggestions you would like to offer, please use the **[issue tracker](https://github.com/sandervanbree/braintime/issues)**.
+The [paper](https://www.nature.com/articles/s41562-022-01386-8) (& [preprint](https://www.biorxiv.org/content/10.1101/2021.06.09.447763)) have extensive supplementary material covering the toolbox, which may well give the answer to your question. For remaining questions, any issue you have found, or suggestions you would like to offer, please use the **[issue tracker](https://github.com/sandervanbree/braintime/issues)**.
