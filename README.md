@@ -8,7 +8,7 @@
 
 Warp electrophysiological data from clock time to brain time and analyze the dynamic neural patterns of cognitive processes. A MATLAB toolbox by *Sander van Bree, María Melcón, Luca Kolibius, Casper Kerrén, Maria Wimber, Simon Hanslmayr*. 
 
-For the context to this project, check out the [brain time paper](https://www.nature.com/articles/s41562-022-01386-8) or [preprint](https://www.biorxiv.org/content/10.1101/2021.06.09.447763). For a quick (and less formal) explanation of context, see [this video](https://youtu.be/lT0PqGezb5E).
+For the context to this project, check out the [brain time paper](https://www.nature.com/articles/s41562-022-01386-8) or [preprint](https://www.biorxiv.org/content/10.1101/2021.06.09.447763). For a quick (and less formal) explanation of the project, see [this video](https://youtu.be/lT0PqGezb5E).
 
 ### Dependencies
 - [MATLAB Signal Processing Toolbox](https://uk.mathworks.com/help/signal/getting-started-with-signal-processing-toolbox.html)
