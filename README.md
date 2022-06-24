@@ -63,7 +63,7 @@ What's the premise behind the Brain Time Toolbox (`braintime`)? Insofar a cognit
 
 The second operation is *periodicity analysis*. Here, `braintime` uses multivariate pattern analysis (MVPA) to detect the effects of the applied data transformation. Has evidence of the rhythmicity of the cognitive patterns increased?
 
-Below, we explain how to perform both operations step by step. To see the steps in practice, check out `braintime`'s [tutorials](/tutorial). For extensive methodological documentation, check out the main paper's supplementary material. This figure gives a visual rundown of all steps:
+Below, we explain how to perform both operations step by step. To see the steps in practice, check out `braintime`'s [tutorials](/tutorial). For extensive methodological documentation, check out the main paper's [supplementary material](https://www.nature.com/articles/s41562-022-01386-8#Sec24). This figure gives a visual rundown of all steps:
 
 <img src="https://i.imgur.com/aiBn4mn.png" width="1000">
 
@@ -202,4 +202,4 @@ We want to prevent that arbitrary differences in the periodicity power spectra b
 | 3  | apply multiple testing correction across tested frequencies using false discovery rate (FDR; Benjamini & Yekutieli, 2001).
 
 ### Report questions and issues
-The [paper](https://www.nature.com/articles/s41562-022-01386-8) (& [preprint](https://www.biorxiv.org/content/10.1101/2021.06.09.447763)) have extensive supplementary material covering the toolbox, which may well give the answer to your question. For remaining questions, any issue you have found, or suggestions you would like to offer, please use the **[issue tracker](https://github.com/sandervanbree/braintime/issues)**.
+The [paper](https://www.nature.com/articles/s41562-022-01386-8) (& [preprint](https://www.biorxiv.org/content/10.1101/2021.06.09.447763)) have extensive [supplementary material](https://www.nature.com/articles/s41562-022-01386-8#Sec24) covering the toolbox, which may well give the answer to your question. For remaining questions, any issue you have found, or suggestions you would like to offer, please use the **[issue tracker](https://github.com/sandervanbree/braintime/issues)**.
